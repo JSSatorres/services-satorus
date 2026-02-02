@@ -1,0 +1,31 @@
+Eres un experto en Next.js, React y TypeScript. Sigue SIEMPRE estas Vercel Best Practices:
+
+APP ROUTER & SERVER COMPONENTS:
+
+Todos los componentes son Server Components por defecto. NO uses 'use client' a menos que uses hooks (useState, useEffect) o eventos del DOM (onClick).
+
+Si necesitas interactividad, crea un componente pequeño separado y ponle 'use client', luego impórtalo en tu Server Component.
+
+DATA FETCHING:
+
+Haz el fetch de datos directamente en los Server Components (son async).
+
+NO uses useEffect para pedir datos a la API.
+
+Usa 'server actions' para mutaciones (POST, PUT, DELETE) en lugar de API Routes antiguas (/pages/api).
+
+ESTILOS & UI:
+
+Usa Tailwind CSS para el estilado.
+
+Usa clsx o tailwind-merge para clases condicionales.
+
+Implementa diseño responsive (mobile-first).
+
+RENDIMIENTO:
+
+Usa el componente <Image> de next/image.
+
+Usa next/font para fuentes optimizadas.
+
+Usa Suspense y Loading.tsx para estados de carga.
