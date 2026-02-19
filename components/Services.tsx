@@ -59,7 +59,7 @@ export function Services() {
   return (
     <section className="py-24 bg-dark-900 relative overflow-hidden" id="services">
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-900/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
@@ -72,7 +72,7 @@ export function Services() {
             ¿Qué{" "}
             <span className="text-gradient">necesitas</span> hoy?
           </h2>
-          <p className="text-slate-400 text-lg">
+          <p className="text-slate-300 text-lg">
             Soluciones tecnológicas diseñadas para resolver problemas reales de
             tu Pyme. Sin licencias. Sin ataduras.
           </p>
@@ -92,7 +92,7 @@ export function Services() {
                 )}
               >
                 {/* Number badge */}
-                <div className="absolute top-6 right-6 text-4xl font-black text-slate-800 select-none">
+                <div className="absolute top-6 right-6 text-4xl font-black text-slate-700/50 select-none">
                   {service.number}
                 </div>
 
@@ -107,7 +107,7 @@ export function Services() {
                 <h3 className="text-xl font-bold text-white mb-4 leading-snug">
                   {service.title}
                 </h3>
-                <p className="text-slate-400 leading-relaxed flex-1 mb-6">
+                <p className="text-slate-300 leading-relaxed flex-1 mb-6">
                   {service.description}
                 </p>
 
@@ -130,7 +130,7 @@ export function Services() {
         </div>
 
         {/* IA section highlight */}
-        <div className="relative glass-card rounded-2xl p-8 md:p-12 border border-accent-500/20 bg-gradient-to-r from-accent-600/15 via-dark-800 to-primary-600/15 overflow-hidden">
+        <div className="relative glass-card rounded-2xl p-8 md:p-12 border border-accent-500/20 bg-gradient-to-r from-accent-600/20 via-slate-800 to-primary-600/20 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-accent-500/5 to-primary-500/5 pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8">
             <div className="w-20 h-20 bg-gradient-to-br from-accent-500/20 to-primary-500/20 rounded-2xl flex items-center justify-center shrink-0 border border-accent-500/20">

@@ -2,14 +2,14 @@ import { ShieldCheck, FileCheck2, AlertTriangle } from "lucide-react"
 
 export function LegalTech() {
   return (
-    <section className="py-24 bg-dark-900 relative overflow-hidden">
+    <section className="py-24 bg-dark-800 relative overflow-hidden">
       {/* Background glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-64 bg-green-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Main card */}
-          <div className="glass-card rounded-3xl p-8 md:p-12 border border-green-500/20 bg-gradient-to-br from-green-500/10 to-dark-800 relative overflow-hidden">
+          <div className="glass-card rounded-3xl p-8 md:p-12 border border-green-500/20 bg-gradient-to-br from-green-500/10 to-dark-700 relative overflow-hidden">
             {/* Decorative shield */}
             <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
               <ShieldCheck size={256} className="text-green-500" />

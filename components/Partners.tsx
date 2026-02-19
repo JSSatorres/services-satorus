@@ -56,7 +56,7 @@ const successCases = [
 
 export function Partners() {
   return (
-    <section className="py-24 bg-dark-900 relative overflow-hidden">
+    <section className="py-24 bg-dark-800 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-dark-800/20 to-dark-900/40 pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -70,7 +70,7 @@ export function Partners() {
             Empresas que ya operan con{" "}
             <span className="text-gradient">nuestro software</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-slate-300 max-w-2xl mx-auto">
             Hemos desarrollado soluciones reales para estas empresas. No son
             partners, son clientes satisfechos cuyo negocio ya funciona con el
             software que construimos juntos.

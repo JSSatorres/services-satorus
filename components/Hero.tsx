@@ -8,7 +8,7 @@ export function Hero() {
       <div
         className="absolute inset-0 z-0 opacity-5"
         style={{
-          backgroundImage: `linear-gradient(rgba(148,163,184,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.3) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(148,163,184,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.2) 1px, transparent 1px)`,
           backgroundSize: "64px 64px",
         }}
       />

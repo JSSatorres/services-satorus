@@ -4,9 +4,9 @@ import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 
 export function ContactSection() {
   return (
-    <section className="py-24 bg-dark-900 relative overflow-hidden" id="contact">
+    <section className="py-24 bg-dark-800 relative overflow-hidden" id="contact">
       {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-primary-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-primary-600/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-5 gap-12 items-start">
@@ -20,7 +20,7 @@ export function ContactSection() {
               ¿Hablamos de tu{" "}
               <span className="text-gradient">proyecto</span>?
             </h2>
-            <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+            <p className="text-slate-300 text-lg mb-8 leading-relaxed">
               No importa si eres una peluquería, un bar o una nave industrial.
               Si tienes un proceso que mejorar,{" "}
               <strong className="text-white">
@@ -37,7 +37,7 @@ export function ContactSection() {
                   <h3 className="font-semibold text-white mb-1">
                     ¿Por qué ahora?
                   </h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">
+                  <p className="text-slate-300 text-sm leading-relaxed">
                     La normativa <strong className="text-white">VeriFactu</strong> y
                     el <strong className="text-white">Kit Digital</strong> están
                     impulsando la digitalización. No te quedes atrás mientras tu

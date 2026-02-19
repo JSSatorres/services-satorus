@@ -49,8 +49,8 @@ const steps = [
 
 export function Methodology() {
   return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/10 to-transparent pointer-events-none" />
+    <section className="py-24 bg-dark-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/15 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
