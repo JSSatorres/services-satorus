@@ -6,9 +6,15 @@ import { LegalTech } from "@/components/LegalTech"
 import { Methodology } from "@/components/Methodology"
 import { ContactSection, Footer } from "@/components/Contact"
 
+import { localBusinessSchema } from "@/lib/schema"
+
 export default function Home() {
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <Hero />
       <Problem />
       <Services />

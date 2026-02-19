@@ -27,12 +27,9 @@ export function Hero() {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
-            Satorus: Desarrollamos el{" "}
-            <span className="text-gradient">Software</span> que Controla y
-            Escala tu{" "}
-            <span className="relative inline-block">
-              <span className="text-gradient">Pyme.</span>
-            </span>
+            Software a Medida y{" "}
+            <span className="text-gradient">Automatización IA</span> para tu
+            empresa en <span className="text-gradient">Granada</span>
           </h1>
 
           {/* Subheadline */}

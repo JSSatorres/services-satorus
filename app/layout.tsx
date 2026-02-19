@@ -10,9 +10,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Satorus: Software a Medida y ERPs para Pymes en España | VeriFactu",
+  title: "Satorus | Software a Medida y Automatización IA en Granada",
   description:
-    "Desarrollamos aplicaciones web y móviles a medida, ERPs personalizados y soluciones de automatización IA para Pymes. Cumplimiento VeriFactu garantizado. Consultoría gratuita.",
+    "Expertos en desarrollo de software a medida, ERPs y automatización inteligente para pymes en Granada. Centralizamos tu gestión y cumplimos con VeriFactu. ¡Pide presupuesto!",
 }
 
 export default function RootLayout({
