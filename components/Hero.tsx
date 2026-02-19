@@ -27,9 +27,9 @@ export function Hero() {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
-            Software a Medida y{" "}
+            Satorus: Software a Medida y{" "}
             <span className="text-gradient">Automatización IA</span> para tu
-            empresa en <span className="text-gradient">Granada</span>
+            empresa
           </h1>
 
           {/* Subheadline */}
@@ -45,7 +45,7 @@ export function Hero() {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Link
               href="#contact"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-500/40 hover:scale-105"

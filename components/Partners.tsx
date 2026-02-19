@@ -6,7 +6,7 @@ import Image from "next/image"
 
 function GoblinTraderLogo() {
   return (
-    <svg viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto opacity-90">
+    <svg viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-20 w-auto opacity-100">
       {/* Goblin head simple icon */}
       <circle cx="22" cy="22" r="14" fill="#4ade80" />
       <ellipse cx="17" cy="19" rx="3" ry="4" fill="#166534" />
@@ -14,10 +14,10 @@ function GoblinTraderLogo() {
       <path d="M14 28 Q22 34 30 28" stroke="#166534" strokeWidth="2" fill="none" strokeLinecap="round" />
       <polygon points="22,8 18,14 26,14" fill="#166534" />
       {/* GoblinTrader wordmark */}
-      <text x="44" y="28" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="16" fill="#4ade80">
+      <text x="44" y="28" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="18" fill="#4ade80">
         Goblin
       </text>
-      <text x="44" y="46" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="16" fill="#ffffff">
+      <text x="44" y="48" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="18" fill="#ffffff">
         Trader
       </text>
     </svg>
@@ -113,7 +113,7 @@ export function Partners() {
           <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold text-center mb-8">
             También trabajamos con Pymes locales
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap justify-center gap-4">
             {successCases.map((c) => (
               <div
                 key={c.label}

@@ -28,8 +28,26 @@ export function ContactForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus("submitting")
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    setStatus("success")
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const data = Object.fromEntries(formData.entries())
+
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) throw new Error("Error en el envío")
+      
+      setStatus("success")
+    } catch (error) {
+      console.error(error)
+      setStatus("error")
+    }
   }
 
   if (status === "success") {
@@ -72,7 +90,7 @@ export function ContactForm() {
             id="name"
             name="name"
             required
-            className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
             placeholder="Tu nombre completo"
           />
         </div>
@@ -87,7 +105,7 @@ export function ContactForm() {
             type="text"
             id="company"
             name="company"
-            className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
             placeholder="Nombre de tu negocio"
           />
         </div>
@@ -105,13 +123,13 @@ export function ContactForm() {
           id="solution"
           name="solution"
           required
-          className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none"
         >
-          <option value="" className="bg-dark-800">
+          <option value="" className="text-slate-900">
             Selecciona una opción
           </option>
           {solutionTypes.map((s) => (
-            <option key={s} value={s} className="bg-dark-800">
+            <option key={s} value={s} className="text-slate-900">
               {s}
             </option>
           ))}
@@ -131,7 +149,7 @@ export function ContactForm() {
           id="pain"
           name="pain"
           required
-          className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
           placeholder='Ej: "Mis Excel fallan", "Quiero captar más clientes"'
         />
       </div>
@@ -147,13 +165,13 @@ export function ContactForm() {
         <select
           id="budget"
           name="budget"
-          className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none"
         >
-          <option value="" className="bg-dark-800">
+          <option value="" className="text-slate-900">
             Selecciona un rango
           </option>
           {budgetRanges.map((b) => (
-            <option key={b} value={b} className="bg-dark-800">
+            <option key={b} value={b} className="text-slate-900">
               {b}
             </option>
           ))}
@@ -172,7 +190,7 @@ export function ContactForm() {
           id="message"
           name="message"
           rows={4}
-          className="w-full px-4 py-3 bg-dark-700/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none"
           placeholder="Describe brevemente tu situación actual y qué te gustaría mejorar..."
         />
       </div>
@@ -192,6 +210,12 @@ export function ContactForm() {
           ? "Enviando solicitud..."
           : "Enviar y Recibir Propuesta en 48h"}
       </button>
+
+      {status === "error" && (
+        <p className="text-center text-sm text-red-400 font-medium">
+          Hubo un error al enviar tu solicitud. Por favor, inténtalo de nuevo o escribe a info@satorus.es
+        </p>
+      )}
 
       <p className="text-center text-xs text-slate-500">
         Al enviar, aceptas nuestra política de privacidad. Tus datos nunca serán

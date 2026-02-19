@@ -10,9 +10,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Satorus | Software a Medida y Automatización IA en Granada",
+  title: "Satorus | Software a Medida y Automatización IA",
   description:
-    "Expertos en desarrollo de software a medida, ERPs y automatización inteligente para pymes en Granada. Centralizamos tu gestión y cumplimos con VeriFactu. ¡Pide presupuesto!",
+    "Expertos en desarrollo de software a medida, ERPs y automatización inteligente para pymes. Centralizamos tu gestión y cumplimos con VeriFactu. ¡Pide presupuesto!",
 }
 
 export default function RootLayout({

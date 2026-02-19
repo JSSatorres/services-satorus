@@ -17,7 +17,7 @@ const nuclearServices = [
     title: "Aplicaciones Web y Móviles a Medida",
     description:
       "Desarrollamos herramientas nativas y escalables pensadas para el uso real en el día a día de tu equipo.",
-    tech: ["React", "Node.js", "Flutter"],
+    tech: ["Sin cuotas", "Propiedad 100%", "Soporte Local"],
     color: "primary",
     gradient: "from-primary-600/20 to-primary-800/5",
     border: "border-primary-500/20",
@@ -31,7 +31,7 @@ const nuclearServices = [
     title: "ERP Personalizado para Pymes",
     description:
       "Tu propio sistema de gestión integral. Facturación, stock, proveedores y clientes en un solo panel diseñado solo para lo que tú necesitas, sin pagar por funciones que no usas.",
-    tech: ["Facturación", "Stock", "RRHH"],
+    tech: ["Facturación", "Control Stock", "Gestión Clientes"],
     color: "accent",
     gradient: "from-accent-500/20 to-accent-600/5",
     border: "border-accent-500/20",
@@ -45,7 +45,7 @@ const nuclearServices = [
     title: "Digitalización de Procesos Locales",
     description:
       "Soluciones específicas para negocios de proximidad. Desde sistemas de reserva para peluquerías hasta gestores de pedidos para carpinterías y talleres.",
-    tech: ["Reservas", "Pedidos", "Inventario"],
+    tech: ["Reservas", "Gestión Pedidos", "Digitalización"],
     color: "emerald",
     gradient: "from-emerald-500/20 to-emerald-600/5",
     border: "border-emerald-500/20",

@@ -50,7 +50,7 @@ export function Problem() {
             ¿Sientes que tu empresa te gestiona a ti?
           </p>
           <p className="text-slate-300 mt-3">
-            La mayoría de Pymes en España intentan crecer con herramientas que
+            La mayoría de Pymes intentan crecer con herramientas que
             no fueron diseñadas para ellas. Esto tiene un coste real.
           </p>
         </div>
