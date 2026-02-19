@@ -1,46 +1,93 @@
 import Link from "next/link"
+import { ArrowRight, ChevronDown } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative bg-slate-900 text-white overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 opacity-90 z-0" />
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden animated-bg noise">
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 z-0 opacity-5"
+        style={{
+          backgroundImage: `linear-gradient(rgba(148,163,184,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.3) 1px, transparent 1px)`,
+          backgroundSize: "64px 64px",
+        }}
+      />
 
-      <div className="container mx-auto px-4 py-24 md:py-32 relative z-10 grid md:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-            Tu socio tecnológico: <br />
-            <span className="text-primary-500">Software a Medida</span> y
-            Digitalización Real para Pymes
+      {/* Glow blobs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-24 md:py-32">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-light text-sm text-primary-300 mb-8 border border-primary-500/20">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            Software a medida para Pymes en España
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
+            Satorus: Desarrollamos el{" "}
+            <span className="text-gradient">Software</span> que Controla y
+            Escala tu{" "}
+            <span className="relative inline-block">
+              <span className="text-gradient">Pyme.</span>
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 max-w-lg">
-            Olvídate de los Excel y el software genérico. Creamos el ERP, la Web
-            o la App de Pedidos que tu negocio necesita para crecer y cumplir
-            con la ley Verifactu.
+
+          {/* Subheadline */}
+          <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
+            No instalamos programas genéricos. Creamos aplicaciones web y
+            móviles a medida que{" "}
+            <strong className="text-white">centralizan tu gestión</strong>,
+            eliminan el caos de los Excel y{" "}
+            <strong className="text-white">
+              profesionalizan cada proceso
+            </strong>{" "}
+            de tu negocio.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Link
               href="#contact"
-              className="inline-flex justify-center items-center px-8 py-3 text-base font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-primary-500/25"
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-500/40 hover:scale-105"
             >
-              Solicitar Consultoría Gratuita
+              Solicitar Auditoría y Presupuesto Técnico
+              <ArrowRight
+                size={18}
+                className="group-hover:translate-x-1 transition-transform"
+              />
+            </Link>
+            <Link
+              href="#services"
+              className="inline-flex items-center gap-2 px-8 py-4 glass-card text-slate-200 font-medium rounded-xl hover:border-primary-500/40 transition-all duration-300"
+            >
+              Ver Soluciones
             </Link>
           </div>
-        </div>
 
-        {/* Placeholder for Hero Image */}
-        <div className="relative h-64 md:h-96 w-full rounded-2xl bg-slate-800/50 border border-slate-700 flex items-center justify-center overflow-hidden shadow-2xl">
-          <div className="absolute inset-0 flex items-center justify-center text-slate-500">
-            {/* Abstract representation of QR + Dashboard */}
-            <div className="text-center p-6">
-              <p className="mb-2 font-mono text-sm">
-                [Imagen: Móvil escaneando QR + Pantalla ERP]
-              </p>
-              <div className="w-16 h-16 mx-auto bg-slate-700 rounded-lg mb-4 animate-pulse"></div>
-              <div className="w-32 h-24 mx-auto bg-slate-600 rounded-lg shadow-inner"></div>
-            </div>
+          {/* Social proof stats */}
+          <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
+            {[
+              { value: "100%", label: "Código tuyo" },
+              { value: "48h", label: "Primera propuesta" },
+              { value: "0€", label: "Licencias mensuales" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-2xl font-bold text-gradient">
+                  {stat.value}
+                </div>
+                <div className="text-xs text-slate-400 mt-1">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <ChevronDown size={24} className="text-slate-500" />
       </div>
     </section>
   )

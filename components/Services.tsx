@@ -1,100 +1,168 @@
-import { Factory, Smartphone, Globe, ArrowRight } from "lucide-react"
+import {
+  Smartphone,
+  LayoutDashboard,
+  MapPin,
+  Bot,
+  ArrowRight,
+  Code2,
+  Cpu,
+} from "lucide-react"
 import Link from "next/link"
 import { clsx } from "clsx"
 
-const services = [
+const nuclearServices = [
   {
-    title: "ERPs de Gestión Integral y Verifactu",
-    description:
-      "¿Tu software actual se queda corto? Desarrollamos ERPs a medida adaptados al 100% a tus flujos de trabajo.",
-    details: [
-      "Gestión Total: Control de stock, almacén y pedidos web.",
-      "RRHH Integrado: Fichaje y gestión de empleados.",
-      "Cumplimiento Legal: Adaptados a Verifactu y Ley Antifraude.",
-    ],
-    target: "Comercios, almacenes y empresas de servicios.",
-    icon: Factory,
-  },
-  {
-    title: "Hostelería Inteligente: Pedidos desde el Móvil",
-    description:
-      "Moderniza tu bar o restaurante sin pagar comisiones abusivas a terceros.",
-    details: [
-      "Sistema QR: Escanear, pedir y pagar desde la mesa.",
-      "Sin esperas: Reduce carga de trabajo de camareros.",
-      "Ejemplo Real: Soluciones ágiles como Satorus.",
-    ],
-    target: "Bares, cafeterías y restaurantes.",
+    number: "I",
     icon: Smartphone,
+    title: "Aplicaciones Web y Móviles a Medida",
+    description:
+      "Desarrollamos herramientas nativas y escalables pensadas para el uso real en el día a día de tu equipo.",
+    tech: ["React", "Node.js", "Flutter"],
+    color: "primary",
+    gradient: "from-primary-600/20 to-primary-800/5",
+    border: "border-primary-500/20",
+    iconBg: "bg-primary-500/10",
+    iconColor: "text-primary-400",
+    badge: "bg-primary-500/10 text-primary-300 border-primary-500/20",
   },
   {
-    title: "Diseño Web y Sistemas de Reservas",
+    number: "II",
+    icon: LayoutDashboard,
+    title: "ERP Personalizado para Pymes",
     description:
-      "Tu escaparate digital debe vender por ti. No hacemos simples webs, creamos herramientas de negocio.",
-    details: [
-      "Webs Corporativas: Diseño moderno y rápido.",
-      "Citas Online: Automatiza la agenda de tu negocio.",
-      "SEO Local: Posicionate en tu ciudad.",
-    ],
-    target: "Peluquerías, clínicas y negocios locales.",
-    icon: Globe,
+      "Tu propio sistema de gestión integral. Facturación, stock, proveedores y clientes en un solo panel diseñado solo para lo que tú necesitas, sin pagar por funciones que no usas.",
+    tech: ["Facturación", "Stock", "RRHH"],
+    color: "accent",
+    gradient: "from-accent-500/20 to-accent-600/5",
+    border: "border-accent-500/20",
+    iconBg: "bg-accent-500/10",
+    iconColor: "text-accent-400",
+    badge: "bg-accent-500/10 text-accent-300 border-accent-500/20",
+  },
+  {
+    number: "III",
+    icon: MapPin,
+    title: "Digitalización de Procesos Locales",
+    description:
+      "Soluciones específicas para negocios de proximidad. Desde sistemas de reserva para peluquerías hasta gestores de pedidos para carpinterías y talleres.",
+    tech: ["Reservas", "Pedidos", "Inventario"],
+    color: "emerald",
+    gradient: "from-emerald-500/20 to-emerald-600/5",
+    border: "border-emerald-500/20",
+    iconBg: "bg-emerald-500/10",
+    iconColor: "text-emerald-400",
+    badge: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
   },
 ]
 
 export function Services() {
   return (
-    <section className="py-20 bg-slate-50" id="services">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            ¿Qué necesitas hoy?
+    <section className="py-24 bg-dark-900 relative overflow-hidden" id="services">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-900/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6">
+            <Code2 size={14} />
+            Servicios Nucleares: Software y Gestión
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+            ¿Qué{" "}
+            <span className="text-gradient">necesitas</span> hoy?
           </h2>
-          <p className="text-slate-600 text-lg">
+          <p className="text-slate-400 text-lg">
             Soluciones tecnológicas diseñadas para resolver problemas reales de
-            tu Pyme.
+            tu Pyme. Sin licencias. Sin ataduras.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {services.map((service, index) => {
+        {/* Service cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
+          {nuclearServices.map((service) => {
             const Icon = service.icon
             return (
               <div
-                key={index}
-                className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow border border-slate-100 flex flex-col"
+                key={service.number}
+                className={clsx(
+                  "relative glass-card rounded-2xl p-8 border flex flex-col group hover:scale-[1.02] transition-all duration-300",
+                  service.border,
+                  `bg-gradient-to-br ${service.gradient}`
+                )}
               >
-                <div className="w-14 h-14 bg-primary-100 rounded-lg flex items-center justify-center mb-6 text-primary-600">
-                  <Icon size={28} />
+                {/* Number badge */}
+                <div className="absolute top-6 right-6 text-4xl font-black text-slate-800 select-none">
+                  {service.number}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-4">
+
+                <div
+                  className={clsx(
+                    "w-14 h-14 rounded-xl flex items-center justify-center mb-6",
+                    service.iconBg
+                  )}
+                >
+                  <Icon size={28} className={service.iconColor} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4 leading-snug">
                   {service.title}
                 </h3>
-                <p className="text-slate-600 mb-6">{service.description}</p>
+                <p className="text-slate-400 leading-relaxed flex-1 mb-6">
+                  {service.description}
+                </p>
 
-                <ul className="space-y-3 mb-8 flex-1">
-                  {service.details.map((detail, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-start text-sm text-slate-700"
+                <div className="flex flex-wrap gap-2">
+                  {service.tech.map((t) => (
+                    <span
+                      key={t}
+                      className={clsx(
+                        "text-xs px-3 py-1 rounded-full border font-medium",
+                        service.badge
+                      )}
                     >
-                      <ArrowRight
-                        size={16}
-                        className="text-primary-500 mr-2 mt-1 shrink-0"
-                      />
-                      {detail}
-                    </li>
+                      {t}
+                    </span>
                   ))}
-                </ul>
-
-                <div className="pt-6 border-t border-slate-100">
-                  <p className="text-sm font-medium text-slate-500">
-                    Ideal para:{" "}
-                    <span className="text-slate-900">{service.target}</span>
-                  </p>
                 </div>
               </div>
             )
           })}
+        </div>
+
+        {/* IA section highlight */}
+        <div className="relative glass-card rounded-2xl p-8 md:p-12 border border-accent-500/20 bg-gradient-to-r from-accent-600/15 via-dark-800 to-primary-600/15 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-accent-500/5 to-primary-500/5 pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8">
+            <div className="w-20 h-20 bg-gradient-to-br from-accent-500/20 to-primary-500/20 rounded-2xl flex items-center justify-center shrink-0 border border-accent-500/20">
+              <Bot size={40} className="text-accent-400" />
+            </div>
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-300 text-xs font-medium mb-3">
+                <Cpu size={12} />
+                Capa de Inteligencia y Automatización
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                Automatización RPA y Agentes IA
+              </h3>
+              <p className="text-slate-300 text-lg leading-relaxed max-w-2xl">
+                Una vez que tu software funciona, lo hacemos inteligente.
+                Automatizamos el cierre de presupuestos, la atención por
+                WhatsApp y las campañas de captación por email para que tu
+                equipo se centre en{" "}
+                <strong className="text-white">vender, no en picar datos</strong>.
+              </p>
+            </div>
+            <Link
+              href="#contact"
+              className="group shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-accent-600 hover:bg-accent-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-accent-600/20"
+            >
+              Quiero esto
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

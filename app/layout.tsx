@@ -3,12 +3,16 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { clsx } from "clsx"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "Desarrollo de Software a Medida y ERPs para Pymes en España",
+  title: "Satorus: Software a Medida y ERPs para Pymes en España | VeriFactu",
   description:
-    "Digitaliza tu empresa con software a medida. Especialistas en ERPs compatibles con Verifactu, sistemas de pedidos para hostelería y diseño web profesional.",
+    "Desarrollamos aplicaciones web y móviles a medida, ERPs personalizados y soluciones de automatización IA para Pymes. Cumplimiento VeriFactu garantizado. Consultoría gratuita.",
 }
 
 export default function RootLayout({
@@ -17,11 +21,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={inter.variable}>
       <body
         className={clsx(
           inter.className,
-          "antialiased min-h-screen flex flex-col",
+          "antialiased min-h-screen flex flex-col bg-dark-900"
         )}
       >
         {children}
