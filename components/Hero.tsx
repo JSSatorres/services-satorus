@@ -6,16 +6,16 @@ export function Hero() {
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden animated-bg noise">
       {/* Grid pattern overlay */}
       <div
-        className="absolute inset-0 z-0 opacity-5"
+        className="absolute inset-0 z-0 opacity-10"
         style={{
-          backgroundImage: `linear-gradient(rgba(148,163,184,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.2) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)`,
           backgroundSize: "64px 64px",
         }}
       />
 
       {/* Glow blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 py-24 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
@@ -78,7 +78,7 @@ export function Hero() {
                 <div className="text-2xl font-bold text-gradient">
                   {stat.value}
                 </div>
-                <div className="text-xs text-slate-400 mt-1">{stat.label}</div>
+                <div className="text-xs text-slate-300 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -87,7 +87,7 @@ export function Hero() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <ChevronDown size={24} className="text-slate-500" />
+        <ChevronDown size={24} className="text-slate-400" />
       </div>
     </section>
   )

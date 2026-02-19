@@ -49,8 +49,8 @@ const steps = [
 
 export function Methodology() {
   return (
-    <section className="py-24 bg-dark-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/15 to-transparent pointer-events-none" />
+    <section className="py-24 bg-dark-800 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/5 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
@@ -63,7 +63,7 @@ export function Methodology() {
             Nuestra{" "}
             <span className="text-gradient">Hoja de Ruta</span>
           </h2>
-          <p className="text-slate-400 text-lg">
+          <p className="text-slate-300 text-lg">
             Un proceso transparente y predecible. Sin sorpresas, sin costes
             ocultos.
           </p>
@@ -76,7 +76,7 @@ export function Methodology() {
             return (
               <div
                 key={step.day}
-                className={`glass-card rounded-2xl p-6 md:p-8 border ${step.border} flex gap-6 items-start hover:scale-[1.01] transition-transform duration-300`}
+                className={`glass-card rounded-2xl p-6 md:p-8 border ${step.border} bg-gradient-to-br from-slate-800/50 to-dark-900 flex gap-6 items-start hover:scale-[1.01] transition-all duration-300 group`}
               >
                 {/* Step number / icon */}
                 <div className="flex flex-col items-center gap-3 shrink-0">
@@ -87,7 +87,7 @@ export function Methodology() {
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`w-0.5 h-8 ${step.lineColor} opacity-30`}
+                      className={`w-0.5 h-8 ${step.lineColor} opacity-50`}
                     />
                   )}
                 </div>
@@ -101,7 +101,7 @@ export function Methodology() {
                   <h3 className="text-xl font-bold text-white mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-slate-400 leading-relaxed">
+                  <p className="text-slate-300 leading-relaxed group-hover:text-slate-200 transition-colors">
                     {step.description}
                   </p>
                 </div>

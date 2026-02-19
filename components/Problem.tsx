@@ -34,8 +34,8 @@ const problems = [
 
 export function Problem() {
   return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-700/30 to-transparent pointer-events-none" />
+    <section className="py-24 bg-dark-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-dark-800/50 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
@@ -49,7 +49,7 @@ export function Problem() {
           <p className="text-xl text-slate-300 font-medium">
             ¿Sientes que tu empresa te gestiona a ti?
           </p>
-          <p className="text-slate-400 mt-3">
+          <p className="text-slate-300 mt-3">
             La mayoría de Pymes en España intentan crecer con herramientas que
             no fueron diseñadas para ellas. Esto tiene un coste real.
           </p>
@@ -62,7 +62,7 @@ export function Problem() {
             return (
               <div
                 key={problem.title}
-                className={`glass-card rounded-2xl p-8 border ${problem.border} hover:scale-[1.02] transition-transform duration-300`}
+                className={`glass-card rounded-2xl p-8 border ${problem.border} bg-gradient-to-br from-slate-800/50 to-dark-900 group hover:scale-[1.02] transition-all duration-300`}
               >
                 <div
                   className={`w-14 h-14 ${problem.bg} ${problem.border} border rounded-xl flex items-center justify-center mb-6`}
@@ -72,7 +72,7 @@ export function Problem() {
                 <h3 className="text-xl font-bold text-white mb-3">
                   {problem.title}
                 </h3>
-                <p className="text-slate-400 leading-relaxed">
+                <p className="text-slate-300 leading-relaxed group-hover:text-slate-200 transition-colors">
                   {problem.description}
                 </p>
               </div>
@@ -86,7 +86,7 @@ export function Problem() {
             <p className="text-white font-semibold text-lg mb-1">
               Nosotros hacemos lo contrario
             </p>
-            <p className="text-slate-400">
+            <p className="text-slate-300">
               Adaptamos la tecnología a ti, no al revés. Software diseñado
               exactamente para tus procesos.
             </p>

@@ -31,10 +31,11 @@ const config: Config = {
           600: "#7c3aed",
         },
         dark: {
-          900: "#1e293b", // Slate 800 - Lighter base
-          800: "#334155", // Slate 700 
-          700: "#475569", // Slate 600
-          600: "#64748b", // Slate 500
+          900: "#020617", // Very dark navy/black
+          800: "#0f172a", // Deep navy
+          700: "#1e293b", // Slate navy
+          600: "#334155", // Slate
+          500: "#475569",
         },
       },
       backgroundImage: {
@@ -42,9 +43,9 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "hero-gradient":
-          "linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)",
+          "linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%)",
         "card-gradient":
-          "linear-gradient(135deg, rgba(71,85,105,0.8) 0%, rgba(51,65,85,0.9) 100%)",
+          "linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%)",
       },
       animation: {
         "fade-in-up": "fadeInUp 0.6s ease-out forwards",

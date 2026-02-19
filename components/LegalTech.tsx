@@ -2,16 +2,16 @@ import { ShieldCheck, FileCheck2, AlertTriangle } from "lucide-react"
 
 export function LegalTech() {
   return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden">
+    <section className="py-24 bg-dark-900 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Main card */}
-          <div className="glass-card rounded-3xl p-8 md:p-12 border border-green-500/20 bg-gradient-to-br from-green-500/10 to-dark-700 relative overflow-hidden">
+          <div className="glass-card rounded-3xl p-8 md:p-12 border border-green-500/30 bg-gradient-to-br from-green-500/10 via-dark-800/80 to-dark-900 relative overflow-hidden">
             {/* Decorative shield */}
-            <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+            <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
               <ShieldCheck size={256} className="text-green-500" />
             </div>
 
@@ -41,27 +41,27 @@ export function LegalTech() {
               </p>
 
               <div className="grid sm:grid-cols-2 gap-6">
-                <div className="bg-dark-700/50 rounded-xl p-5 border border-slate-700/30">
+                <div className="bg-gradient-to-br from-slate-800/80 to-dark-900 rounded-xl p-5 border border-slate-700/50 group hover:border-green-500/30 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <FileCheck2 size={20} className="text-green-400" />
                     <span className="font-semibold text-white">
                       VeriFactu Integrado
                     </span>
                   </div>
-                  <p className="text-slate-400 text-sm leading-relaxed">
+                  <p className="text-slate-300 text-sm leading-relaxed">
                     Generación de facturas con código QR verificable, huella
                     digital y registro en la AEAT de forma automática.
                   </p>
                 </div>
 
-                <div className="bg-dark-700/50 rounded-xl p-5 border border-slate-700/30">
+                <div className="bg-gradient-to-br from-slate-800/80 to-dark-900 rounded-xl p-5 border border-slate-700/50 group hover:border-blue-500/30 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <ShieldCheck size={20} className="text-blue-400" />
                     <span className="font-semibold text-white">
                       Control de Jornada Legal
                     </span>
                   </div>
-                  <p className="text-slate-400 text-sm leading-relaxed">
+                  <p className="text-slate-300 text-sm leading-relaxed">
                     Sistema de fichaje digital integrado que cumple con el Real
                     Decreto Ley de registro de jornada. Protege a tu empresa.
                   </p>
@@ -69,12 +69,12 @@ export function LegalTech() {
               </div>
 
               {/* Warning callout */}
-              <div className="mt-6 flex items-start gap-3 bg-red-500/5 border border-red-500/15 rounded-xl p-4">
+              <div className="mt-6 flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                 <AlertTriangle
                   size={18}
                   className="text-red-400 shrink-0 mt-0.5"
                 />
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-200">
                   <strong className="text-red-400">
                     Multas de hasta 50.000€
                   </strong>{" "}

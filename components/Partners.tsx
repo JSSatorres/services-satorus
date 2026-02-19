@@ -56,13 +56,13 @@ const successCases = [
 
 export function Partners() {
   return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-800/20 to-dark-900/40 pointer-events-none" />
+    <section className="py-24 bg-dark-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-dark-900/30 to-dark-900/60 pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-700/30 border border-slate-600/20 text-slate-300 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-700/50 border border-slate-600/30 text-slate-300 text-sm font-medium mb-6">
             <Trophy size={14} className="text-yellow-400" />
             Clientes que ya confían en nosotros
           </div>
@@ -83,7 +83,7 @@ export function Partners() {
             return (
               <div
                 key={client.name}
-                className={`glass-card rounded-2xl p-6 flex flex-col items-center justify-between text-center border ${client.accentColor} hover:scale-105 transition-all duration-300 hover:shadow-xl ${client.glowColor} group min-h-[160px]`}
+                className={`glass-card rounded-2xl p-6 flex flex-col items-center justify-between text-center border ${client.accentColor} bg-gradient-to-br from-slate-800/50 to-dark-900 hover:scale-105 transition-all duration-300 hover:shadow-xl ${client.glowColor} group min-h-[160px]`}
               >
                 <div className="flex-1 flex items-center justify-center w-full mb-4">
                   {client.image ? (
@@ -100,7 +100,7 @@ export function Partners() {
                     client.Logo && <client.Logo />
                   )}
                 </div>
-                <p className="text-slate-400 text-xs leading-relaxed mt-auto">
+                <p className="text-slate-300 text-xs leading-relaxed mt-auto group-hover:text-slate-200 transition-colors">
                   {client.detail}
                 </p>
               </div>
@@ -110,7 +110,7 @@ export function Partners() {
 
         {/* Success case badges */}
         <div className="border-t border-slate-800/50 pt-12">
-          <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold text-center mb-8">
+          <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold text-center mb-8">
             También trabajamos con Pymes locales
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -122,7 +122,7 @@ export function Partners() {
                 <span className="text-xl">{c.emoji}</span>
                 <div>
                   <div className="font-semibold text-white text-sm">{c.label}</div>
-                  <div className="text-slate-500 text-xs">{c.detail}</div>
+                  <div className="text-slate-300 text-xs">{c.detail}</div>
                 </div>
               </div>
             ))}

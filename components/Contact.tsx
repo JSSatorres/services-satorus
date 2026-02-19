@@ -4,9 +4,9 @@ import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 
 export function ContactSection() {
   return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden" id="contact">
+    <section className="py-24 bg-dark-900 relative overflow-hidden" id="contact">
       {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-primary-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-5 gap-12 items-start">
@@ -37,7 +37,7 @@ export function ContactSection() {
                   <h3 className="font-semibold text-white mb-1">
                     ¿Por qué ahora?
                   </h3>
-                  <p className="text-slate-300 text-sm leading-relaxed">
+                  <p className="text-slate-200 text-sm leading-relaxed">
                     La normativa <strong className="text-white">VeriFactu</strong> y
                     el <strong className="text-white">Kit Digital</strong> están
                     impulsando la digitalización. No te quedes atrás mientras tu
@@ -49,7 +49,7 @@ export function ContactSection() {
           </div>
 
           {/* Right Side: Form (3 cols) */}
-          <div className="lg:col-span-3 glass-card rounded-3xl p-8 border border-slate-700/30">
+          <div className="lg:col-span-3 glass-card rounded-3xl p-8 border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-dark-900 shadow-2xl">
             <h3 className="text-xl font-bold text-white mb-6">
               Solicitud de Proyecto
             </h3>
