@@ -13,30 +13,34 @@ const config: Config = {
       },
       colors: {
         primary: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
+          50: "#f0f7ff",
+          100: "#e0effe",
+          200: "#badffc",
+          300: "#7cc4fa",
+          400: "#35a6f6",
+          500: "#0b89e7",
+          600: "#026ac4",
+          700: "#03559f",
+          800: "#074883",
+          900: "#0c3d6c",
+          950: "#08274a",
+        },
+        accent: {
           400: "#60a5fa",
           500: "#3b82f6",
           600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
-          950: "#172554",
-        },
-        accent: {
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
         },
         dark: {
-          900: "#020617", // Very dark navy/black
-          800: "#0f172a", // Deep navy
-          700: "#1e293b", // Slate navy
-          600: "#334155", // Slate
+          950: "#010410",
+          900: "#020617",
+          800: "#0f172a",
+          700: "#1e293b",
+          600: "#334155",
           500: "#475569",
         },
+      },
+      boxShadow: {
+        'island': '0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1)',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

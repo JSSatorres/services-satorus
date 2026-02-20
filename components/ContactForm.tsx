@@ -90,7 +90,7 @@ export function ContactForm() {
             id="name"
             name="name"
             required
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+            className="w-full px-4 py-3 bg-dark-950/50 border border-primary-500/20 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500 shadow-inner outline-none transition-all"
             placeholder="Tu nombre completo"
           />
         </div>
@@ -105,7 +105,7 @@ export function ContactForm() {
             type="text"
             id="company"
             name="company"
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+            className="w-full px-4 py-3 bg-dark-950/50 border border-primary-500/20 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500 shadow-inner outline-none transition-all"
             placeholder="Nombre de tu negocio"
           />
         </div>
@@ -202,13 +202,12 @@ export function ContactForm() {
           "w-full flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg",
           status === "submitting"
             ? "bg-primary-700 opacity-70 cursor-not-allowed"
-            : "bg-primary-600 hover:bg-primary-500 shadow-primary-600/30 hover:shadow-primary-500/40 hover:scale-[1.02]"
+            : "bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 shadow-primary-500/25 hover:shadow-primary-400/40 hover:scale-[1.01]"
         )}
       >
-        <Send size={18} />
         {status === "submitting"
           ? "Enviando solicitud..."
-          : "Enviar y Recibir Propuesta en 48h"}
+          : "ENVIAR SOLICITUD"}
       </button>
 
       {status === "error" && (

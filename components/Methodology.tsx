@@ -1,4 +1,5 @@
 import { ClipboardList, FileText, Code2, Key, CheckCircle2 } from "lucide-react"
+import { clsx } from "clsx"
 
 const steps = [
   {
@@ -69,45 +70,57 @@ export function Methodology() {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="max-w-3xl mx-auto space-y-6">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <div
-                key={step.day}
-                className={`glass-card rounded-2xl p-6 md:p-8 border ${step.border} bg-gradient-to-br from-slate-800/50 to-dark-900 flex gap-6 items-start hover:scale-[1.01] transition-all duration-300 group`}
-              >
-                {/* Step number / icon */}
-                <div className="flex flex-col items-center gap-3 shrink-0">
-                  <div
-                    className={`w-14 h-14 ${step.bg} rounded-xl flex items-center justify-center`}
-                  >
-                    <Icon size={26} className={step.color} />
+        {/* Roadmap Steps */}
+        <div className="relative max-w-5xl mx-auto mt-24">
+          {/* Horizontal Connecting Line */}
+          <div className="hidden md:block absolute top-[72px] inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent z-0" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
+            {steps.map((step, index) => {
+              const isEven = (index + 1) % 2 === 0
+              return (
+                <div key={step.day} className="flex flex-col items-center group">
+                  {/* Text for even steps (above sphere) */}
+                  <div className={clsx(
+                    "md:mb-10 md:h-24 transition-all duration-500",
+                    !isEven && "md:invisible md:opacity-0"
+                  )}>
+                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tighter">
+                      {step.title}
+                    </h3>
+                    <p className="text-slate-400 text-[10px] leading-relaxed max-w-[140px] mx-auto opacity-70">
+                      {step.description}
+                    </p>
                   </div>
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`w-0.5 h-8 ${step.lineColor} opacity-50`}
-                    />
-                  )}
-                </div>
 
-                <div>
-                  <div
-                    className={`text-xs font-bold uppercase tracking-widest ${step.color} mb-1`}
-                  >
-                    {step.day}
+                  {/* 3D Glowing Sphere */}
+                  <div className="relative w-24 h-24 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                     <div className="absolute inset-0 sphere-3d rounded-full overflow-hidden">
+                        {/* Internal Glow/Highlight */}
+                        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white/20 blur-md rounded-full" />
+                     </div>
+                     <span className="relative z-10 text-4xl font-black text-white/90 drop-shadow-2xl">{index + 1}</span>
+                     
+                     {/* Outer Aura Glow */}
+                     <div className="absolute inset-x-0 bottom-0 h-1/2 bg-primary-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-slate-300 leading-relaxed group-hover:text-slate-200 transition-colors">
-                    {step.description}
-                  </p>
+
+                  {/* Text for odd steps (below sphere) */}
+                  <div className={clsx(
+                    "mt-10 md:h-24 transition-all duration-500",
+                    isEven && "md:invisible md:opacity-0"
+                  )}>
+                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tighter">
+                      {step.title}
+                    </h3>
+                    <p className="text-slate-400 text-[10px] leading-relaxed max-w-[140px] mx-auto opacity-70">
+                      {step.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>

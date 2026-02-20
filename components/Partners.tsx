@@ -77,35 +77,49 @@ export function Partners() {
           </p>
         </div>
 
-        {/* Client logos grid */}
-        <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-16">
-          {clients.map((client) => {
-            return (
-              <div
-                key={client.name}
-                className={`glass-card rounded-2xl p-6 flex flex-col items-center justify-between text-center border ${client.accentColor} bg-gradient-to-br from-slate-800/50 to-dark-900 hover:scale-105 transition-all duration-300 hover:shadow-xl ${client.glowColor} group min-h-[160px]`}
-              >
-                <div className="flex-1 flex items-center justify-center w-full mb-4">
+        {/* Glowing Glass Podium */}
+        <div className="max-w-6xl mx-auto mb-24 px-4 relative">
+          <p className="text-center text-[10px] uppercase tracking-[0.3em] text-slate-500 font-black mb-12">
+            Empresas y sectores que confían en nosotros
+          </p>
+          
+          <div className="relative group">
+            {/* Podium Top Layer */}
+            <div className="podium-top rounded-xl py-6 md:py-8 px-10 flex flex-wrap items-center justify-center gap-12 md:gap-20 relative z-10 transition-transform duration-500 group-hover:-translate-y-1">
+              {clients.map((client) => (
+                <div
+                  key={client.name}
+                  className="relative h-6 md:h-7 w-28 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                >
                   {client.image ? (
-                    <div className="relative w-full h-12">
-                      <Image
-                        src={client.image}
-                        alt={client.name}
-                        fill
-                        className="object-contain"
-                        sizes="(max-w-768px) 100vw, 250px"
-                      />
-                    </div>
+                    <Image
+                      src={client.image}
+                      alt={client.name}
+                      fill
+                      className="object-contain"
+                      sizes="150px"
+                    />
                   ) : (
                     client.Logo && <client.Logo />
                   )}
                 </div>
-                <p className="text-slate-300 text-xs leading-relaxed mt-auto group-hover:text-slate-200 transition-colors">
-                  {client.detail}
-                </p>
-              </div>
-            )
-          })}
+              ))}
+              
+              {/* Sector Icons/Badges */}
+              {successCases.map((sc) => (
+                <div key={sc.label} className="flex items-center gap-2 text-primary-300/50 hover:text-primary-300 transition-colors">
+                   <span className="text-lg">🛠️</span>
+                   <span className="text-[10px] font-black uppercase tracking-widest">{sc.label.split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Podium Depth/Edge */}
+            <div className="podium-edge mx-4 relative z-0" />
+            
+            {/* Soft Glow below the podium */}
+            <div className="absolute -inset-x-20 -bottom-20 h-40 bg-primary-500/10 blur-[100px] pointer-events-none" />
+          </div>
         </div>
 
         {/* Success case badges */}

@@ -3,85 +3,71 @@ import { ArrowRight, ChevronDown } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden animated-bg noise">
-      {/* Grid pattern overlay */}
-      <div
-        className="absolute inset-0 z-0 opacity-10"
-        style={{
-          backgroundImage: `linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)`,
-          backgroundSize: "64px 64px",
-        }}
-      />
+    <section className="relative min-h-screen flex flex-col items-center pt-12 overflow-hidden bg-dark-950">
+      {/* SATORUS LOGO at Top Center */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2">
+         <div className="w-6 h-6 bg-primary-500 rounded flex items-center justify-center">
+            <span className="text-white text-[10px] font-black">S</span>
+         </div>
+         <span className="text-white font-black tracking-tighter text-sm uppercase">Satorus</span>
+      </div>
 
-      {/* Glow blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Background decoration */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full h-[600px] bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-24 md:py-32">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-light text-sm text-primary-300 mb-8 border border-primary-500/20">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Software a medida para Pymes en España
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-24 md:pt-32">
+        <div className="flex flex-col lg:flex-row items-center gap-20">
+          <div className="flex-1 text-left">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-950/50 border border-primary-500/20 text-[10px] text-primary-300 mb-8 uppercase tracking-widest font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
+              Software Factory de Alto Rendimiento
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6 tracking-tight text-white max-w-xl">
+              Satorus: Desarrollamos el Software que <br/>
+              <span className="text-gradient">Controla y Escala tu Pyme.</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-slate-400 text-lg max-w-lg mb-10 leading-relaxed">
+              No instalamos programas genéricos. Creamos aplicaciones web y
+              móviles y médica gestión a eliminen fricción operativa.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="#contact"
+                className="inline-flex items-center justify-center px-10 py-4 bg-gradient-to-b from-primary-500 to-primary-700 text-white font-bold rounded-lg transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:scale-[1.02] border border-white/10"
+              >
+                Solicitar Auditoría y Presupuesto Técnico
+              </Link>
+              <Link
+                href="#services"
+                className="inline-flex items-center justify-center px-10 py-4 glass-card text-white font-bold rounded-lg hover:bg-white/5 transition-all duration-300 border border-white/10"
+              >
+                Ver Soluciones
+              </Link>
+            </div>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
-            Satorus: Software a Medida y{" "}
-            <span className="text-gradient">Automatización IA</span> para tu
-            empresa
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-            No instalamos programas genéricos. Creamos aplicaciones web y
-            móviles a medida que{" "}
-            <strong className="text-white">centralizan tu gestión</strong>,
-            eliminan el caos de los Excel y{" "}
-            <strong className="text-white">
-              profesionalizan cada proceso
-            </strong>{" "}
-            de tu negocio.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <Link
-              href="#contact"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-500/40 hover:scale-105"
-            >
-              Solicitar Auditoría y Presupuesto Técnico
-              <ArrowRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
-            <Link
-              href="#services"
-              className="inline-flex items-center gap-2 px-8 py-4 glass-card text-slate-200 font-medium rounded-xl hover:border-primary-500/40 transition-all duration-300"
-            >
-              Ver Soluciones
-            </Link>
-          </div>
-
-          {/* Social proof stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
-            {[
-              { value: "100%", label: "Código tuyo" },
-              { value: "48h", label: "Primera propuesta" },
-              { value: "0€", label: "Licencias mensuales" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-gradient">
-                  {stat.value}
-                </div>
-                <div className="text-xs text-slate-300 mt-1">{stat.label}</div>
-              </div>
-            ))}
+          {/* Isometric Image Placeholder */}
+          <div className="flex-1 w-full max-w-[600px] visible">
+            <div className="iso-tilt relative">
+               <div className="w-full aspect-[4/3] bg-white rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.8)] border-[12px] border-dark-800 flex items-center justify-center">
+                  <div className="text-center">
+                     <p className="font-black text-2xl text-dark-900 opacity-20 uppercase tracking-tighter">Isometric View</p>
+                     <p className="text-dark-900 opacity-10 mt-2">Dashboard Visuals Here</p>
+                  </div>
+               </div>
+               {/* Luminous glow below the board */}
+               <div className="absolute -inset-4 bg-primary-500/20 blur-3xl -z-10 rounded-full" />
+            </div>
           </div>
         </div>
       </div>
-
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
         <ChevronDown size={24} className="text-slate-400" />
