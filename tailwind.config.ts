@@ -9,68 +9,46 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)"],
+        sans: ["var(--font-geist)", "Geist", "Space Grotesk", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        display: ["Instrument Serif", "Times New Roman", "serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       colors: {
-        primary: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
-          950: "#172554",
-        },
-        accent: {
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-        },
-        dark: {
-          900: "#020617", // Very dark navy/black
-          800: "#0f172a", // Deep navy
-          700: "#1e293b", // Slate navy
-          600: "#334155", // Slate
-          500: "#475569",
-        },
+        bg: "#0a0a0b",
+        "bg-1": "#101012",
+        "bg-2": "#15151a",
+        surface: "#16161b",
+        "surface-hi": "#1c1c22",
+        border: "#232329",
+        "border-hi": "#2f2f37",
+        accent: "#c8ff3d",
+        "accent-2": "#88f7c2",
+        "accent-warm": "#ff6a35",
+        "accent-amber": "#ffc857",
+        "text-mid": "#b9b9c2",
+        "text-dim": "#7a7a84",
+        "text-faint": "#4d4d56",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "hero-gradient":
-          "linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%)",
-        "card-gradient":
-          "linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%)",
+      maxWidth: {
+        site: "1280px",
       },
       animation: {
-        "fade-in-up": "fadeInUp 0.6s ease-out forwards",
-        "fade-in": "fadeIn 0.8s ease-out forwards",
-        float: "float 6s ease-in-out infinite",
-        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "gradient-shift": "gradientShift 8s ease infinite",
+        marquee: "marquee 38s linear infinite",
+        "pulse-dot": "pulse-dot 2s ease-in-out infinite",
+        strike: "strike 1.2s .8s cubic-bezier(.2,.7,.2,1) forwards",
+        "fade-up": "fade-up .4s forwards",
+        spin: "spin 0.7s linear infinite",
+        blink: "blink 1s step-end infinite",
       },
       keyframes: {
-        fadeInUp: {
-          "0%": { opacity: "0", transform: "translateY(24px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        marquee: { to: { transform: "translateX(-50%)" } },
+        "pulse-dot": {
+          "0%,100%": { opacity: "1", boxShadow: "0 0 0 0 rgba(200,255,61,.5)" },
+          "50%": { opacity: ".6", boxShadow: "0 0 0 6px rgba(200,255,61,0)" },
         },
-        fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-12px)" },
-        },
-        gradientShift: {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-        },
+        strike: { to: { transform: "rotate(-3deg) scaleX(1)" } },
+        "fade-up": { to: { opacity: "1", transform: "none" } },
+        blink: { "0%,100%": { opacity: "1" }, "50%": { opacity: "0" } },
       },
     },
   },
