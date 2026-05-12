@@ -3,6 +3,16 @@
 import { useEffect, useRef } from "react"
 import Link from "next/link"
 
+function getNextQuarter(): string {
+  const now = new Date()
+  const month = now.getMonth() // 0-11
+  const year = now.getFullYear()
+  const currentQ = Math.floor(month / 3) + 1 // 1-4
+  const nextQ = currentQ === 4 ? 1 : currentQ + 1
+  const nextYear = currentQ === 4 ? year + 1 : year
+  return `Q${nextQ} ${nextYear}`
+}
+
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null)
 
@@ -16,9 +26,11 @@ export function Hero() {
           }
         })
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" },
     )
-    heroRef.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    heroRef.current
+      ?.querySelectorAll(".reveal:not(.in)")
+      .forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [])
 
@@ -37,19 +49,31 @@ export function Hero() {
           overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: "var(--max)", margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <div
+          style={{
+            maxWidth: "var(--max)",
+            margin: "0 auto",
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
           {/* Eyebrow chips */}
           <div
             className="reveal in"
-            style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32, flexWrap: "wrap" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              marginBottom: 32,
+              flexWrap: "wrap",
+            }}
           >
             <span className="chip">
-              <i className="dot" /> Aceptando proyectos · Q4 2025
+              <i className="dot" /> Aceptando proyectos · {getNextQuarter()}
             </span>
             <span className="chip warm">
               <i className="dot" /> Nuevo: Agent as a Service
             </span>
-            <span className="mono">_basados en Alicante</span>
           </div>
 
           {/* Headline */}
@@ -65,8 +89,12 @@ export function Hero() {
               margin: 0,
             }}
           >
-            Software a medida<br />
-            e <em style={{ fontStyle: "italic", color: "var(--accent)" }}>inteligencia</em><br />
+            Software a medida
+            <br />e{" "}
+            <em style={{ fontStyle: "italic", color: "var(--accent)" }}>
+              inteligencia
+            </em>
+            <br />
             que se ejecuta sola
           </h1>
 
@@ -82,13 +110,23 @@ export function Hero() {
             }}
           >
             Construimos plataformas, ERPs y{" "}
-            <strong style={{ color: "var(--text)", fontWeight: 500 }}>agentes de IA autónomos</strong>{" "}
-            que sustituyen tareas repetitivas. Diseñados para pymes que se han quedado sin paciencia
-            con las herramientas genéricas.
+            <strong style={{ color: "var(--text)", fontWeight: 500 }}>
+              agentes de IA autónomos
+            </strong>{" "}
+            que sustituyen tareas repetitivas. Diseñados para pymes que se han
+            quedado sin paciencia con las herramientas genéricas.
           </p>
 
           {/* CTAs */}
-          <div className="reveal in d3" style={{ marginTop: 36, display: "flex", gap: 14, flexWrap: "wrap" }}>
+          <div
+            className="reveal in d3"
+            style={{
+              marginTop: 36,
+              display: "flex",
+              gap: 14,
+              flexWrap: "wrap",
+            }}
+          >
             <Link href="#aaas" className="btn btn-primary">
               Conoce los Agentes <span className="arrow">→</span>
             </Link>
@@ -110,8 +148,16 @@ export function Hero() {
           >
             {[
               { num: "12", suffix: "+", label: "Proyectos en producción" },
-              { num: "94", suffix: "%", label: "Horas administrativas ahorradas" },
-              { num: "24", suffix: "/7", label: "Agentes operando sin descanso" },
+              {
+                num: "94",
+                suffix: "%",
+                label: "Horas administrativas ahorradas",
+              },
+              {
+                num: "24",
+                suffix: "/7",
+                label: "Agentes operando sin descanso",
+              },
               { num: "48", suffix: "h", label: "Primera propuesta técnica" },
             ].map((s, i) => (
               <div
@@ -128,7 +174,9 @@ export function Hero() {
                     lineHeight: 1,
                   }}
                 >
-                  <em style={{ color: "var(--accent)", fontStyle: "normal" }}>{s.num}</em>
+                  <em style={{ color: "var(--accent)", fontStyle: "normal" }}>
+                    {s.num}
+                  </em>
                   {s.suffix}
                 </div>
                 <div
@@ -152,8 +200,18 @@ export function Hero() {
       {/* ── Marquee ── */}
       <div className="marquee" aria-hidden="true">
         <div className="marquee-track">
-          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em></span>
-          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em></span>
+          <span>
+            Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js{" "}
+            <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>
+            LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>
+            Stripe <em>·</em>Twilio <em>·</em>
+          </span>
+          <span>
+            Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js{" "}
+            <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>
+            LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>
+            Stripe <em>·</em>Twilio <em>·</em>
+          </span>
         </div>
       </div>
     </>
@@ -189,7 +247,8 @@ function Nav() {
         justifyContent: "space-between",
         backdropFilter: "blur(14px) saturate(140%)",
         WebkitBackdropFilter: "blur(14px) saturate(140%)",
-        background: "linear-gradient(to bottom, rgba(10,10,11,0.7), rgba(10,10,11,0.3))",
+        background:
+          "linear-gradient(to bottom, rgba(10,10,11,0.7), rgba(10,10,11,0.3))",
         borderBottom: "1px solid transparent",
         transition: "border-color .3s, background .3s",
       }}
@@ -219,7 +278,9 @@ function Nav() {
         >
           s
         </span>
-        <b style={{ fontWeight: 600, fontSize: 16, letterSpacing: "-0.01em" }}>Satorus</b>
+        <b style={{ fontWeight: 600, fontSize: 16, letterSpacing: "-0.01em" }}>
+          Satorus
+        </b>
       </Link>
 
       <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
@@ -241,7 +302,11 @@ function Nav() {
             {l.label}
           </Link>
         ))}
-        <Link href="#contacto" className="btn nav-cta" style={{ padding: "10px 16px", fontSize: 13 }}>
+        <Link
+          href="#contacto"
+          className="btn nav-cta"
+          style={{ padding: "10px 16px", fontSize: 13 }}
+        >
           Hablemos →
         </Link>
       </div>
