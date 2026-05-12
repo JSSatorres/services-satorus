@@ -59,7 +59,7 @@ export function Methodology() {
           className="sec-head-grid"
         >
           <div className="reveal">
-            <div className="eyebrow" style={{ marginBottom: 18 }}>· 05 / Proceso</div>
+            <div className="eyebrow" style={{ marginBottom: 18 }}>· 04 / Proceso</div>
             <h2
               style={{
                 fontFamily: "var(--font-display)",

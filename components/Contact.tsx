@@ -36,7 +36,7 @@ export function ContactSection() {
         >
           {/* Left side */}
           <div className="reveal">
-            <div className="eyebrow warm" style={{ marginBottom: 22 }}>· 06 / Hablemos</div>
+            <div className="eyebrow warm" style={{ marginBottom: 22 }}>· 05 / Hablemos</div>
             <h2
               style={{
                 fontFamily: "var(--font-display)",

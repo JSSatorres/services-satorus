@@ -112,7 +112,7 @@ export function Hero() {
               { num: "12", suffix: "+", label: "Proyectos en producción" },
               { num: "94", suffix: "%", label: "Horas administrativas ahorradas" },
               { num: "24", suffix: "/7", label: "Agentes operando sin descanso" },
-              { num: "2026", suffix: "", label: "VeriFactu · listos antes" },
+              { num: "48", suffix: "h", label: "Primera propuesta técnica" },
             ].map((s, i) => (
               <div
                 key={s.label}
@@ -152,8 +152,8 @@ export function Hero() {
       {/* ── Marquee ── */}
       <div className="marquee" aria-hidden="true">
         <div className="marquee-track">
-          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em>VeriFactu <em>·</em></span>
-          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em>VeriFactu <em>·</em></span>
+          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em></span>
+          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em></span>
         </div>
       </div>
     </>
@@ -226,7 +226,6 @@ function Nav() {
         {[
           { href: "#servicios", label: "Servicios" },
           { href: "#aaas", label: "AaaS · Agentes IA" },
-          { href: "#verifactu", label: "VeriFactu" },
           { href: "#proceso", label: "Proceso" },
         ].map((l) => (
           <Link

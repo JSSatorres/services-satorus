@@ -2,7 +2,6 @@ import { Hero } from "@/components/Hero"
 import { Problem } from "@/components/Problem"
 import { Services } from "@/components/Services"
 import { AaaSShowcase } from "@/components/AaaSShowcase"
-import { LegalTech } from "@/components/LegalTech"
 import { Methodology } from "@/components/Methodology"
 import { ContactSection, Footer } from "@/components/Contact"
 
@@ -19,7 +18,6 @@ export default function Home() {
       <Problem />
       <Services />
       <AaaSShowcase />
-      <LegalTech />
       <Methodology />
       <ContactSection />
       <Footer />

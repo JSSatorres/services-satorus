@@ -8,7 +8,6 @@ const solutionTypes = [
   "Software a medida",
   "Integración / automatización",
   "Agente de IA (AaaS)",
-  "Cumplimiento VeriFactu",
   "Aún no lo tengo claro",
 ]
 
