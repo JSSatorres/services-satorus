@@ -1,115 +1,155 @@
-import { ClipboardList, FileText, Code2, Key, CheckCircle2 } from "lucide-react"
+"use client"
+
+import { useEffect, useRef } from "react"
 
 const steps = [
   {
-    day: "Día 1",
-    icon: ClipboardList,
-    title: "Auditoría de Procesos bajo NDA",
-    description:
-      "Analizamos tu negocio en profundidad bajo Acuerdo de Confidencialidad. Identificamos cuellos de botella, ineficiencias y oportunidades de digitalización.",
-    color: "text-primary-400",
-    bg: "bg-primary-400/10",
-    border: "border-primary-400/20",
-    lineColor: "bg-primary-500",
+    marker: "01",
+    title: "Auditoría operativa",
+    desc: "Una semana en tus zapatos: dónde se rompe el flujo, qué tareas matan al equipo, qué automatizar primero.",
+    odd: true,
   },
   {
-    day: "Día 6",
-    icon: FileText,
-    title: "Propuesta Técnica y Presupuesto Cerrado",
-    description:
-      "Entrega de propuesta técnica detallada y presupuesto cerrado. Sin sorpresas. Sabes exactamente qué vas a recibir y cuánto va a costar.",
-    color: "text-accent-400",
-    bg: "bg-accent-400/10",
-    border: "border-accent-400/20",
-    lineColor: "bg-accent-500",
+    marker: "02",
+    title: "Diseño & prototipo",
+    desc: "Maquetamos el sistema en Figma + un prototipo clicable. Antes de escribir código, validamos contigo.",
+    odd: false,
   },
   {
-    day: "Desarrollo",
-    icon: Code2,
-    title: "Programación Ágil — Entregas cada 15 días",
-    description:
-      "Metodología ágil con sprints de 15 días. Cada dos semanas recibes una entrega funcional que puedes probar y validar con tu equipo.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    border: "border-emerald-400/20",
-    lineColor: "bg-emerald-500",
+    marker: "03",
+    title: "Build en sprints",
+    desc: "Sprints de 2 semanas con demo y feedback. Despliegues continuos. Tú ves el progreso real cada lunes.",
+    odd: true,
   },
   {
-    day: "Entrega",
-    icon: Key,
-    title: "El Código y la Base de Datos son Tuyos al 100%",
-    description:
-      "Sin dependencias, sin lock-in. Recibes el código fuente completo y la base de datos. Tu inversión te pertenece para siempre.",
-    color: "text-yellow-400",
-    bg: "bg-yellow-400/10",
-    border: "border-yellow-400/20",
-    lineColor: "bg-yellow-500",
+    marker: "04",
+    title: "Operación y evolución",
+    desc: "Monitorizamos, iteramos y entrenamos a los agentes con tus datos. El sistema mejora con el uso.",
+    odd: false,
   },
 ]
 
 export function Methodology() {
-  return (
-    <section className="py-24 bg-dark-800 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-900/5 to-transparent pointer-events-none" />
+  const ref = useRef<HTMLElement>(null)
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+        })
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    )
+    ref.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <section
+      ref={ref}
+      id="proceso"
+      style={{ padding: "140px 0 100px", position: "relative" }}
+    >
+      <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)", position: "relative" }}>
+
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6">
-            <CheckCircle2 size={14} />
-            Metodología de Trabajo
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 60, alignItems: "end", marginBottom: 64 }}
+          className="sec-head-grid"
+        >
+          <div className="reveal">
+            <div className="eyebrow" style={{ marginBottom: 18 }}>· 05 / Proceso</div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(40px, 6vw, 84px)",
+                fontWeight: 400,
+                lineHeight: 1.02,
+                letterSpacing: "-0.02em",
+                maxWidth: "16ch",
+              }}
+            >
+              De idea a{" "}
+              <em style={{ fontStyle: "italic", color: "var(--accent)" }}>producción</em>,<br />en cuatro pasos.
+            </h2>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-            Nuestra{" "}
-            <span className="text-gradient">Hoja de Ruta</span>
-          </h2>
-          <p className="text-slate-300 text-lg">
-            Un proceso transparente y predecible. Sin sorpresas, sin costes
-            ocultos.
-          </p>
+          <div className="reveal d1" style={{ color: "var(--text-mid)", fontSize: 17 }}>
+            Trabajamos en sprints cortos con demos cada dos semanas. Ves el producto crecer,
+            decides qué priorizar, y desde el primer mes ya hay algo funcionando.
+          </div>
         </div>
 
-        {/* Steps */}
-        <div className="max-w-3xl mx-auto space-y-6">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <div
-                key={step.day}
-                className={`glass-card rounded-2xl p-6 md:p-8 border ${step.border} bg-gradient-to-br from-slate-800/50 to-dark-900 flex gap-6 items-start hover:scale-[1.01] transition-all duration-300 group`}
-              >
-                {/* Step number / icon */}
-                <div className="flex flex-col items-center gap-3 shrink-0">
-                  <div
-                    className={`w-14 h-14 ${step.bg} rounded-xl flex items-center justify-center`}
-                  >
-                    <Icon size={26} className={step.color} />
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`w-0.5 h-8 ${step.lineColor} opacity-50`}
-                    />
-                  )}
-                </div>
+        {/* Road */}
+        <div
+          style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, position: "relative", marginTop: 30 }}
+          className="road-grid-resp"
+        >
+          {/* Connector line */}
+          <div
+            style={{
+              position: "absolute",
+              top: 28,
+              left: "6%",
+              right: "6%",
+              height: 1,
+              background: "linear-gradient(90deg, var(--border) 0%, var(--accent) 50%, var(--border) 100%)",
+            }}
+            className="road-line-resp"
+          />
 
-                <div>
-                  <div
-                    className={`text-xs font-bold uppercase tracking-widest ${step.color} mb-1`}
-                  >
-                    {step.day}
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-slate-300 leading-relaxed group-hover:text-slate-200 transition-colors">
-                    {step.description}
-                  </p>
-                </div>
+          {steps.map((s, i) => (
+            <div
+              key={s.marker}
+              className={`reveal${i > 0 ? ` d${i}` : ""}`}
+              style={{ padding: "0 14px", position: "relative" }}
+            >
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "var(--bg-1)",
+                  border: `1px solid ${s.odd ? "var(--accent)" : "var(--border-hi)"}`,
+                  display: "grid",
+                  placeItems: "center",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  color: s.odd ? "var(--accent)" : "var(--text-mid)",
+                  marginBottom: 22,
+                  position: "relative",
+                  zIndex: 2,
+                }}
+              >
+                {s.marker}
               </div>
-            )
-          })}
+              <h4
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontWeight: 500,
+                  fontSize: 16,
+                  margin: "0 0 8px",
+                  lineHeight: 1.3,
+                  letterSpacing: "-0.005em",
+                }}
+              >
+                {s.title}
+              </h4>
+              <p style={{ color: "var(--text-mid)", fontSize: 13.5, lineHeight: 1.55, margin: 0 }}>
+                {s.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 880px) {
+          .sec-head-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .road-grid-resp { grid-template-columns: 1fr !important; gap: 28px !important; }
+          .road-line-resp { display: none !important; }
+        }
+      `}</style>
     </section>
   )
 }

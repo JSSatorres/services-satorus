@@ -1,95 +1,192 @@
+"use client"
+
+import { useEffect, useRef } from "react"
 import { ContactForm } from "./ContactForm"
 import Link from "next/link"
-import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 
 export function ContactSection() {
-  return (
-    <section className="py-24 bg-dark-900 relative overflow-hidden" id="contact">
-      {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
+  const ref = useRef<HTMLElement>(null)
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="grid lg:grid-cols-5 gap-12 items-start">
-          {/* Left Side: CTA (2 cols) */}
-          <div className="lg:col-span-2">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6">
-              <Mail size={14} />
-              Pide tu Presupuesto
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
-              ¿Hablamos de tu{" "}
-              <span className="text-gradient">proyecto</span>?
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) }
+        })
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    )
+    ref.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <section
+      ref={ref}
+      id="contacto"
+      style={{
+        padding: "130px 0 80px",
+        background: "linear-gradient(180deg, var(--bg-1) 0%, var(--bg) 100%)",
+      }}
+    >
+      <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 60, alignItems: "start" }}
+          className="contact-grid-resp"
+        >
+          {/* Left side */}
+          <div className="reveal">
+            <div className="eyebrow warm" style={{ marginBottom: 22 }}>· 06 / Hablemos</div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(40px, 6vw, 84px)",
+                fontWeight: 400,
+                lineHeight: 1.02,
+                letterSpacing: "-0.02em",
+                marginBottom: 22,
+              }}
+            >
+              Cuéntanos qué{" "}
+              <em style={{ fontStyle: "italic", color: "var(--accent)" }}>te frena</em>.
             </h2>
-            <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-              No importa si eres una peluquería, un bar o una nave industrial.
-              Si tienes un proceso que mejorar,{" "}
-              <strong className="text-white">
-                tenemos el código para hacerlo
-              </strong>
-              .
+            <p
+              style={{
+                color: "var(--text-mid)",
+                fontSize: "clamp(16px, 1.4vw, 19px)",
+                maxWidth: 620,
+                marginBottom: 36,
+              }}
+            >
+              Una llamada de 30 minutos. Sin venta, sin compromiso. Salimos con un diagnóstico
+              y, si encaja, una propuesta concreta en 5 días.
             </p>
 
-            {/* Why now box */}
-            <div className="glass-card rounded-2xl p-6 border border-primary-500/15">
-              <div className="flex items-start gap-3">
-                <ArrowRight size={18} className="text-primary-400 mt-1 shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-white mb-1">
-                    ¿Por qué ahora?
-                  </h3>
-                  <p className="text-slate-200 text-sm leading-relaxed">
-                    La normativa <strong className="text-white">VeriFactu</strong> y
-                    el <strong className="text-white">Kit Digital</strong> están
-                    impulsando la digitalización. No te quedes atrás mientras tu
-                    competencia avanza.
-                  </p>
+            <div
+              style={{
+                borderTop: "1px solid var(--border)",
+                paddingTop: 28,
+                display: "grid",
+                gap: 18,
+              }}
+            >
+              {[
+                {
+                  icon: (
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={1.6}>
+                      <path d="M3 7l9 6 9-6M3 7v10h18V7" />
+                    </svg>
+                  ),
+                  label: "Email",
+                  value: "hola@satorus.es",
+                  href: "mailto:hola@satorus.es",
+                },
+                {
+                  icon: (
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={1.6}>
+                      <path d="M5 4h4l2 5-3 2a14 14 0 006 6l2-3 5 2v4a2 2 0 01-2 2A18 18 0 013 6a2 2 0 012-2z" />
+                    </svg>
+                  ),
+                  label: "Teléfono",
+                  value: "+34 900 000 000",
+                  href: "tel:+34900000000",
+                },
+                {
+                  icon: (
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={1.6}>
+                      <path d="M12 22s8-7 8-13a8 8 0 10-16 0c0 6 8 13 8 13z" />
+                      <circle cx={12} cy={9} r={3} />
+                    </svg>
+                  ),
+                  label: "Oficina",
+                  value: "Alicante, España · remoto-friendly",
+                  href: null,
+                },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: 14, alignItems: "start" }}
+                >
+                  <span style={{ marginTop: 4 }}>{row.icon}</span>
+                  <div>
+                    <h5
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        fontSize: 13,
+                        fontWeight: 500,
+                        margin: "0 0 2px",
+                        letterSpacing: "-0.005em",
+                      }}
+                    >
+                      {row.label}
+                    </h5>
+                    {row.href ? (
+                      <a href={row.href} style={{ color: "var(--text-mid)", fontSize: 14 }}>
+                        {row.value}
+                      </a>
+                    ) : (
+                      <p style={{ color: "var(--text-mid)", fontSize: 14, margin: 0 }}>
+                        {row.value}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Side: Form (3 cols) */}
-          <div className="lg:col-span-3 glass-card rounded-3xl p-8 border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-dark-900 shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-6">
-              Solicitud de Proyecto
-            </h3>
+          {/* Form */}
+          <div
+            className="reveal d1"
+            style={{
+              padding: 36,
+              border: "1px solid var(--border)",
+              borderRadius: "var(--rad-lg)",
+              background: "var(--surface)",
+            }}
+          >
             <ContactForm />
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 880px) {
+          .contact-grid-resp { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   )
 }
 
 export function Footer() {
   return (
-    <footer className="bg-dark-900 border-t border-slate-800/50 py-10">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-black text-sm">
-              S
-            </div>
-            <span className="font-bold text-white">Satorus</span>
-            <span className="text-slate-600 text-sm">
-              © {new Date().getFullYear()}
-            </span>
-          </div>
-
-          {/* Links */}
-          <div className="flex gap-6 text-sm text-slate-500">
-            <Link href="/aviso-legal" className="hover:text-slate-300 transition-colors">
-              Aviso Legal
-            </Link>
-            <Link href="/politica-de-privacidad" className="hover:text-slate-300 transition-colors">
-              Política de Privacidad
-            </Link>
-          </div>
-
-     
-        </div>
+    <footer
+      style={{
+        borderTop: "1px solid var(--border)",
+        padding: "40px var(--pad)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 20,
+      }}
+    >
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-dim)" }}>
+        © 2025 Satorus · Software & IA para pymes · Alicante
       </div>
+      <div style={{ display: "flex", gap: 24, fontSize: 13, color: "var(--text-mid)" }}>
+        <Link href="/aviso-legal" style={{ transition: "color .2s" }} className="footer-link">
+          Aviso legal
+        </Link>
+        <Link href="/politica-de-privacidad" style={{ transition: "color .2s" }} className="footer-link">
+          Privacidad
+        </Link>
+        <a href="https://linkedin.com" target="_blank" rel="noopener" style={{ transition: "color .2s" }} className="footer-link">
+          LinkedIn
+        </a>
+      </div>
+      <style>{`.footer-link:hover { color: var(--text) !important; }`}</style>
     </footer>
   )
 }

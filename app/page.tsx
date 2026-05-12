@@ -1,7 +1,7 @@
 import { Hero } from "@/components/Hero"
 import { Problem } from "@/components/Problem"
 import { Services } from "@/components/Services"
-import { Partners } from "@/components/Partners"
+import { AaaSShowcase } from "@/components/AaaSShowcase"
 import { LegalTech } from "@/components/LegalTech"
 import { Methodology } from "@/components/Methodology"
 import { ContactSection, Footer } from "@/components/Contact"
@@ -10,7 +10,7 @@ import { localBusinessSchema } from "@/lib/schema"
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
@@ -18,7 +18,7 @@ export default function Home() {
       <Hero />
       <Problem />
       <Services />
-      <Partners />
+      <AaaSShowcase />
       <LegalTech />
       <Methodology />
       <ContactSection />

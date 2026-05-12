@@ -1,91 +1,258 @@
+"use client"
+
+import { useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowRight, ChevronDown } from "lucide-react"
 
 export function Hero() {
+  const heroRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in")
+            io.unobserve(e.target)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    )
+    heroRef.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden animated-bg noise">
-      {/* Grid pattern overlay */}
-      <div
-        className="absolute inset-0 z-0 opacity-10"
+    <>
+      {/* ── Nav ── */}
+      <Nav />
+
+      {/* ── Hero ── */}
+      <header
+        ref={heroRef}
+        className="hero"
         style={{
-          backgroundImage: `linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)`,
-          backgroundSize: "64px 64px",
+          padding: "170px var(--pad) 80px",
+          position: "relative",
+          overflow: "hidden",
         }}
-      />
-
-      {/* Glow blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/15 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-24 md:py-32">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-light text-sm text-primary-300 mb-8 border border-primary-500/20">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Software a medida para Pymes en España
+      >
+        <div style={{ maxWidth: "var(--max)", margin: "0 auto", position: "relative", zIndex: 2 }}>
+          {/* Eyebrow chips */}
+          <div
+            className="reveal in"
+            style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32, flexWrap: "wrap" }}
+          >
+            <span className="chip">
+              <i className="dot" /> Aceptando proyectos · Q4 2025
+            </span>
+            <span className="chip warm">
+              <i className="dot" /> Nuevo: Agent as a Service
+            </span>
+            <span className="mono">_basados en Alicante</span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
-            Satorus: Software a Medida y{" "}
-            <span className="text-gradient">Automatización IA</span> para tu
-            empresa
+          <h1
+            className="reveal in d1"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(54px, 9vw, 128px)",
+              fontWeight: 400,
+              lineHeight: 1.02,
+              letterSpacing: "-0.02em",
+              maxWidth: "14ch",
+              margin: 0,
+            }}
+          >
+            Software a medida<br />
+            e <em style={{ fontStyle: "italic", color: "var(--accent)" }}>inteligencia</em><br />
+            que se ejecuta sola
           </h1>
 
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-            No instalamos programas genéricos. Creamos aplicaciones web y
-            móviles a medida que{" "}
-            <strong className="text-white">centralizan tu gestión</strong>,
-            eliminan el caos de los Excel y{" "}
-            <strong className="text-white">
-              profesionalizan cada proceso
-            </strong>{" "}
-            de tu negocio.
+          {/* Sub */}
+          <p
+            className="reveal in d2"
+            style={{
+              marginTop: 28,
+              maxWidth: 600,
+              color: "var(--text-mid)",
+              fontSize: 18,
+              lineHeight: 1.55,
+            }}
+          >
+            Construimos plataformas, ERPs y{" "}
+            <strong style={{ color: "var(--text)", fontWeight: 500 }}>agentes de IA autónomos</strong>{" "}
+            que sustituyen tareas repetitivas. Diseñados para pymes que se han quedado sin paciencia
+            con las herramientas genéricas.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <Link
-              href="#contact"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-500/40 hover:scale-105"
-            >
-              Solicitar Auditoría y Presupuesto Técnico
-              <ArrowRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-              />
+          <div className="reveal in d3" style={{ marginTop: 36, display: "flex", gap: 14, flexWrap: "wrap" }}>
+            <Link href="#aaas" className="btn btn-primary">
+              Conoce los Agentes <span className="arrow">→</span>
             </Link>
-            <Link
-              href="#services"
-              className="inline-flex items-center gap-2 px-8 py-4 glass-card text-slate-200 font-medium rounded-xl hover:border-primary-500/40 transition-all duration-300"
-            >
-              Ver Soluciones
+            <Link href="#contacto" className="btn">
+              Auditoría gratuita
             </Link>
           </div>
 
-          {/* Social proof stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
+          {/* Stats */}
+          <div
+            className="reveal in d4"
+            style={{
+              marginTop: 80,
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              borderTop: "1px solid var(--border)",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
             {[
-              { value: "100%", label: "Código tuyo" },
-              { value: "48h", label: "Primera propuesta" },
-              { value: "0€", label: "Licencias mensuales" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl font-bold text-gradient">
-                  {stat.value}
+              { num: "12", suffix: "+", label: "Proyectos en producción" },
+              { num: "94", suffix: "%", label: "Horas administrativas ahorradas" },
+              { num: "24", suffix: "/7", label: "Agentes operando sin descanso" },
+              { num: "2026", suffix: "", label: "VeriFactu · listos antes" },
+            ].map((s, i) => (
+              <div
+                key={s.label}
+                style={{
+                  padding: "28px 24px 28px 0",
+                  borderRight: i < 3 ? "1px solid var(--border)" : "none",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(40px, 4vw, 56px)",
+                    lineHeight: 1,
+                  }}
+                >
+                  <em style={{ color: "var(--accent)", fontStyle: "normal" }}>{s.num}</em>
+                  {s.suffix}
                 </div>
-                <div className="text-xs text-slate-300 mt-1">{stat.label}</div>
+                <div
+                  style={{
+                    color: "var(--text-dim)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginTop: 10,
+                  }}
+                >
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
+      </header>
+
+      {/* ── Marquee ── */}
+      <div className="marquee" aria-hidden="true">
+        <div className="marquee-track">
+          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em>VeriFactu <em>·</em></span>
+          <span>Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>Stripe <em>·</em>Twilio <em>·</em>VeriFactu <em>·</em></span>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* ── Nav component ── */
+function Nav() {
+  useEffect(() => {
+    const nav = document.getElementById("nav")
+    if (!nav) return
+    const onScroll = () => {
+      if (window.scrollY > 12) nav.classList.add("scrolled")
+      else nav.classList.remove("scrolled")
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  return (
+    <nav
+      id="nav"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        padding: "14px var(--pad)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backdropFilter: "blur(14px) saturate(140%)",
+        WebkitBackdropFilter: "blur(14px) saturate(140%)",
+        background: "linear-gradient(to bottom, rgba(10,10,11,0.7), rgba(10,10,11,0.3))",
+        borderBottom: "1px solid transparent",
+        transition: "border-color .3s, background .3s",
+      }}
+    >
+      <style>{`
+        #nav.scrolled {
+          border-color: var(--border) !important;
+          background: rgba(10,10,11,0.85) !important;
+        }
+      `}</style>
+
+      <Link href="#" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 8,
+            background: "var(--accent)",
+            color: "#0a0a0b",
+            display: "grid",
+            placeItems: "center",
+            fontFamily: "var(--font-display)",
+            fontSize: 20,
+            fontStyle: "italic",
+            boxShadow: "0 0 24px -4px rgba(200,255,61,0.7)",
+          }}
+        >
+          s
+        </span>
+        <b style={{ fontWeight: 600, fontSize: 16, letterSpacing: "-0.01em" }}>Satorus</b>
+      </Link>
+
+      <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+        {[
+          { href: "#servicios", label: "Servicios" },
+          { href: "#aaas", label: "AaaS · Agentes IA" },
+          { href: "#verifactu", label: "VeriFactu" },
+          { href: "#proceso", label: "Proceso" },
+        ].map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            style={{
+              fontSize: 13,
+              color: "var(--text-mid)",
+              transition: "color .2s",
+            }}
+            className="nav-link-item"
+          >
+            {l.label}
+          </Link>
+        ))}
+        <Link href="#contacto" className="btn nav-cta" style={{ padding: "10px 16px", fontSize: 13 }}>
+          Hablemos →
+        </Link>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <ChevronDown size={24} className="text-slate-400" />
-      </div>
-    </section>
+      <style>{`
+        .nav-link-item:hover { color: var(--text); }
+        @media (max-width: 820px) {
+          .nav-link-item { display: none; }
+        }
+      `}</style>
+    </nav>
   )
 }
