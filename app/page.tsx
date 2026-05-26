@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero"
+import { ScrollVideo } from "@/components/ScrollVideo"
 import { Problem } from "@/components/Problem"
 import { Services } from "@/components/Services"
 import { AaaSShowcase } from "@/components/AaaSShowcase"
@@ -15,6 +16,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
       <Hero />
+      <ScrollVideo />
       <Problem />
       <Services />
       <AaaSShowcase />

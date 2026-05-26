@@ -11,27 +11,37 @@ const solutionTypes = [
   "Aún no lo tengo claro",
 ]
 
-const inputStyle: React.CSSProperties = {
+const inputBase: React.CSSProperties = {
   background: "var(--bg-1)",
-  border: "1px solid var(--border)",
+  border: "1px solid var(--border-hi)",
   color: "var(--text)",
-  padding: "12px 14px",
-  borderRadius: 10,
+  padding: "11px 14px",
+  borderRadius: 8,
   fontFamily: "var(--font-sans)",
   fontSize: 14,
   width: "100%",
   outline: "none",
   transition: "border-color .2s",
+  lineHeight: 1.5,
 }
 
-const labelStyle: React.CSSProperties = {
+const labelBase: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
-  fontSize: 11,
+  fontSize: 10,
   textTransform: "uppercase" as const,
-  letterSpacing: "0.1em",
+  letterSpacing: "0.14em",
   color: "var(--text-dim)",
   display: "block",
-  marginBottom: 6,
+  marginBottom: 7,
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label style={labelBase}>{label}</label>
+      {children}
+    </div>
+  )
 }
 
 export function ContactForm() {
@@ -41,153 +51,107 @@ export function ContactForm() {
     e.preventDefault()
     setStatus("submitting")
     try {
-      const formData = new FormData(e.currentTarget)
-      const data = Object.fromEntries(formData.entries())
+      const data = Object.fromEntries(new FormData(e.currentTarget).entries())
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
-      if (!response.ok) throw new Error("Error en el envío")
+      if (!response.ok) throw new Error()
       setStatus("success")
     } catch {
       setStatus("error")
     }
   }
 
+  const focusOn  = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { e.target.style.borderColor = "var(--accent)" }
+  const focusOff = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { e.target.style.borderColor = "var(--border-hi)" }
+
   if (status === "success") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "48px 0", gap: 24 }}>
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: "50%",
-            background: "rgba(200,255,61,0.1)",
-            border: "1px solid rgba(200,255,61,0.3)",
-            display: "grid",
-            placeItems: "center",
-          }}
-        >
-          <svg viewBox="0 0 24 24" width={28} height={28} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "56px 0", gap: 20 }}>
+        <div style={{
+          width: 56, height: 56,
+          borderRadius: "50%",
+          background: "rgba(200,255,61,0.08)",
+          border: "1px solid rgba(200,255,61,0.25)",
+          display: "grid",
+          placeItems: "center",
+        }}>
+          <svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
         <div>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 400, marginBottom: 8 }}>
-            ¡Mensaje enviado!
+          <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 26, letterSpacing: "-0.02em", marginBottom: 8 }}>
+            Mensaje recibido
           </h3>
-          <p style={{ color: "var(--text-mid)", fontSize: 15 }}>
+          <p style={{ color: "var(--text-mid)", fontSize: 14, lineHeight: 1.6 }}>
             Recibirás nuestra propuesta en menos de 48 horas.
           </p>
         </div>
         <button
           onClick={() => setStatus("idle")}
-          style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+          style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-dim)", background: "none", border: "none", cursor: "pointer", letterSpacing: "0.06em" }}
         >
-          Enviar otra solicitud
+          Enviar otra solicitud →
         </button>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Name + company row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }} className="form-row-resp">
-        <div>
-          <label style={labelStyle}>Nombre</label>
-          <input
-            type="text"
-            name="name"
-            required
-            placeholder="María García"
-            style={inputStyle}
-            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-            onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Empresa</label>
-          <input
-            type="text"
-            name="company"
-            placeholder="Tu pyme S.L."
-            style={inputStyle}
-            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-            onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
-          />
-        </div>
+    <form onSubmit={handleSubmit} style={{ display: "grid", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="form-row-resp">
+        <Field label="Nombre">
+          <input type="text" name="name" required placeholder="María García" style={inputBase} onFocus={focusOn} onBlur={focusOff} autoComplete="name" />
+        </Field>
+        <Field label="Empresa">
+          <input type="text" name="company" placeholder="Tu pyme S.L." style={inputBase} onFocus={focusOn} onBlur={focusOff} autoComplete="organization" />
+        </Field>
       </div>
 
-      <div style={{ marginBottom: 14 }}>
-        <label style={labelStyle}>Email</label>
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="maria@empresa.es"
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
-        />
-      </div>
+      <Field label="Email">
+        <input type="email" name="email" required placeholder="maria@empresa.es" style={inputBase} onFocus={focusOn} onBlur={focusOff} autoComplete="email" />
+      </Field>
 
-      <div style={{ marginBottom: 14 }}>
-        <label style={labelStyle}>¿Qué buscas?</label>
-        <select
-          name="solution"
-          style={{ ...inputStyle, appearance: "none" }}
-          onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
-        >
-          {solutionTypes.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
+      <Field label="¿Qué buscas?">
+        <select name="solution" style={{ ...inputBase, appearance: "none" }} onFocus={focusOn} onBlur={focusOff}>
+          {solutionTypes.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-      </div>
+      </Field>
 
-      <div style={{ marginBottom: 14 }}>
-        <label style={labelStyle}>Cuéntanos</label>
+      <Field label="Cuéntanos">
         <textarea
           name="message"
           rows={4}
           placeholder="Procesos que duelen, herramientas que usas, lo que sea..."
-          style={{ ...inputStyle, resize: "vertical", minHeight: 100 }}
-          onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+          style={{ ...inputBase, resize: "vertical", minHeight: 100 }}
+          onFocus={focusOn}
+          onBlur={focusOff}
         />
-      </div>
+      </Field>
 
       <button
         type="submit"
         disabled={status === "submitting"}
         className="btn btn-primary"
-        style={{
-          width: "100%",
-          justifyContent: "center",
-          marginTop: 8,
-          opacity: status === "submitting" ? 0.7 : 1,
-          cursor: status === "submitting" ? "not-allowed" : "pointer",
-        }}
+        style={{ width: "100%", justifyContent: "center", marginTop: 4, opacity: status === "submitting" ? 0.65 : 1 }}
       >
         {status === "submitting" ? "Enviando…" : <>Enviar mensaje <span className="arrow">→</span></>}
       </button>
 
       {status === "error" && (
-        <p style={{ textAlign: "center", fontSize: 13, color: "var(--accent-warm)", marginTop: 12 }}>
-          Hubo un error. Inténtalo de nuevo o escribe a hola@satorus.es
+        <p style={{ textAlign: "center", fontSize: 13, color: "var(--accent-warm)", margin: 0 }}>
+          Hubo un error. Escríbenos a hola@satorus.es
         </p>
       )}
 
-      <p style={{ textAlign: "center", fontSize: 11, color: "var(--text-faint)", marginTop: 16, fontFamily: "var(--font-mono)" }}>
+      <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-faint)", margin: 0, letterSpacing: "0.06em" }}>
         Tus datos no serán compartidos con terceros.
       </p>
 
       <style>{`
-        @media (max-width: 720px) {
-          .form-row-resp { grid-template-columns: 1fr !important; }
-        }
         select option { background: var(--bg-1); color: var(--text); }
       `}</style>
     </form>

@@ -5,9 +5,9 @@ import Link from "next/link"
 
 function getNextQuarter(): string {
   const now = new Date()
-  const month = now.getMonth() // 0-11
+  const month = now.getMonth()
   const year = now.getFullYear()
-  const currentQ = Math.floor(month / 3) + 1 // 1-4
+  const currentQ = Math.floor(month / 3) + 1
   const nextQ = currentQ === 4 ? 1 : currentQ + 1
   const nextYear = currentQ === 4 ? year + 1 : year
   return `Q${nextQ} ${nextYear}`
@@ -17,115 +17,110 @@ export function Hero() {
   const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    const els = heroRef.current?.querySelectorAll(".reveal")
+    if (!els) return
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in")
-            io.unobserve(e.target)
-          }
-        })
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" },
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }),
+      { threshold: 0.1 },
     )
-    heroRef.current
-      ?.querySelectorAll(".reveal:not(.in)")
-      .forEach((el) => io.observe(el))
+    els.forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [])
 
   return (
     <>
-      {/* ── Nav ── */}
       <Nav />
-
-      {/* ── Hero ── */}
       <header
         ref={heroRef}
-        className="hero"
         style={{
-          padding: "170px var(--pad) 80px",
+          padding: "180px var(--pad) 100px",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            maxWidth: "var(--max)",
-            margin: "0 auto",
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          {/* Eyebrow chips */}
+        {/* Large background number */}
+        <div aria-hidden style={{
+          position: "absolute",
+          right: "-2%",
+          top: "8%",
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: "clamp(260px, 30vw, 520px)",
+          lineHeight: 1,
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(255,255,255,0.03)",
+          pointerEvents: "none",
+          userSelect: "none",
+          letterSpacing: "-0.05em",
+        }}>
+          S
+        </div>
+
+        <div style={{ maxWidth: "var(--max)", margin: "0 auto", position: "relative", zIndex: 2 }}>
+
+          {/* Top chips */}
           <div
             className="reveal in"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              marginBottom: 32,
-              flexWrap: "wrap",
-            }}
+            style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 48, flexWrap: "wrap" }}
           >
             <span className="chip">
               <i className="dot" /> Aceptando proyectos · {getNextQuarter()}
             </span>
             <span className="chip warm">
-              <i className="dot" /> Nuevo: Agent as a Service
+              <i className="dot" /> Agent as a Service
             </span>
           </div>
 
-          {/* Headline */}
+          {/* Headline — editorial, large, with tight leading */}
           <h1
             className="reveal in d1"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(54px, 9vw, 128px)",
-              fontWeight: 400,
-              lineHeight: 1.02,
-              letterSpacing: "-0.02em",
-              maxWidth: "14ch",
+              fontSize: "clamp(60px, 10.5vw, 148px)",
+              fontWeight: 800,
+              lineHeight: 0.95,
+              letterSpacing: "-0.04em",
+              maxWidth: "13ch",
               margin: 0,
             }}
           >
-            Software a medida
-            <br />e{" "}
-            <em style={{ fontStyle: "italic", color: "var(--accent)" }}>
-              inteligencia
-            </em>
+            Software{" "}
+            <span style={{
+              display: "inline-block",
+              fontStyle: "italic",
+              fontWeight: 700,
+              color: "var(--accent)",
+              position: "relative",
+            }}>
+              preciso
+            </span>
             <br />
-            que se ejecuta sola
+            <span style={{ color: "var(--text-mid)", fontWeight: 700 }}>+ IA que</span>
+            <br />
+            trabaja sola
           </h1>
 
           {/* Sub */}
           <p
             className="reveal in d2"
             style={{
-              marginTop: 28,
-              maxWidth: 600,
+              marginTop: 36,
+              maxWidth: 520,
               color: "var(--text-mid)",
-              fontSize: 18,
-              lineHeight: 1.55,
+              fontSize: "clamp(16px, 1.4vw, 18px)",
+              lineHeight: 1.65,
+              fontWeight: 400,
             }}
           >
             Construimos plataformas, ERPs y{" "}
-            <strong style={{ color: "var(--text)", fontWeight: 500 }}>
-              agentes de IA autónomos
-            </strong>{" "}
-            que sustituyen tareas repetitivas. Diseñados para pymes que se han
-            quedado sin paciencia con las herramientas genéricas.
+            <strong style={{ color: "var(--text)", fontWeight: 600 }}>agentes autónomos</strong>{" "}
+            para pymes que ya no tienen paciencia con las herramientas genéricas.
           </p>
 
           {/* CTAs */}
           <div
             className="reveal in d3"
-            style={{
-              marginTop: 36,
-              display: "flex",
-              gap: 14,
-              flexWrap: "wrap",
-            }}
+            style={{ marginTop: 44, display: "flex", gap: 12, flexWrap: "wrap" }}
           >
             <Link href="#aaas" className="btn btn-primary">
               Conoce los Agentes <span className="arrow">→</span>
@@ -135,60 +130,47 @@ export function Hero() {
             </Link>
           </div>
 
-          {/* Stats */}
+          {/* Stats row */}
           <div
             className="reveal in d4"
             style={{
-              marginTop: 80,
+              marginTop: 96,
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
               borderTop: "1px solid var(--border)",
-              borderBottom: "1px solid var(--border)",
             }}
           >
             {[
               { num: "12", suffix: "+", label: "Proyectos en producción" },
-              {
-                num: "94",
-                suffix: "%",
-                label: "Horas administrativas ahorradas",
-              },
-              {
-                num: "24",
-                suffix: "/7",
-                label: "Agentes operando sin descanso",
-              },
-              { num: "48", suffix: "h", label: "Primera propuesta técnica" },
+              { num: "94", suffix: "%", label: "Horas admin ahorradas" },
+              { num: "24", suffix: "/7", label: "Agentes sin descanso" },
+              { num: "48", suffix: "h", label: "Primera propuesta" },
             ].map((s, i) => (
               <div
                 key={s.label}
                 style={{
-                  padding: "28px 24px 28px 0",
+                  padding: "32px 24px 32px 0",
                   borderRight: i < 3 ? "1px solid var(--border)" : "none",
                 }}
               >
-                <div
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "clamp(40px, 4vw, 56px)",
-                    lineHeight: 1,
-                  }}
-                >
-                  <em style={{ color: "var(--accent)", fontStyle: "normal" }}>
-                    {s.num}
-                  </em>
-                  {s.suffix}
+                <div style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(40px, 4.5vw, 64px)",
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  letterSpacing: "-0.04em",
+                }}>
+                  <em style={{ color: "var(--accent)", fontStyle: "normal" }}>{s.num}</em>
+                  <span style={{ color: "var(--text-dim)", fontWeight: 700 }}>{s.suffix}</span>
                 </div>
-                <div
-                  style={{
-                    color: "var(--text-dim)",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    marginTop: 10,
-                  }}
-                >
+                <div style={{
+                  color: "var(--text-faint)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 10,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  marginTop: 12,
+                }}>
                   {s.label}
                 </div>
               </div>
@@ -197,35 +179,36 @@ export function Hero() {
         </div>
       </header>
 
-      {/* ── Marquee ── */}
+      {/* Marquee — tech stack */}
       <div className="marquee" aria-hidden="true">
         <div className="marquee-track">
-          <span>
-            Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js{" "}
-            <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>
-            LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>
-            Stripe <em>·</em>Twilio <em>·</em>
-          </span>
-          <span>
-            Python <em>·</em>FastAPI <em>·</em>React <em>·</em>Node.js{" "}
-            <em>·</em>PostgreSQL <em>·</em>Docker <em>·</em>OpenAI <em>·</em>
-            LangChain <em>·</em>n8n <em>·</em>Supabase <em>·</em>AWS <em>·</em>
-            Stripe <em>·</em>Twilio <em>·</em>
-          </span>
+          {[
+            "Python", "FastAPI", "React", "Next.js", "PostgreSQL",
+            "Docker", "OpenAI", "LangChain", "n8n", "Supabase",
+            "AWS", "Stripe", "Twilio", "TypeScript", "Redis",
+          ].map((t) => (
+            <span key={t}>{t}<em>·</em></span>
+          ))}
+          {[
+            "Python", "FastAPI", "React", "Next.js", "PostgreSQL",
+            "Docker", "OpenAI", "LangChain", "n8n", "Supabase",
+            "AWS", "Stripe", "Twilio", "TypeScript", "Redis",
+          ].map((t) => (
+            <span key={t + "_2"}>{t}<em>·</em></span>
+          ))}
         </div>
       </div>
     </>
   )
 }
 
-/* ── Nav component ── */
+/* ── Nav ── */
 function Nav() {
   useEffect(() => {
     const nav = document.getElementById("nav")
     if (!nav) return
     const onScroll = () => {
-      if (window.scrollY > 12) nav.classList.add("scrolled")
-      else nav.classList.remove("scrolled")
+      nav.classList.toggle("scrolled", window.scrollY > 12)
     }
     window.addEventListener("scroll", onScroll, { passive: true })
     onScroll()
@@ -241,82 +224,59 @@ function Nav() {
         left: 0,
         right: 0,
         zIndex: 50,
-        padding: "14px var(--pad)",
+        padding: "16px var(--pad)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backdropFilter: "blur(14px) saturate(140%)",
-        WebkitBackdropFilter: "blur(14px) saturate(140%)",
-        background:
-          "linear-gradient(to bottom, rgba(10,10,11,0.7), rgba(10,10,11,0.3))",
+        backdropFilter: "blur(20px) saturate(150%)",
+        WebkitBackdropFilter: "blur(20px) saturate(150%)",
+        background: "rgba(8,8,9,0.6)",
         borderBottom: "1px solid transparent",
-        transition: "border-color .3s, background .3s",
+        transition: "border-color .4s, background .4s",
       }}
     >
-      <style>{`
-        #nav.scrolled {
-          border-color: var(--border) !important;
-          background: rgba(10,10,11,0.85) !important;
-        }
-      `}</style>
-
+      {/* Logo */}
       <Link href="#" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: "var(--accent)",
-            color: "#0a0a0b",
-            display: "grid",
-            placeItems: "center",
-            fontFamily: "var(--font-display)",
-            fontSize: 20,
-            fontStyle: "italic",
-            boxShadow: "0 0 24px -4px rgba(200,255,61,0.7)",
-          }}
-        >
-          s
+        <span style={{
+          width: 32, height: 32,
+          borderRadius: 8,
+          background: "var(--accent)",
+          color: "var(--bg)",
+          display: "grid",
+          placeItems: "center",
+          fontFamily: "var(--font-display)",
+          fontSize: 18,
+          fontWeight: 800,
+          letterSpacing: "-0.05em",
+          boxShadow: "0 0 28px -4px rgba(200,255,61,0.65)",
+        }}>
+          S
         </span>
-        <b style={{ fontWeight: 600, fontSize: 16, letterSpacing: "-0.01em" }}>
+        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, letterSpacing: "-0.03em" }}>
           Satorus
-        </b>
+        </span>
       </Link>
 
-      <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+      {/* Links */}
+      <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
         {[
           { href: "#servicios", label: "Servicios" },
-          { href: "#aaas", label: "AaaS · Agentes IA" },
+          { href: "#aaas", label: "Agentes IA" },
           { href: "#proceso", label: "Proceso" },
         ].map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            style={{
-              fontSize: 13,
-              color: "var(--text-mid)",
-              transition: "color .2s",
-            }}
             className="nav-link-item"
+            style={{ fontSize: 13, fontWeight: 500, color: "var(--text-dim)", transition: "color .2s", letterSpacing: "-0.01em" }}
           >
             {l.label}
           </Link>
         ))}
-        <Link
-          href="#contacto"
-          className="btn nav-cta"
-          style={{ padding: "10px 16px", fontSize: 13 }}
-        >
+        <Link href="#contacto" className="btn" style={{ padding: "9px 16px", fontSize: 13 }}>
           Hablemos →
         </Link>
       </div>
-
-      <style>{`
-        .nav-link-item:hover { color: var(--text); }
-        @media (max-width: 820px) {
-          .nav-link-item { display: none; }
-        }
-      `}</style>
     </nav>
   )
 }

@@ -1,18 +1,18 @@
 import type { Metadata } from "next"
-import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
+import { Syne, Manrope, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-geist",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
   display: "swap",
 })
 
-const instrumentSerif = Instrument_Serif({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-manrope",
   display: "swap",
 })
 
@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
+      className={`${syne.variable} ${manrope.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <div className="page-bg" />
