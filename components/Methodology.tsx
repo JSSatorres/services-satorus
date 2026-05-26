@@ -42,7 +42,7 @@ export function Methodology() {
   }, [])
 
   return (
-    <section ref={ref} id="proceso" style={{ padding: "140px 0 100px" }}>
+    <section ref={ref} id="proceso" className="sec-pad-resp" style={{ padding: "140px 0 100px" }}>
       <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
 
         {/* Header */}

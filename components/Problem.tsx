@@ -48,7 +48,7 @@ export function Problem() {
   }, [])
 
   return (
-    <section ref={ref} id="problema" style={{ padding: "140px 0 100px", position: "relative" }}>
+    <section ref={ref} id="problema" className="sec-pad-resp" style={{ padding: "140px 0 100px", position: "relative" }}>
       <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
 
         {/* Section header */}
@@ -128,7 +128,7 @@ export function Problem() {
 
         {/* Answer bar */}
         <div
-          className="reveal d2"
+          className="reveal d2 answer-bar-resp"
           style={{
             marginTop: 2,
             padding: "28px 32px",

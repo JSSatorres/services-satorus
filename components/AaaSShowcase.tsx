@@ -136,6 +136,7 @@ export function AaaSShowcase() {
     <section
       ref={ref}
       id="aaas"
+      className="sec-pad-resp"
       style={{
         position: "relative",
         padding: "160px 0 140px",
@@ -195,106 +196,132 @@ export function AaaSShowcase() {
         </div>
 
         {/* Agent picker + terminal */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 96 }} className="aaas-showcase-grid">
+        <div style={{ marginBottom: 96 }}>
 
-          {/* Tabs */}
-          <div className="reveal" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {TABS.map((tab) => {
-              const isActive = active === tab.key
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => { setActive(tab.key); runAgent(tab.key) }}
-                  style={{
-                    textAlign: "left",
-                    padding: "18px 20px",
-                    border: `1px solid ${isActive ? "rgba(255,106,53,0.4)" : "var(--border)"}`,
-                    borderRadius: 10,
-                    background: isActive ? "rgba(255,106,53,0.07)" : "var(--surface)",
-                    color: "var(--text)",
-                    cursor: "pointer",
-                    display: "flex",
-                    gap: 14,
-                    alignItems: "center",
-                    transition: "border-color .2s, background .2s",
-                  }}
-                >
-                  <span style={{
-                    width: 36, height: 36,
-                    borderRadius: 8,
-                    background: isActive ? "var(--accent-warm)" : "rgba(255,106,53,0.07)",
-                    border: `1px solid ${isActive ? "var(--accent-warm)" : "rgba(255,106,53,0.15)"}`,
-                    display: "grid",
-                    placeItems: "center",
-                    color: isActive ? "#1a0c05" : "var(--accent-warm)",
-                    flexShrink: 0,
-                    transition: "all .2s",
-                  }}>
-                    {tab.icon}
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginBottom: 2 }}>
-                      {tab.label}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-dim)", letterSpacing: "-0.01em" }}>
-                      {tab.desc}
-                    </div>
-                  </span>
-                  <span style={{ color: isActive ? "var(--accent-warm)" : "var(--text-faint)", fontSize: 16, transition: "transform .2s", transform: isActive ? "translateX(2px)" : "none" }}>›</span>
-                </button>
-              )
-            })}
+          {/* ── Desktop: side-by-side grid ── */}
+          <div className="aaas-desk-grid reveal" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+
+            {/* Tabs — vertical list */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {TABS.map((tab) => {
+                const isActive = active === tab.key
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => { setActive(tab.key); runAgent(tab.key) }}
+                    style={{
+                      textAlign: "left",
+                      padding: "18px 20px",
+                      border: `1px solid ${isActive ? "rgba(255,106,53,0.4)" : "var(--border)"}`,
+                      borderRadius: 10,
+                      background: isActive ? "rgba(255,106,53,0.07)" : "var(--surface)",
+                      color: "var(--text)",
+                      cursor: "pointer",
+                      display: "flex",
+                      gap: 14,
+                      alignItems: "center",
+                      transition: "border-color .2s, background .2s",
+                    }}
+                  >
+                    <span style={{
+                      width: 36, height: 36,
+                      borderRadius: 8,
+                      background: isActive ? "var(--accent-warm)" : "rgba(255,106,53,0.07)",
+                      border: `1px solid ${isActive ? "var(--accent-warm)" : "rgba(255,106,53,0.15)"}`,
+                      display: "grid",
+                      placeItems: "center",
+                      color: isActive ? "#1a0c05" : "var(--accent-warm)",
+                      flexShrink: 0,
+                      transition: "all .2s",
+                    }}>
+                      {tab.icon}
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginBottom: 2 }}>
+                        {tab.label}
+                      </div>
+                      <div style={{ fontSize: 12, color: "var(--text-dim)", letterSpacing: "-0.01em" }}>
+                        {tab.desc}
+                      </div>
+                    </span>
+                    <span style={{ color: isActive ? "var(--accent-warm)" : "var(--text-faint)", fontSize: 16, transition: "transform .2s", transform: isActive ? "translateX(2px)" : "none" }}>›</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Terminal — desktop */}
+            <TerminalPanel title={title} bodyRef={bodyRef} lines={lines} />
           </div>
 
-          {/* Terminal */}
-          <div className="reveal d1" style={{
-            background: "#0a0a0d",
-            border: "1px solid var(--border-hi)",
-            borderRadius: 14,
-            minHeight: 420,
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            boxShadow: "0 32px 80px -20px rgba(0,0,0,0.6)",
-          }}>
-            {/* Header bar */}
+          {/* ── Mobile: chips row + terminal full width ── */}
+          <div className="aaas-mob-grid">
+
+            {/* Chip strip */}
             <div style={{
               display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "12px 16px",
-              borderBottom: "1px solid var(--border)",
-              background: "rgba(255,255,255,0.015)",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 4,
+              scrollbarWidth: "none",
+              marginBottom: 14,
             }}>
-              <div style={{ display: "flex", gap: 5 }}>
-                {["#ff5f57","#febc2e","#28c840"].map((c) => (
-                  <span key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c, display: "block" }} />
-                ))}
-              </div>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-dim)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {title}
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-faint)" }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent)", boxShadow: "0 0 8px var(--accent)", display: "block", animation: "pulse-dot 1.8s ease-in-out infinite" }} />
-                LIVE
-              </span>
+              {TABS.map((tab) => {
+                const isActive = active === tab.key
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => { setActive(tab.key); runAgent(tab.key) }}
+                    style={{
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 16px",
+                      borderRadius: 999,
+                      border: `1px solid ${isActive ? "var(--accent-warm)" : "var(--border-hi)"}`,
+                      background: isActive ? "rgba(255,106,53,0.12)" : "var(--surface)",
+                      color: isActive ? "var(--accent-warm)" : "var(--text-dim)",
+                      cursor: "pointer",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      letterSpacing: "-0.01em",
+                      transition: "border-color .2s, background .2s, color .2s",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <span style={{
+                      color: isActive ? "var(--accent-warm)" : "var(--text-faint)",
+                      display: "flex", alignItems: "center",
+                    }}>
+                      {tab.icon}
+                    </span>
+                    {tab.label}
+                  </button>
+                )
+              })}
             </div>
 
-            {/* Body */}
-            <div ref={bodyRef} style={{ padding: 20, flex: 1, fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.7, overflowY: "auto", overflowX: "hidden" }}>
-              {lines.length === 0 ? (
-                <div className="term-line">
-                  <span className="pr">›</span>
-                  <span className="cm">esperando entrada…</span>
-                  <span className="cursor" />
-                </div>
-              ) : lines}
-            </div>
+            {/* Active tab description */}
+            <p style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              color: "var(--text-faint)",
+              letterSpacing: "0.06em",
+              marginBottom: 12,
+              paddingLeft: 2,
+            }}>
+              {TABS.find((t) => t.key === active)?.desc}
+            </p>
+
+            {/* Terminal — mobile */}
+            <TerminalPanel title={title} bodyRef={bodyRef} lines={lines} />
           </div>
         </div>
 
         {/* Metrics */}
-        <div className="reveal" style={{
+        <div className="reveal aaas-metrics-resp" style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
           border: "1px solid var(--border-hi)",

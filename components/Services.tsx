@@ -54,7 +54,7 @@ export function Services() {
   }, [])
 
   return (
-    <section ref={ref} id="servicios" style={{ padding: "140px 0 100px" }}>
+    <section ref={ref} id="servicios" className="sec-pad-resp" style={{ padding: "140px 0 100px" }}>
       <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
 
         {/* Header */}
@@ -92,7 +92,7 @@ export function Services() {
               }}
             >
               {/* Number */}
-              <span style={{
+              <span className="serv-num-col" style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 color: "var(--text-faint)",
@@ -103,7 +103,7 @@ export function Services() {
               </span>
 
               {/* Title */}
-              <h3 style={{
+              <h3 className="serv-title-col" style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "clamp(22px, 2.2vw, 30px)",
                 fontWeight: 700,
@@ -132,7 +132,7 @@ export function Services() {
               </h3>
 
               {/* Desc + tags */}
-              <div>
+              <div className="serv-body-col">
                 <p style={{ color: "var(--text-mid)", fontSize: 15, lineHeight: 1.65, margin: 0 }}>
                   {s.desc}
                 </p>

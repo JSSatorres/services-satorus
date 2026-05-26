@@ -23,7 +23,7 @@ export function ContactSection() {
       style={{ padding: "140px 0 80px", borderTop: "1px solid var(--border)" }}
     >
       <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 80, alignItems: "start" }} className="contact-grid-resp">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 80, alignItems: "start" }} className="contact-grid-resp sec-pad-resp">
 
           {/* Left */}
           <div className="reveal">
@@ -114,7 +114,7 @@ export function ContactSection() {
 
           {/* Form */}
           <div
-            className="reveal d1"
+            className="reveal d1 contact-form-resp"
             style={{
               padding: "40px",
               border: "1px solid var(--border-hi)",
