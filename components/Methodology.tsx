@@ -2,135 +2,154 @@
 
 import { useEffect, useRef } from "react"
 
-const steps = [
-  {
-    marker: "01",
-    title: "Auditoría operativa",
-    desc: "Una semana en tus zapatos: dónde se rompe el flujo, qué tareas matan al equipo, qué automatizar primero.",
-    accent: true,
-  },
-  {
-    marker: "02",
-    title: "Diseño & prototipo",
-    desc: "Maquetamos el sistema en Figma + un prototipo clicable. Antes de escribir código, validamos contigo.",
-    accent: false,
-  },
-  {
-    marker: "03",
-    title: "Build en sprints",
-    desc: "Sprints de 2 semanas con demo y feedback. Despliegues continuos. Ves el progreso real cada lunes.",
-    accent: true,
-  },
-  {
-    marker: "04",
-    title: "Operación y evolución",
-    desc: "Monitorizamos, iteramos y entrenamos a los agentes con tus datos. El sistema mejora con el uso.",
-    accent: false,
-  },
-]
+export function Capas() {
+  return (
+    <section className="capas" id="capas">
+      <div className="container capas__inner">
+        <div className="capas__left">
+          <span className="eyebrow"><span className="eyebrow__dot"></span> CÓMO FUNCIONA</span>
+          <h2 className="capas__title"><em className="serif">Cinco capas,</em> un agente que trabaja por ti.</h2>
+          <p className="capas__lede">Cada agente que entregamos se construye sobre el mismo stack robusto. Auditas las decisiones, controlas el coste y mantienes la propiedad de los datos. <b>Nada de cajas negras.</b></p>
+          <a className="btn btn--pill btn--primary" href="#contacto">Diseña tu agente <span className="btn__arrow">→</span></a>
 
-export function Methodology() {
-  const ref = useRef<HTMLElement>(null)
+          <div className="capas__detail">
+            <span className="mono small dim">// flujo · entrada → respuesta</span>
+            <div className="capas__flow">
+              <span>L5</span><span className="capas__arrow">→</span>
+              <span>L4</span><span className="capas__arrow">→</span>
+              <span>L3</span><span className="capas__arrow">→</span>
+              <span>L2</span><span className="capas__arrow">→</span>
+              <span>L1</span>
+            </div>
+            <span className="mono small dim">ciclo medio: ~1.4s · trazado completo</span>
+          </div>
+        </div>
+
+        <ol className="capas__list">
+          <li className="layer" data-accent="orange">
+            <span className="layer__id mono">L5</span>
+            <div className="layer__main">
+              <h4>Interfaz <span className="layer__dot">·</span> <span className="layer__det">chat, email, WhatsApp, API</span></h4>
+            </div>
+            <span className="layer__tag mono small">user-facing</span>
+            <span className="layer__pulse"></span>
+          </li>
+          <li className="layer" data-accent="amber">
+            <span className="layer__id mono">L4</span>
+            <div className="layer__main">
+              <h4>Razonamiento <span className="layer__dot">·</span> <span className="layer__det">GPT-4 / Claude / Llama</span></h4>
+            </div>
+            <span className="layer__tag mono small">LLM</span>
+            <span className="layer__pulse"></span>
+          </li>
+          <li className="layer" data-accent="yellow">
+            <span className="layer__id mono">L3</span>
+            <div className="layer__main">
+              <h4>Herramientas <span className="layer__dot">·</span> <span className="layer__det">tu ERP, CRM, base de datos</span></h4>
+            </div>
+            <span className="layer__tag mono small">function calling</span>
+            <span className="layer__pulse"></span>
+          </li>
+          <li className="layer" data-accent="mint">
+            <span className="layer__id mono">L2</span>
+            <div className="layer__main">
+              <h4>Memoria <span className="layer__dot">·</span> <span className="layer__det">contexto + RAG sobre tu negocio</span></h4>
+            </div>
+            <span className="layer__tag mono small">vector store</span>
+            <span className="layer__pulse"></span>
+          </li>
+          <li className="layer" data-accent="lime">
+            <span className="layer__id mono">L1</span>
+            <div className="layer__main">
+              <h4>Trazabilidad <span className="layer__dot">·</span> <span className="layer__det">logs, métricas, guardrails</span></h4>
+            </div>
+            <span className="layer__tag mono small">observability</span>
+            <span className="layer__pulse"></span>
+          </li>
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+export function Proceso() {
+  const railRef = useRef<HTMLOListElement>(null)
 
   useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }),
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
-    )
-    ref.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-visible")
+          io.unobserve(e.target)
+        }
+      }
+    }, { threshold: 0.15 })
+    if (railRef.current) io.observe(railRef.current)
     return () => io.disconnect()
   }, [])
 
   return (
-    <section ref={ref} id="proceso" className="sec-pad-resp" style={{ padding: "140px 0 100px" }}>
-      <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
+    <section className="proceso" id="proceso">
+      <div className="container">
+        <header className="section-head">
+          <span className="eyebrow"><span className="eyebrow__dot"></span> 04 / PROCESO</span>
+          <h2 className="section-title">De idea a <em className="serif">producción</em>,<br/>en cuatro pasos.</h2>
+          <p className="section-lede">Trabajamos en sprints cortos con demos cada dos semanas. Ves el producto crecer, decides qué priorizar, y desde el primer mes ya hay algo funcionando.</p>
+        </header>
 
-        {/* Header */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 60, alignItems: "end", marginBottom: 80 }} className="sec-head-grid">
-          <div className="reveal">
-            <div className="eyebrow" style={{ marginBottom: 20 }}>
-              <span className="dot" /> 04 · Proceso
-            </div>
-            <h2 style={{ fontSize: "clamp(40px, 6vw, 88px)" }}>
-              De idea a{" "}
-              <em style={{ fontStyle: "italic", color: "var(--accent)" }}>producción</em>
-              ,<br />cuatro pasos.
-            </h2>
-          </div>
-          <div className="reveal d1" style={{ color: "var(--text-mid)", fontSize: 17, lineHeight: 1.65 }}>
-            Sprints cortos con demos cada dos semanas. Ves el producto crecer, decides qué priorizar,
-            y desde el primer mes ya hay algo funcionando en producción.
-          </div>
-        </div>
-
-        {/* Steps grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, position: "relative" }} className="road-grid-resp">
-
-          {/* Connector line */}
-          <div className="road-line-resp" style={{
-            position: "absolute",
-            top: 27,
-            left: "3%", right: "3%",
-            height: 1,
-            background: "linear-gradient(90deg, transparent, var(--border-hi) 15%, var(--border-hi) 85%, transparent)",
-          }} />
-
-          {steps.map((s, i) => (
-            <div
-              key={s.marker}
-              className={`reveal${i > 0 ? ` d${i}` : ""}`}
-              style={{ padding: "0 20px 0 0", position: "relative" }}
-            >
-              {/* Marker circle */}
-              <div style={{
-                width: 54, height: 54,
-                borderRadius: "50%",
-                background: s.accent ? "rgba(200,255,61,0.08)" : "var(--bg-1)",
-                border: `1px solid ${s.accent ? "var(--accent)" : "var(--border-hi)"}`,
-                display: "grid",
-                placeItems: "center",
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
-                letterSpacing: "0.1em",
-                color: s.accent ? "var(--accent)" : "var(--text-dim)",
-                marginBottom: 28,
-                position: "relative",
-                zIndex: 2,
-                transition: "transform .3s var(--ease-out), box-shadow .3s",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement
-                el.style.transform = "scale(1.08)"
-                el.style.boxShadow = s.accent
-                  ? "0 0 24px -4px rgba(200,255,61,0.4)"
-                  : "0 0 16px -4px rgba(255,255,255,0.1)"
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement
-                el.style.transform = "none"
-                el.style.boxShadow = "none"
-              }}
-              >
-                {s.marker}
-              </div>
-
-              <h4 style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 17,
-                letterSpacing: "-0.02em",
-                margin: "0 0 10px",
-                lineHeight: 1.2,
-              }}>
-                {s.title}
-              </h4>
-              <p style={{ color: "var(--text-mid)", fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>
-                {s.desc}
-              </p>
-            </div>
-          ))}
-        </div>
+        <ol className="proceso__rail" ref={railRef}>
+          <div className="proceso__line"><span className="proceso__line-fill"></span></div>
+          <li className="step">
+            <span className="step__id mono">01 · SEMANA 1</span>
+            <h3>Auditoría <em className="serif">operativa</em></h3>
+            <p>Una semana en tus zapatos: dónde se rompe el flujo, qué tareas matan al equipo, qué automatizar primero.</p>
+            <ul className="step__check mono small">
+              <li>→ shadowing del equipo</li>
+              <li>→ mapa de procesos</li>
+              <li>→ quick-wins detectados</li>
+            </ul>
+          </li>
+          <li className="step">
+            <span className="step__id mono">02 · SEMANA 2-3</span>
+            <h3>Diseño &amp; <em className="serif">prototipo</em></h3>
+            <p>Maquetamos el sistema en Figma + un prototipo clicable. Antes de escribir código, validamos contigo.</p>
+            <ul className="step__check mono small">
+              <li>→ wireframes hi-fi</li>
+              <li>→ prototipo navegable</li>
+              <li>→ arquitectura técnica</li>
+            </ul>
+          </li>
+          <li className="step">
+            <span className="step__id mono">03 · MES 1-3</span>
+            <h3>Build en <em className="serif">sprints</em></h3>
+            <p>Sprints de 2 semanas con demo y feedback. Despliegues continuos. Tú ves el progreso real cada lunes.</p>
+            <ul className="step__check mono small">
+              <li>→ demo cada 14 días</li>
+              <li>→ CI/CD desde día 1</li>
+              <li>→ tests &gt; 80% coverage</li>
+            </ul>
+          </li>
+          <li className="step">
+            <span className="step__id mono">04 · ONGOING</span>
+            <h3>Operación &amp; <em className="serif">evolución</em></h3>
+            <p>Monitorizamos, iteramos y entrenamos a los agentes con tus datos. El sistema mejora con el uso.</p>
+            <ul className="step__check mono small">
+              <li>→ observabilidad 24/7</li>
+              <li>→ retraining mensual</li>
+              <li>→ SLA &lt; 1h</li>
+            </ul>
+          </li>
+        </ol>
       </div>
     </section>
+  )
+}
+
+export function Methodology() {
+  return (
+    <>
+      <Capas />
+      <Proceso />
+    </>
   )
 }

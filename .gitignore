@@ -3,3 +3,11 @@ node_modules
 .DS_Store
 .env.local
 .env
+tsconfig.tsbuildinfo
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Screenshots de referencia en raíz
+*.png
+newDesign/

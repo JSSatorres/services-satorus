@@ -1,28 +1,35 @@
-import { Hero } from "@/components/Hero"
-import { ScrollVideo } from "@/components/ScrollVideo"
-import { Problem } from "@/components/Problem"
+import { Nav, Hero } from "@/components/Hero"
+import { Stats, Marquee, Problem } from "@/components/Problem"
 import { Services } from "@/components/Services"
 import { AaaSShowcase } from "@/components/AaaSShowcase"
-import { Methodology } from "@/components/Methodology"
+import { Capas, Proceso } from "@/components/Methodology"
 import { ContactSection, Footer } from "@/components/Contact"
+import { Ambient } from "@/components/Ambient"
 
 import { localBusinessSchema } from "@/lib/schema"
 
 export default function Home() {
   return (
-    <main>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
-      <Hero />
-      <ScrollVideo />
-      <Problem />
-      <Services />
-      <AaaSShowcase />
-      <Methodology />
-      <ContactSection />
-      <Footer />
-    </main>
+      <Ambient />
+      <div className="cursor-glow" aria-hidden="true"></div>
+      <Nav />
+      <main id="top">
+        <Hero />
+        <Stats />
+        <Marquee />
+        <Problem />
+        <Services />
+        <AaaSShowcase />
+        <Capas />
+        <Proceso />
+        <ContactSection />
+        <Footer />
+      </main>
+    </>
   )
 }

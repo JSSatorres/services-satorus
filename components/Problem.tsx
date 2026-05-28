@@ -2,178 +2,138 @@
 
 import { useEffect, useRef } from "react"
 
-const problems = [
-  {
-    num: "01",
-    title: "Procesos sin trazabilidad",
-    desc: "Pedidos, facturas y partes de trabajo viven en Excel, WhatsApp y archivadores. Nadie sabe dónde está la versión buena.",
-    icon: (
-      <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-        <path d="M3 7h18M3 12h18M3 17h12" />
-      </svg>
-    ),
-  },
-  {
-    num: "02",
-    title: "Horas robadas a tareas manuales",
-    desc: "Tu equipo dedica el 40% de su jornada a transcribir, reenviar y reconciliar. Trabajo invisible que no genera valor.",
-    icon: (
-      <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-        <circle cx={12} cy={12} r={9} /><path d="M12 7v5l3 2" />
-      </svg>
-    ),
-  },
-  {
-    num: "03",
-    title: "VeriFactu y compliance pendiente",
-    desc: "La AEAT exige facturación verificable desde 2026. Si tu software no está listo, el riesgo legal es real.",
-    icon: (
-      <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-        <path d="M12 3l9 16H3L12 3z" /><path d="M12 10v4M12 17h.01" />
-      </svg>
-    ),
-  },
-]
-
-export function Problem() {
-  const ref = useRef<HTMLElement>(null)
+export function Stats() {
+  const rowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }),
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
-    )
-    ref.current?.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el))
+    const els = rowRef.current?.querySelectorAll<HTMLElement>("[data-count]")
+    if (!els) return
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue
+        const el = e.target as HTMLElement
+        const target = Number(el.dataset.count)
+        const suffix = el.dataset.suffix || ""
+        const dur = 1400
+        const t0 = performance.now()
+        const step = (t: number) => {
+          const k = Math.min(1, (t - t0) / dur)
+          const eased = 1 - Math.pow(1 - k, 3)
+          el.textContent = Math.round(target * eased) + suffix
+          if (k < 1) requestAnimationFrame(step)
+        }
+        requestAnimationFrame(step)
+        io.unobserve(el)
+      }
+    }, { threshold: 0.4 })
+    els.forEach(el => io.observe(el))
     return () => io.disconnect()
   }, [])
 
   return (
-    <section ref={ref} id="problema" className="sec-pad-resp" style={{ padding: "140px 0 100px", position: "relative" }}>
-      <div style={{ maxWidth: "var(--max)", margin: "0 auto", padding: "0 var(--pad)" }}>
-
-        {/* Section header */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 60, alignItems: "end", marginBottom: 72 }} className="sec-head-grid">
-          <div className="reveal">
-            <div className="eyebrow" style={{ marginBottom: 20 }}>
-              <span className="dot" /> 01 · El problema
-            </div>
-            <h2 style={{ fontSize: "clamp(40px, 6vw, 88px)" }}>
-              El{" "}
-              <em style={{ fontStyle: "italic", color: "var(--accent)" }}>caos operativo</em>
-              <br />ya no es una opción.
-            </h2>
-          </div>
-          <div className="reveal d1" style={{ color: "var(--text-mid)", fontSize: 17, lineHeight: 1.65 }}>
-            Hojas de cálculo que se rompen, correos olvidados, herramientas que no hablan entre sí.
-            Cada hora que dedicas a copiar y pegar datos es una hora que tu competencia dedica a crecer.
-          </div>
+    <section className="stats">
+      <div className="container stats__row" ref={rowRef}>
+        <div className="stat">
+          <span className="stat__num" data-count="12" data-suffix="+">0</span>
+          <span className="stat__lbl">proyectos en producción</span>
         </div>
-
-        {/* Problem cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--border)" }} className="problem-grid-resp">
-          {problems.map((p, i) => (
-            <article
-              key={p.num}
-              className={`reveal${i > 0 ? ` d${i}` : ""}`}
-              style={{
-                padding: "40px 32px",
-                background: "var(--bg-1)",
-                position: "relative",
-                transition: "background .3s",
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-2)" }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-1)" }}
-            >
-              {/* Number */}
-              <div style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                letterSpacing: "0.15em",
-                color: "var(--text-faint)",
-                marginBottom: 28,
-              }}>
-                {p.num}
-              </div>
-
-              {/* Icon */}
-              <div style={{
-                width: 40, height: 40,
-                borderRadius: 8,
-                background: "rgba(255,106,53,0.08)",
-                border: "1px solid rgba(255,106,53,0.18)",
-                display: "grid",
-                placeItems: "center",
-                color: "var(--accent-warm)",
-                marginBottom: 24,
-              }}>
-                {p.icon}
-              </div>
-
-              <h3 style={{
-                fontFamily: "var(--font-display)",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                marginBottom: 12,
-                lineHeight: 1.1,
-              }}>
-                {p.title}
-              </h3>
-              <p style={{ color: "var(--text-mid)", fontSize: 14, lineHeight: 1.65, margin: 0 }}>
-                {p.desc}
-              </p>
-            </article>
-          ))}
+        <div className="stat">
+          <span className="stat__num" data-count="94" data-suffix="%">0</span>
+          <span className="stat__lbl">horas administrativas ahorradas</span>
         </div>
-
-        {/* Answer bar */}
-        <div
-          className="reveal d2 answer-bar-resp"
-          style={{
-            marginTop: 2,
-            padding: "28px 32px",
-            background: "var(--bg-1)",
-            border: "none",
-            borderTop: "2px solid var(--accent)",
-            display: "grid",
-            gridTemplateColumns: "auto 1fr",
-            gap: 28,
-            alignItems: "center",
-          }}
-        >
-          <span style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.1em",
-            color: "var(--bg)",
-            background: "var(--accent)",
-            padding: "7px 14px",
-            borderRadius: 4,
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-          }}>
-            SATORUS
-          </span>
-          <p style={{
-            margin: 0,
-            fontSize: "clamp(16px, 1.4vw, 20px)",
-            color: "var(--text)",
-            fontFamily: "var(--font-display)",
-            fontWeight: 600,
-            fontStyle: "italic",
-            lineHeight: 1.3,
-            letterSpacing: "-0.02em",
-          }}>
-            Reescribimos esos procesos como software propio — y cuando tiene sentido, los entregamos a un agente que los ejecuta solo.
-          </p>
+        <div className="stat">
+          <span className="stat__num">24<span className="stat__divider">/</span>7</span>
+          <span className="stat__lbl">agentes operando sin descanso</span>
+        </div>
+        <div className="stat">
+          <span className="stat__num" data-count="48" data-suffix="h">0</span>
+          <span className="stat__lbl">primera propuesta técnica</span>
         </div>
       </div>
+    </section>
+  )
+}
 
-      <style>{`
-        @media (max-width: 880px) {
-          .problem-grid-resp { grid-template-columns: 1fr !important; }
+export function Marquee() {
+  const items = ["Python","FastAPI","React","Node.js","PostgreSQL","Docker","OpenAI","LangChain","n8n","Supabase","AWS","Stripe","Twilio"]
+  const track = [...items, ...items]
+  return (
+    <section className="marquee" aria-hidden="true">
+      <div className="marquee__track">
+        {track.map((t, i) => (
+          <span key={i}>{t}<span className="dot"> ·</span></span>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export function Problem() {
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-visible")
+          io.unobserve(e.target)
         }
-      `}</style>
+      }
+    }, { threshold: 0.15 })
+    gridRef.current?.querySelectorAll(".pcard").forEach(el => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <section className="problem" id="problema">
+      <div className="container">
+        <header className="section-head">
+          <span className="eyebrow"><span className="eyebrow__dot"></span> 01 / EL PROBLEMA</span>
+          <h2 className="section-title">El <em className="serif">caos operativo</em><br/>ya no es una opción.</h2>
+          <p className="section-lede">Hojas de cálculo que se rompen, correos olvidados, herramientas que no hablan entre sí. Cada hora que dedicas a copiar y pegar datos es una hora que tu competencia dedica a crecer.</p>
+        </header>
+
+        <div className="problem__grid" ref={gridRef}>
+          <article className="pcard">
+            <span className="pcard__num mono">01</span>
+            <h3>Procesos sin <em className="serif">trazabilidad</em></h3>
+            <p>Pedidos, facturas y partes de trabajo viven en Excel, WhatsApp y archivadores. Nadie sabe dónde está la versión buena.</p>
+            <div className="pcard__viz">
+              <div className="pcard__viz-row"><span>excel.xlsx</span><span className="pcard__viz-tag">v17_final_FINAL</span></div>
+              <div className="pcard__viz-row"><span>whatsapp</span><span className="pcard__viz-tag">312 unread</span></div>
+              <div className="pcard__viz-row"><span>email</span><span className="pcard__viz-tag">no responde</span></div>
+            </div>
+          </article>
+
+          <article className="pcard">
+            <span className="pcard__num mono">02</span>
+            <h3>Horas robadas a tareas <em className="serif">manuales</em></h3>
+            <p>Tu equipo dedica el 40% de su jornada a transcribir, reenviar y reconciliar. Trabajo invisible que no genera valor.</p>
+            <div className="pcard__viz pcard__viz--bar">
+              <div className="pcard__bar"><span style={{"--w": "40%"} as React.CSSProperties} data-bar></span><label className="mono small">manual <b>40%</b></label></div>
+              <div className="pcard__bar"><span style={{"--w": "22%"} as React.CSSProperties} data-bar></span><label className="mono small">reuniones <b>22%</b></label></div>
+              <div className="pcard__bar"><span style={{"--w": "38%"} as React.CSSProperties} data-bar></span><label className="mono small">producir <b>38%</b></label></div>
+            </div>
+          </article>
+
+          <article className="pcard">
+            <span className="pcard__num mono">03</span>
+            <h3>VeriFactu y <em className="serif">compliance</em> pendiente</h3>
+            <p>La AEAT exige facturación verificable desde 2026. Si tu software no está listo, el riesgo legal es real.</p>
+            <div className="pcard__viz pcard__viz--countdown">
+              <div className="pcard__cd"><span className="pcard__cd-n">07</span><label className="mono small">meses</label></div>
+              <div className="pcard__cd"><span className="pcard__cd-n">14</span><label className="mono small">días</label></div>
+              <div className="pcard__cd"><span className="pcard__cd-n">02</span><label className="mono small">horas</label></div>
+              <span className="mono small dim pcard__cd-cap">→ deadline AEAT</span>
+            </div>
+          </article>
+        </div>
+
+        <div className="problem__footer">
+          <span className="mono small dim">// SATORUS</span>
+          <p>Reescribimos esos procesos como software propio — y, cuando tiene sentido, los entregamos a un <b>agente que los ejecuta solo</b>.</p>
+        </div>
+      </div>
     </section>
   )
 }
