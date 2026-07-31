@@ -11,6 +11,10 @@ type SectionCurtainStackProps = {
 
 const MIN_VISIBLE_HEIGHT = 24;
 
+function readSeamDepth(isMobile: boolean) {
+  return isMobile ? 24 : 38;
+}
+
 function readHeaderHeight() {
   const value = getComputedStyle(document.documentElement).getPropertyValue(
     "--header-height",
@@ -56,51 +60,66 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
           rootRef.current?.classList.add("curtain-motion-enabled");
 
           visiblePanels.forEach((panel, index) => {
-            gsap.set(panel, { zIndex: visiblePanels.length - index + 1 });
+            panel.classList.add("curtain-panel--visible");
+            gsap.set(panel, { zIndex: index + 1 });
           });
 
           visiblePanels.slice(0, -1).forEach((panel, index) => {
             const nextPanel = visiblePanels[index + 1];
-            const surface = panel.querySelector<HTMLElement>(
+            const nextSurface = nextPanel.querySelector<HTMLElement>(
               ".section-curtain-surface",
             );
-            if (!surface) return;
+            if (!nextSurface) return;
 
-            panel.classList.add("curtain-panel--moving");
+            const activateSeam = () => {
+              nextPanel.classList.add("curtain-panel--seam-active");
+              gsap.set(nextSurface, { willChange: "transform" });
+            };
+            const releaseSeam = () => {
+              nextPanel.classList.remove("curtain-panel--seam-active");
+              gsap.set(nextSurface, { willChange: "auto" });
+            };
 
-            gsap.to(surface, {
-              y: () => {
-                const radius = mobile ? 30 : 52;
+            ScrollTrigger.create({
+              trigger: panel,
+              start: () => {
                 const availableHeight =
                   window.innerHeight - readHeaderHeight();
-                return -(Math.min(panel.offsetHeight, availableHeight) + radius);
+                return panel.offsetHeight <= availableHeight
+                  ? `clamp(top ${readHeaderHeight()}px)`
+                  : "clamp(bottom bottom)";
               },
-              ease: "none",
-              scrollTrigger: {
-                trigger: panel,
-                start: () => {
-                  const availableHeight =
-                    window.innerHeight - readHeaderHeight();
-                  return panel.offsetHeight <= availableHeight
-                    ? `clamp(top ${readHeaderHeight()}px)`
-                    : "clamp(bottom bottom)";
-                },
-                endTrigger: nextPanel,
-                end: () => `top ${readHeaderHeight()}px`,
-                pin: panel,
-                pinSpacing: false,
-                scrub: desktop ? 0.72 : 0.34,
-                anticipatePin: 1,
-                fastScrollEnd: true,
-                invalidateOnRefresh: true,
-                refreshPriority: -10,
-                onEnter: () => gsap.set(surface, { willChange: "transform" }),
-                onEnterBack: () =>
-                  gsap.set(surface, { willChange: "transform" }),
-                onLeave: () => gsap.set(surface, { willChange: "auto" }),
-                onLeaveBack: () => gsap.set(surface, { willChange: "auto" }),
-              },
+              endTrigger: nextPanel,
+              end: () =>
+                `top ${readHeaderHeight() - readSeamDepth(Boolean(mobile))}px`,
+              pin: panel,
+              pinSpacing: false,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              refreshPriority: -10,
             });
+
+            gsap.fromTo(
+              nextSurface,
+              { y: () => readSeamDepth(Boolean(mobile)) * 0.7 },
+              {
+                y: 0,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: nextPanel,
+                  start: "clamp(top bottom)",
+                  end: () =>
+                    `top ${readHeaderHeight() - readSeamDepth(Boolean(mobile))}px`,
+                  scrub: desktop ? 0.5 : 0.24,
+                  invalidateOnRefresh: true,
+                  refreshPriority: -10,
+                  onEnter: activateSeam,
+                  onEnterBack: activateSeam,
+                  onLeave: releaseSeam,
+                  onLeaveBack: releaseSeam,
+                },
+              },
+            );
           });
 
           ScrollTrigger.sort();
@@ -112,7 +131,10 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
             window.cancelAnimationFrame(refreshFrame);
             rootRef.current?.classList.remove("curtain-motion-enabled");
             allPanels.forEach((panel) => {
-              panel.classList.remove("curtain-panel--moving");
+              panel.classList.remove(
+                "curtain-panel--seam-active",
+                "curtain-panel--visible",
+              );
             });
           };
         },

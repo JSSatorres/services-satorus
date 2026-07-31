@@ -71,14 +71,69 @@ main {
   position: relative;
 }
 
-.curtain-motion-enabled .curtain-panel--moving .section-curtain-surface > section {
-  overflow: clip;
-  border-radius: 0 0 52px 52px;
+.curtain-motion-enabled .curtain-panel--visible {
+  min-height: 100svh;
+}
+
+.curtain-motion-enabled
+  .curtain-panel--visible
+  > .section-curtain-surface,
+.curtain-motion-enabled
+  .curtain-panel--visible
+  > .section-curtain-surface
+  > section {
+  min-height: inherit;
+}
+
+.curtain-motion-enabled
+  .curtain-panel--seam-active
+  > .section-curtain-surface {
+  --curtain-seam-depth: 38px;
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      rgba(0, 0, 0, 0.12) 6px,
+      rgba(0, 0, 0, 0.48) 17px,
+      rgba(0, 0, 0, 0.82) 27px,
+      #000 var(--curtain-seam-depth)
+    ),
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(0, 0, 0, 0.2) 0 0.4px,
+      transparent 0.55px
+    );
+  -webkit-mask-size:
+    100% 100%,
+    4px 4px;
+  -webkit-mask-repeat: no-repeat, repeat;
+  -webkit-mask-composite: source-over;
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      rgba(0, 0, 0, 0.12) 6px,
+      rgba(0, 0, 0, 0.48) 17px,
+      rgba(0, 0, 0, 0.82) 27px,
+      #000 var(--curtain-seam-depth)
+    ),
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(0, 0, 0, 0.2) 0 0.4px,
+      transparent 0.55px
+    );
+  mask-size:
+    100% 100%,
+    4px 4px;
+  mask-repeat: no-repeat, repeat;
+  mask-composite: add;
 }
 
 @media (max-width: 900px) {
-  .curtain-motion-enabled .curtain-panel--moving .section-curtain-surface > section {
-    border-radius: 0 0 30px 30px;
+  .curtain-motion-enabled
+    .curtain-panel--seam-active
+    > .section-curtain-surface {
+    --curtain-seam-depth: 24px;
   }
 }
 
