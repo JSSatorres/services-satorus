@@ -1,62 +1,118 @@
-import { NextResponse } from "next/server"
-import { Resend } from "resend"
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
 
-export async function POST(req: Request) {
+export const runtime = "nodejs";
+
+type ContactPayload = {
+  name?: unknown;
+  company?: unknown;
+  email?: unknown;
+  message?: unknown;
+  consent?: unknown;
+  website?: unknown;
+};
+
+function clean(value: unknown, maxLength: number) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+export async function POST(request: Request) {
+  let payload: ContactPayload;
+
   try {
-    const apiKey = process.env.RESEND_API_KEY
-    const isPlaceholder = apiKey === "re_your_api_key_here"
-    
-    if (!apiKey || isPlaceholder) {
-      console.error("❌ Resend API Key is missing or invalid. Please set it in .env")
-      return NextResponse.json(
-        { success: false, error: "Servicio de contacto no configurado todavía." },
-        { status: 503 }
-      )
-    }
-
-    const resend = new Resend(apiKey)
-    const data = await req.json()
-    const { name, company, solution, pain, budget, message } = data
-
-    console.log("📨 Intentando enviar email para:", name)
-
-    // Real email sending with Resend
-    const { data: resendData, error: resendError } = await resend.emails.send({
-      from: "Satorus Web <onboarding@resend.dev>",
-      to: ["juansataz.dev@gmail.com"], // Sending only to verified email for Sandbox mode
-      replyTo: "info@satorus.es",
-
-      subject: `🚀 Nueva solicitud: ${solution} de ${name}`,
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; color: #333;">
-          <h1 style="color: #3b82f6;">Nueva solicitud de proyecto</h1>
-          <p><strong>Nombre:</strong> ${name}</p>
-          <p><strong>Empresa:</strong> ${company || "No indicada"}</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p><strong>Tipo de Solución:</strong> ${solution}</p>
-          <p><strong>Problema a resolver:</strong> ${pain}</p>
-          <p><strong>Presupuesto estimado:</strong> ${budget || "No indicado"}</p>
-          <p style="white-space: pre-wrap;"><strong>Mensaje adicional:</strong><br/>${message}</p>
-        </div>
-      `,
-    })
-
-    if (resendError) {
-      console.error("❌ Error de Resend:", resendError)
-      return NextResponse.json(
-        { success: false, error: resendError.message },
-        { status: 500 }
-      )
-    }
-
-    console.log("✅ Email enviado con éxito. ID:", resendData?.id)
-    return NextResponse.json({ success: true, message: "Enviado correctamente", id: resendData?.id })
-
-  } catch (error) {
-    console.error("Error sending real contact email:", error)
+    payload = (await request.json()) as ContactPayload;
+  } catch {
     return NextResponse.json(
-      { success: false, error: "Error al enviar el correo" },
-      { status: 500 }
-    )
+      { message: "El formulario no se ha podido leer. Revisa los campos." },
+      { status: 400 },
+    );
   }
+
+  const name = clean(payload.name, 80);
+  const company = clean(payload.company, 120);
+  const email = clean(payload.email, 160).toLowerCase();
+  const message = clean(payload.message, 2000);
+  const website = clean(payload.website, 200);
+  const consent = payload.consent === true;
+
+  // Los bots suelen completar este campo oculto. Respondemos sin enviar nada.
+  if (website) {
+    return NextResponse.json({ message: "Mensaje enviado." });
+  }
+
+  if (name.length < 2) {
+    return NextResponse.json(
+      { message: "Escribe un nombre de al menos dos caracteres." },
+      { status: 400 },
+    );
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { message: "Escribe un correo válido para que podamos responderte." },
+      { status: 400 },
+    );
+  }
+
+  if (message.length < 20) {
+    return NextResponse.json(
+      { message: "Cuéntanos un poco más: el mensaje debe tener al menos 20 caracteres." },
+      { status: 400 },
+    );
+  }
+
+  if (!consent) {
+    return NextResponse.json(
+      { message: "Necesitamos que aceptes la política de privacidad para responderte." },
+      { status: 400 },
+    );
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.CONTACT_FROM_EMAIL;
+  const to = process.env.CONTACT_TO_EMAIL ?? "hola@satorus.es";
+
+  if (!apiKey || !from) {
+    return NextResponse.json(
+      {
+        message:
+          "El formulario aún no está conectado. Escríbenos directamente a hola@satorus.es.",
+      },
+      { status: 503 },
+    );
+  }
+
+  const resend = new Resend(apiKey);
+  const subjectCompany = company ? ` — ${company}` : "";
+  const text = [
+    `Nombre: ${name}`,
+    `Empresa: ${company || "No indicada"}`,
+    `Correo: ${email}`,
+    "",
+    "Mensaje:",
+    message,
+  ].join("\n");
+
+  const { error } = await resend.emails.send({
+    from,
+    to,
+    replyTo: email,
+    subject: `Nueva consulta desde satorus.es${subjectCompany}`,
+    text,
+  });
+
+  if (error) {
+    console.error("No se ha podido enviar el formulario de contacto", error.name);
+    return NextResponse.json(
+      {
+        message:
+          "El mensaje no ha salido. Escríbenos directamente a hola@satorus.es.",
+      },
+      { status: 502 },
+    );
+  }
+
+  return NextResponse.json({
+    message: "Mensaje enviado. Te responderemos lo antes posible.",
+  });
 }
