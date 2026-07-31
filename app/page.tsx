@@ -4,6 +4,7 @@ import { ContactForm } from "@/components/contact-form"
 import { DesktopScrollStory } from "@/components/desktop-scroll-story"
 import { Hero } from "@/components/hero"
 import { MobileFlowReveal } from "@/components/mobile-flow-reveal"
+import { SectionCurtainStack } from "@/components/section-curtain-stack"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 
@@ -88,9 +89,10 @@ export default function Home() {
     <>
       <SiteHeader />
       <main id="contenido">
-        <Hero />
+        <SectionCurtainStack>
+          <Hero />
 
-        <section className="plain-talk" aria-labelledby="plain-talk-title">
+          <section className="plain-talk" aria-labelledby="plain-talk-title">
           <div className="plain-talk-copy">
             <h2 id="plain-talk-title">
               Hablamos claro.
@@ -112,9 +114,9 @@ export default function Home() {
             <span className="sketch-start">Lo que te frena</span>
             <span className="sketch-end">Un recorrido claro</span>
           </div>
-        </section>
+          </section>
 
-        <section
+          <section
           className="friction-section"
           id="que-resolvemos"
           aria-labelledby="friction-title"
@@ -146,9 +148,9 @@ export default function Home() {
               <ArrowDown aria-hidden="true" size={22} />
             </a>
           </div>
-        </section>
+          </section>
 
-        <section
+          <section
           className="services-section"
           id="servicios"
           aria-labelledby="services-title"
@@ -173,12 +175,12 @@ export default function Home() {
               </article>
             ))}
           </div>
-        </section>
+          </section>
 
-        <DesktopScrollStory />
-        <MobileFlowReveal />
+          <DesktopScrollStory />
+          <MobileFlowReveal />
 
-        <section
+          <section
           className="process-section"
           id="como-trabajamos"
           aria-labelledby="process-title"
@@ -204,9 +206,9 @@ export default function Home() {
               </li>
             ))}
           </ol>
-        </section>
+          </section>
 
-        <section
+          <section
           className="faq-section"
           id="preguntas"
           aria-labelledby="faq-title"
@@ -232,9 +234,9 @@ export default function Home() {
               </details>
             ))}
           </div>
-        </section>
+          </section>
 
-        <section
+          <section
           className="contact-section"
           id="contacto"
           aria-labelledby="contact-title"
@@ -252,7 +254,8 @@ export default function Home() {
             <a href="mailto:hola@satorus.es">hola@satorus.es</a>
           </div>
           <ContactForm />
-        </section>
+          </section>
+        </SectionCurtainStack>
       </main>
       <SiteFooter />
     </>

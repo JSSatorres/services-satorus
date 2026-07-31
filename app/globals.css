@@ -61,6 +61,27 @@ main {
   overflow: clip;
 }
 
+.section-curtain-stack {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-curtain-panel,
+.section-curtain-surface {
+  position: relative;
+}
+
+.curtain-motion-enabled .curtain-panel--moving .section-curtain-surface > section {
+  overflow: clip;
+  border-radius: 0 0 52px 52px;
+}
+
+@media (max-width: 900px) {
+  .curtain-motion-enabled .curtain-panel--moving .section-curtain-surface > section {
+    border-radius: 0 0 30px 30px;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;

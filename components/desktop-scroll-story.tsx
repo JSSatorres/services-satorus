@@ -54,6 +54,7 @@ export function DesktopScrollStory() {
               start: "top top",
               end: "+=220%",
               pin: stage,
+              pinReparent: true,
               scrub: 0.8,
               anticipatePin: 1,
               invalidateOnRefresh: true,
