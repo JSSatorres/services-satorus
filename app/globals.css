@@ -13,6 +13,7 @@
 :root {
   --tool-blue: #2948c7;
   --tool-blue-dark: #20389a;
+  --hero-rest-blue: #10376e;
   --action-orange: #e56748;
   --action-orange-dark: #bd4932;
   --label-lime: #dfe97a;
@@ -72,12 +73,15 @@ main {
   position: relative;
 }
 
-.section-curtain-surface:has(> .hero),
 .section-curtain-surface:has(> .services-section),
 .section-curtain-surface:has(> .desktop-scroll-story),
 .section-curtain-surface:has(> .mobile-flow-reveal),
 .section-curtain-surface:has(> .faq-section) {
   --curtain-panel-background: var(--cool-paper);
+}
+
+.section-curtain-surface:has(> .hero) {
+  --curtain-panel-background: var(--hero-rest-blue);
 }
 
 .section-curtain-surface:has(> .plain-talk) {
