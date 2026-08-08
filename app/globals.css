@@ -26,6 +26,7 @@
   --header-height: 74px;
   --page-pad: clamp(1.25rem, 4vw, 4.5rem);
   --section-pad: clamp(5rem, 9vw, 9rem);
+  --curtain-rest-space: clamp(10rem, 26svh, 20rem);
 }
 
 * {
@@ -71,6 +72,27 @@ main {
   position: relative;
 }
 
+.section-curtain-surface:has(> .hero),
+.section-curtain-surface:has(> .services-section),
+.section-curtain-surface:has(> .desktop-scroll-story),
+.section-curtain-surface:has(> .mobile-flow-reveal),
+.section-curtain-surface:has(> .faq-section) {
+  --curtain-panel-background: var(--cool-paper);
+}
+
+.section-curtain-surface:has(> .plain-talk) {
+  --curtain-panel-background: var(--action-orange);
+}
+
+.section-curtain-surface:has(> .friction-section),
+.section-curtain-surface:has(> .contact-section) {
+  --curtain-panel-background: var(--bench-graphite);
+}
+
+.section-curtain-surface:has(> .process-section) {
+  --curtain-panel-background: var(--label-lime);
+}
+
 .curtain-motion-enabled .curtain-panel--visible {
   min-height: 100svh;
 }
@@ -83,6 +105,13 @@ main {
   > .section-curtain-surface
   > section {
   min-height: inherit;
+}
+
+.curtain-motion-enabled
+  .curtain-panel--visible:not(:last-child)
+  > .section-curtain-surface {
+  padding-block-end: var(--curtain-rest-space);
+  background: var(--curtain-panel-background, var(--cool-paper));
 }
 
 .curtain-motion-enabled
@@ -130,6 +159,10 @@ main {
 }
 
 @media (max-width: 900px) {
+  :root {
+    --curtain-rest-space: clamp(7.5rem, 20svh, 14rem);
+  }
+
   .curtain-motion-enabled
     .curtain-panel--seam-active
     > .section-curtain-surface {
