@@ -119,6 +119,21 @@ main {
 }
 
 .curtain-motion-enabled
+  .curtain-panel--visible.curtain-panel--has-next
+  > .section-curtain-surface:has(> .hero)
+  > .hero {
+  overflow: visible;
+}
+
+.curtain-motion-enabled
+  .curtain-panel--visible.curtain-panel--has-next
+  > .section-curtain-surface:has(> .hero)
+  > .hero
+  > .hero-photo {
+  bottom: calc(-1 * var(--curtain-rest-space));
+}
+
+.curtain-motion-enabled
   .curtain-panel--seam-active
   > .section-curtain-surface {
   --curtain-seam-depth: 38px;
