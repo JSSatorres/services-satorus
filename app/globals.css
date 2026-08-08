@@ -133,6 +133,35 @@ main {
   bottom: calc(-1 * var(--curtain-rest-space));
 }
 
+@media (min-width: 901px) {
+  .curtain-motion-enabled
+    .curtain-panel--visible.curtain-panel--has-next
+    > .section-curtain-surface:has(> .friction-section)
+    > .friction-section {
+    position: relative;
+    overflow: visible;
+  }
+
+  .curtain-motion-enabled
+    .curtain-panel--visible.curtain-panel--has-next
+    > .section-curtain-surface:has(> .friction-section)
+    > .friction-section
+    > .friction-photo {
+    position: absolute;
+    inset: 0 auto calc(-1 * var(--curtain-rest-space)) 0;
+    width: 51%;
+    min-height: 0;
+  }
+
+  .curtain-motion-enabled
+    .curtain-panel--visible.curtain-panel--has-next
+    > .section-curtain-surface:has(> .friction-section)
+    > .friction-section
+    > .friction-copy {
+    grid-column: 2;
+  }
+}
+
 .curtain-motion-enabled
   .curtain-panel--seam-active
   > .section-curtain-surface {
