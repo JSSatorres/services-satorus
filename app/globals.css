@@ -112,7 +112,7 @@ main {
 }
 
 .curtain-motion-enabled
-  .curtain-panel--visible:not(:last-child)
+  .curtain-panel--visible.curtain-panel--has-next
   > .section-curtain-surface {
   padding-block-end: var(--curtain-rest-space);
   background: var(--curtain-panel-background, var(--cool-paper));

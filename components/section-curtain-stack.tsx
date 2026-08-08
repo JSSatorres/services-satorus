@@ -148,7 +148,12 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
   return (
     <div className="section-curtain-stack" ref={rootRef}>
       {panels.map((panel, index) => (
-        <div className="section-curtain-panel" key={index}>
+        <div
+          className={`section-curtain-panel${
+            index < panels.length - 1 ? " curtain-panel--has-next" : ""
+          }`}
+          key={index}
+        >
           <div className="section-curtain-surface">{panel}</div>
         </div>
       ))}
