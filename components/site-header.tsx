@@ -1,15 +1,16 @@
 "use client";
 
 import { ArrowUpRight, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 const links = [
-  { href: "#servicios", label: "Qué hacemos" },
-  { href: "#como-trabajamos", label: "Cómo trabajamos" },
-  { href: "#que-resolvemos", label: "Para quién" },
-  { href: "#preguntas", label: "Recursos" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#servicios", label: "Qué hacemos" },
+  { href: "/productos", label: "Productos" },
+  { href: "/#como-trabajamos", label: "Cómo trabajamos" },
+  { href: "/#que-resolvemos", label: "Para quién" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
 export function SiteHeader() {
@@ -22,22 +23,22 @@ export function SiteHeader() {
 
   return (
     <header className="site-header">
-      <a className="wordmark" href="#top" aria-label="Satorus, volver al inicio" translate="no">
+      <Link className="wordmark" href="/" aria-label="Satorus, volver al inicio" translate="no">
         <BrandLogo />
-      </a>
+      </Link>
 
       <nav className="desktop-nav" aria-label="Navegación principal">
         {links.map((link) => (
-          <a key={link.href} href={link.href}>
+          <Link key={link.href} href={link.href}>
             {link.label}
-          </a>
+          </Link>
         ))}
       </nav>
 
-      <a className="header-cta" href="#contacto">
+      <Link className="header-cta" href="/#contacto">
         Hablemos
         <ArrowUpRight aria-hidden="true" size={18} strokeWidth={2.2} />
-      </a>
+      </Link>
 
       <button
         className="menu-button"
@@ -53,14 +54,14 @@ export function SiteHeader() {
       <div className="mobile-nav" id="mobile-navigation" data-open={open}>
         <nav aria-label="Navegación móvil">
           {links.map((link) => (
-            <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+            <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
               {link.label}
-            </a>
+            </Link>
           ))}
-          <a href="#contacto" onClick={() => setOpen(false)}>
+          <Link href="/#contacto" onClick={() => setOpen(false)}>
             Cuéntanos qué te frena
             <ArrowUpRight aria-hidden="true" size={21} />
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

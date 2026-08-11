@@ -1,0 +1,1292 @@
+.page {
+  overflow: clip;
+  background: var(--cool-paper);
+}
+
+.page h1,
+.page h2,
+.page h3 {
+  margin: 0;
+  font-family: var(--font-display-family);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.page p,
+.page figure,
+.page ol {
+  margin: 0;
+}
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(520px, 1.14fr);
+  align-items: center;
+  gap: clamp(2rem, 4vw, 5rem);
+  padding: calc(var(--header-height) + clamp(3.5rem, 8vh, 6.5rem)) var(--page-pad) clamp(4rem, 8vh, 7rem);
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    var(--cool-paper);
+  background-size: 58px 58px;
+}
+
+.hero::before {
+  position: absolute;
+  content: "";
+  inset: var(--header-height) auto 0 54%;
+  width: 1px;
+  background: var(--line);
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 4;
+  max-width: 710px;
+}
+
+.heroCopy h1 {
+  max-width: 11ch;
+  font-size: clamp(3.75rem, 7.2vw, 6rem);
+  font-variation-settings: "wdth" 66, "wght" 820;
+  line-height: 0.86;
+}
+
+.heroCopy h1 span {
+  display: block;
+  color: var(--tool-blue);
+}
+
+.heroCopy > p {
+  max-width: 52ch;
+  margin-top: 2rem;
+  color: var(--graphite-soft);
+  font-size: clamp(1.08rem, 1.4vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.productJump {
+  width: min(100%, 610px);
+  margin-top: clamp(2.5rem, 6vh, 5rem);
+  border-top: 2px solid var(--bench-graphite);
+}
+
+.productJump a {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  min-height: 62px;
+  border-bottom: 1px solid var(--bench-graphite);
+  font-family: var(--font-display-family);
+  font-size: 1.3rem;
+  font-variation-settings: "wdth" 82, "wght" 720;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background 220ms ease;
+}
+
+.productJump a:first-child:hover {
+  background: var(--label-lime);
+  transform: translateX(6px);
+}
+
+.productJump a:last-child:hover {
+  background: var(--action-orange);
+  transform: translateX(6px);
+}
+
+.productJump a span {
+  font-family: var(--font-body-family);
+  color: var(--graphite-soft);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.heroWorkbench {
+  position: relative;
+  min-height: min(68vw, 680px);
+  isolation: isolate;
+}
+
+.heroBlueField {
+  position: absolute;
+  z-index: -3;
+  inset: 0 -8vw -2rem 4%;
+  background: var(--tool-blue);
+  clip-path: polygon(19% 0, 100% 0, 100% 87%, 0 100%);
+}
+
+.heroPidotecaSheet,
+.heroSportSheet {
+  position: absolute;
+  background: var(--cool-paper);
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 24px 45px rgba(9, 19, 46, 0.24);
+}
+
+.heroPidotecaSheet {
+  z-index: 1;
+  top: 8%;
+  right: 2%;
+  width: 82%;
+  padding: clamp(0.55rem, 1vw, 0.85rem);
+  transform: rotate(2.2deg);
+}
+
+.heroSportSheet {
+  z-index: 2;
+  right: 34%;
+  bottom: 4%;
+  width: 58%;
+  padding: clamp(0.5rem, 0.8vw, 0.7rem);
+  transform: rotate(-4deg);
+}
+
+.sheetImage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: white;
+  border: 1px solid rgba(23, 27, 24, 0.16);
+}
+
+.sheetImage img {
+  object-fit: cover;
+  object-position: top left;
+}
+
+.heroPidotecaSheet figcaption,
+.heroSportSheet figcaption {
+  padding: 0.65rem 0.2rem 0.1rem;
+  font-size: clamp(0.72rem, 1vw, 0.86rem);
+  font-weight: 720;
+}
+
+.heroRoute {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 12px rgba(45, 15, 8, 0.2));
+}
+
+.heroRoute path {
+  fill: none;
+  stroke: var(--action-orange);
+  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-dasharray: 1600;
+  stroke-dashoffset: 1600;
+  animation: route-draw 1.35s 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.heroRoute circle {
+  fill: var(--label-lime);
+  stroke: var(--bench-graphite);
+  stroke-width: 4;
+}
+
+@keyframes route-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.pidoteca {
+  position: relative;
+  padding: var(--section-pad) var(--page-pad);
+  color: white;
+  background: var(--tool-blue);
+}
+
+.productHeading,
+.sportHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: clamp(3rem, 8vw, 9rem);
+  align-items: end;
+}
+
+.productHeading h2,
+.sportHeading h2 {
+  max-width: 13ch;
+  font-size: clamp(3.4rem, 6.3vw, 6rem);
+  font-variation-settings: "wdth" 68, "wght" 810;
+  line-height: 0.88;
+}
+
+.productHeading h2 span,
+.sportHeading h2 span {
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--label-lime);
+  font-size: 0.34em;
+  font-variation-settings: "wdth" 92, "wght" 760;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.productIntro > p,
+.sportHeading > div > p {
+  max-width: 48ch;
+  font-size: clamp(1.05rem, 1.35vw, 1.24rem);
+  line-height: 1.55;
+}
+
+.productIntro > p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 62px;
+  margin-top: 2rem;
+  padding: 0.9rem 1.3rem 0.9rem 1.55rem;
+  color: white;
+  background: var(--action-orange);
+  border: 1px solid var(--bench-graphite);
+  border-radius: 10px 32px 32px 10px;
+  box-shadow: 0 16px 30px rgba(32, 21, 12, 0.25);
+  font-weight: 780;
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.primaryCta:hover {
+  background: var(--action-orange-dark);
+  transform: translateY(-3px) rotate(-0.4deg);
+}
+
+.pidotecaScene {
+  position: relative;
+  min-height: clamp(560px, 57vw, 780px);
+  margin-top: clamp(4rem, 9vw, 8rem);
+}
+
+.dashboardFrame {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: min(78%, 1080px);
+  padding: clamp(0.7rem, 1.2vw, 1rem);
+  color: white;
+  background: var(--bench-graphite);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 32px 70px rgba(4, 12, 42, 0.34);
+  transform: rotate(-1deg);
+}
+
+.frameTopline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.15rem 0.35rem 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8rem;
+  font-weight: 720;
+}
+
+.frameTopline span:last-child {
+  color: var(--label-lime);
+}
+
+.dashboardImage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 8.55;
+  background: white;
+}
+
+.dashboardImage img {
+  object-fit: cover;
+  object-position: top left;
+}
+
+.dashboardFrame figcaption {
+  max-width: 62ch;
+  padding: 0.8rem 0.35rem 0.2rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.88rem;
+}
+
+.mapSheet {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 1%;
+  width: min(33%, 430px);
+  padding: clamp(0.75rem, 1.4vw, 1.2rem);
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 22px 40px rgba(3, 9, 31, 0.3);
+  transform: rotate(3.4deg);
+}
+
+.mapSheet > span {
+  display: block;
+  margin-bottom: 0.85rem;
+  font-family: var(--font-display-family);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-variation-settings: "wdth" 80, "wght" 760;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.mapSheet > div {
+  position: relative;
+  aspect-ratio: 10 / 7;
+  overflow: hidden;
+  background: white;
+  border: 1px solid rgba(23, 27, 24, 0.2);
+}
+
+.mapSheet img {
+  object-fit: contain;
+}
+
+.mapSheet figcaption {
+  padding-top: 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 680;
+}
+
+.pidotecaFlow {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+  border-top: 2px solid white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.48);
+}
+
+.pidotecaFlow li {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: start;
+  gap: 1rem;
+  min-height: 230px;
+  padding: 2rem clamp(1.2rem, 2.5vw, 2.5rem) 2.2rem 0;
+}
+
+.pidotecaFlow li + li {
+  padding-left: clamp(1.2rem, 2.5vw, 2.5rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.flowNumber {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--bench-graphite);
+  background: var(--action-orange);
+  border: 1px solid var(--bench-graphite);
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.pidotecaFlow svg {
+  margin-top: 0.25rem;
+  color: var(--label-lime);
+}
+
+.pidotecaFlow h3 {
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-variation-settings: "wdth" 82, "wght" 740;
+  line-height: 1;
+}
+
+.pidotecaFlow p {
+  max-width: 35ch;
+  margin-top: 0.85rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.sportApp {
+  padding: var(--section-pad) var(--page-pad) 0;
+  background: var(--cool-paper);
+}
+
+.sportHeading {
+  color: var(--bench-graphite);
+}
+
+.sportHeading h2 span {
+  color: var(--action-orange-dark);
+}
+
+.sportHeading > div > p {
+  color: var(--graphite-soft);
+}
+
+.sportHeading > div > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--bench-graphite);
+  font-weight: 780;
+}
+
+.sportScene {
+  position: relative;
+  min-height: clamp(590px, 61vw, 830px);
+  margin-top: clamp(4rem, 9vw, 8rem);
+}
+
+.trainingPhoto {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: min(74%, 1050px);
+  height: 76%;
+  overflow: hidden;
+  background: var(--bench-graphite);
+  clip-path: polygon(0 0, 100% 0, 91% 100%, 0 91%);
+}
+
+.trainingPhoto::after {
+  position: absolute;
+  content: "";
+  inset: 0;
+  background: rgba(16, 55, 110, 0.15);
+  pointer-events: none;
+}
+
+.trainingPhoto img {
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.82) contrast(1.03);
+}
+
+.trainingPhoto figcaption {
+  position: absolute;
+  z-index: 1;
+  right: 8%;
+  bottom: 11%;
+  max-width: 31ch;
+  padding: 0.8rem 1rem;
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+  font-weight: 740;
+  transform: rotate(-1.8deg);
+}
+
+.sportDashboard {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  width: min(48%, 690px);
+  padding: clamp(0.7rem, 1.2vw, 1rem);
+  background: white;
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 26px 55px rgba(16, 20, 17, 0.24);
+  transform: rotate(2deg);
+}
+
+.sportDashboard > span {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--tool-blue);
+  font-weight: 780;
+}
+
+.sportDashboard > div {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid rgba(23, 27, 24, 0.16);
+}
+
+.sportDashboard img {
+  object-fit: cover;
+  object-position: top left;
+}
+
+.sportDashboard figcaption {
+  padding-top: 0.65rem;
+  color: var(--graphite-soft);
+  font-size: 0.8rem;
+}
+
+.connectedStrip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: clamp(3rem, 6vw, 6rem);
+  border-top: 2px solid var(--bench-graphite);
+  border-bottom: 1px solid var(--bench-graphite);
+}
+
+.connectedStrip > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 92px;
+  padding: 1rem clamp(0.6rem, 1.4vw, 1.25rem);
+  font-weight: 720;
+}
+
+.connectedStrip > div + div {
+  border-left: 1px solid var(--bench-graphite);
+}
+
+.connectedStrip > div:not(:last-child)::after {
+  position: absolute;
+  z-index: 1;
+  content: "";
+  top: 50%;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--action-orange);
+  border: 2px solid var(--bench-graphite);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.connectedStrip svg {
+  flex: none;
+  color: var(--tool-blue);
+}
+
+.noteJourney {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 5rem);
+  margin: clamp(4rem, 8vw, 8rem) calc(-1 * var(--page-pad)) 0;
+  padding: clamp(4rem, 7vw, 7rem) var(--page-pad);
+  color: white;
+  background: var(--bench-graphite);
+}
+
+.noteSource,
+.noteDestination {
+  min-height: 220px;
+  padding: clamp(1.4rem, 3vw, 2.6rem);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.noteSource {
+  background: var(--tool-blue);
+  transform: rotate(-1deg);
+}
+
+.noteDestination {
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  transform: rotate(1deg);
+}
+
+.noteSource > span,
+.noteDestination > span {
+  font-size: 0.85rem;
+  font-weight: 780;
+}
+
+.noteSource p,
+.noteDestination p {
+  max-width: 34ch;
+  margin-top: 1.6rem;
+  font-family: var(--font-display-family);
+  font-size: clamp(1.6rem, 3vw, 2.7rem);
+  font-variation-settings: "wdth" 80, "wght" 720;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.noteSource small,
+.noteDestination small {
+  display: block;
+  margin-top: 1.4rem;
+  opacity: 0.72;
+  font-size: 0.9rem;
+}
+
+.noteArrow {
+  color: var(--action-orange);
+}
+
+.waitlist {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(410px, 1.1fr);
+  align-items: center;
+  gap: clamp(3rem, 8vw, 9rem);
+  margin-inline: calc(-1 * var(--page-pad));
+  padding: clamp(5rem, 9vw, 9rem) var(--page-pad);
+  background: var(--action-orange);
+}
+
+.waitlistCopy h2 {
+  max-width: 10ch;
+  font-size: clamp(3.4rem, 6.4vw, 6rem);
+  font-variation-settings: "wdth" 68, "wght" 810;
+  line-height: 0.88;
+}
+
+.waitlistCopy p {
+  max-width: 44ch;
+  margin-top: 1.8rem;
+  font-size: clamp(1.05rem, 1.4vw, 1.22rem);
+}
+
+.waitlistSheet {
+  position: relative;
+  padding: clamp(2rem, 4vw, 4rem);
+  background: var(--cool-paper);
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 24px 48px rgba(63, 17, 7, 0.28);
+  transform: rotate(1deg);
+}
+
+.waitlistTape {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 120px;
+  height: 36px;
+  background: var(--label-lime);
+  box-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+.waitlistForm {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.waitlistInputRow > label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-weight: 780;
+}
+
+.waitlistInputRow > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-bottom: 2px solid var(--bench-graphite);
+}
+
+.waitlistInputRow input {
+  min-width: 0;
+  min-height: 60px;
+  padding: 0.8rem 0.25rem;
+  color: var(--bench-graphite);
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.waitlistInputRow input::placeholder {
+  color: #626861;
+  opacity: 1;
+}
+
+.waitlistInputRow input:focus-visible {
+  outline: 3px solid var(--tool-blue);
+  outline-offset: 3px;
+}
+
+.waitlistInputRow button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 60px;
+  padding: 0.85rem 1.2rem;
+  color: white;
+  background: var(--tool-blue);
+  border: 1px solid var(--bench-graphite);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  font-weight: 780;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.waitlistInputRow button:hover:not(:disabled) {
+  background: var(--tool-blue-dark);
+  transform: translateY(-2px);
+}
+
+.waitlistInputRow button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.waitlistConsent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.7rem;
+  color: var(--graphite-soft);
+  font-size: 0.9rem;
+}
+
+.waitlistConsent input {
+  width: 19px;
+  height: 19px;
+  margin-top: 0.12rem;
+  accent-color: var(--tool-blue);
+}
+
+.waitlistConsent a {
+  color: var(--tool-blue-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.waitlistStatus {
+  min-height: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 680;
+}
+
+.waitlistStatus[data-kind="success"] {
+  color: #315309;
+}
+
+.waitlistStatus[data-kind="error"] {
+  color: #8d281c;
+}
+
+.waitlistStatus a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.honeypot {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.9fr) minmax(440px, 1.1fr);
+  }
+
+  .productHeading,
+  .sportHeading {
+    gap: 3rem;
+  }
+
+  .pidotecaFlow li {
+    grid-template-columns: auto 1fr;
+  }
+
+  .pidotecaFlow li svg {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding-top: calc(var(--header-height) + 4rem);
+  }
+
+  .hero::before {
+    display: none;
+  }
+
+  .heroCopy h1 {
+    max-width: 10ch;
+  }
+
+  .heroWorkbench {
+    min-height: 620px;
+  }
+
+  .productHeading,
+  .sportHeading,
+  .waitlist {
+    grid-template-columns: 1fr;
+  }
+
+  .productHeading h2,
+  .sportHeading h2 {
+    max-width: 12ch;
+  }
+
+  .productIntro,
+  .sportHeading > div {
+    max-width: 620px;
+  }
+
+  .pidotecaScene {
+    min-height: 650px;
+  }
+
+  .dashboardFrame {
+    width: 88%;
+  }
+
+  .mapSheet {
+    width: 42%;
+  }
+
+  .pidotecaFlow {
+    grid-template-columns: 1fr;
+  }
+
+  .pidotecaFlow li {
+    min-height: 0;
+    grid-template-columns: auto auto 1fr;
+    padding: 1.6rem 0;
+  }
+
+  .pidotecaFlow li svg {
+    display: block;
+  }
+
+  .pidotecaFlow li + li {
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.32);
+    border-left: 0;
+  }
+
+  .sportScene {
+    min-height: 680px;
+  }
+
+  .trainingPhoto {
+    width: 88%;
+    height: 70%;
+  }
+
+  .sportDashboard {
+    width: 62%;
+  }
+
+  .connectedStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .connectedStrip > div {
+    min-height: 64px;
+  }
+
+  .connectedStrip > div + div {
+    border-top: 1px solid var(--bench-graphite);
+    border-left: 0;
+  }
+
+  .connectedStrip > div:not(:last-child)::after {
+    top: auto;
+    right: auto;
+    bottom: -7px;
+    left: 34px;
+    transform: none;
+  }
+
+  .noteJourney {
+    grid-template-columns: 1fr;
+  }
+
+  .noteArrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .waitlist {
+    margin-top: 0;
+  }
+
+  .waitlistCopy h2 {
+    max-width: 11ch;
+  }
+}
+
+@media (max-width: 620px) {
+  .hero {
+    background-size: 42px 42px;
+  }
+
+  .heroCopy h1,
+  .productHeading h2,
+  .sportHeading h2,
+  .waitlistCopy h2 {
+    font-size: clamp(3.1rem, 15vw, 4.9rem);
+  }
+
+  .productJump a {
+    grid-template-columns: 1fr auto;
+  }
+
+  .productJump a span {
+    display: none;
+  }
+
+  .heroWorkbench {
+    min-height: 460px;
+  }
+
+  .heroBlueField {
+    inset: 0 -12vw -1rem -4%;
+  }
+
+  .heroPidotecaSheet {
+    top: 9%;
+    right: -2%;
+    width: 94%;
+  }
+
+  .heroSportSheet {
+    right: 32%;
+    bottom: 2%;
+    width: 68%;
+  }
+
+  .heroRoute path {
+    stroke-width: 22;
+  }
+
+  .pidotecaScene {
+    min-height: 500px;
+  }
+
+  .dashboardFrame {
+    width: 100%;
+  }
+
+  .frameTopline span:first-child,
+  .dashboardFrame figcaption {
+    display: none;
+  }
+
+  .mapSheet {
+    right: -4%;
+    bottom: 0;
+    width: 54%;
+  }
+
+  .mapSheet > span {
+    font-size: 1.15rem;
+  }
+
+  .pidotecaFlow li {
+    grid-template-columns: auto 1fr;
+  }
+
+  .pidotecaFlow li svg {
+    display: none;
+  }
+
+  .sportScene {
+    min-height: 520px;
+  }
+
+  .trainingPhoto {
+    width: 100%;
+    height: 62%;
+  }
+
+  .trainingPhoto figcaption {
+    right: 3%;
+    bottom: 4%;
+    max-width: 25ch;
+    font-size: 0.82rem;
+  }
+
+  .sportDashboard {
+    width: 76%;
+  }
+
+  .noteSource,
+  .noteDestination {
+    min-height: 0;
+  }
+
+  .waitlistSheet {
+    padding: 2.2rem 1.15rem 1.4rem;
+    transform: none;
+  }
+
+  .waitlistInputRow > div {
+    grid-template-columns: 1fr;
+    border: 0;
+  }
+
+  .waitlistInputRow input {
+    border-bottom: 2px solid var(--bench-graphite);
+  }
+
+  .waitlistInputRow button {
+    width: 100%;
+    margin-top: 0.8rem;
+    border: 1px solid var(--bench-graphite);
+    border-radius: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroRoute path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .primaryCta,
+  .productJump a,
+  .waitlistInputRow button {
+    transition: none;
+  }
+}
+
+/* products-page refinement: 2026-08-11 */
+:global(.section-curtain-surface):has(> .hero) {
+  --curtain-panel-background: var(--cool-paper);
+}
+
+:global(.section-curtain-surface):has(> .pidoteca) {
+  --curtain-panel-background: #ebe7dd;
+}
+
+:global(.section-curtain-surface):has(> .sportApp) {
+  --curtain-panel-background: var(--cool-paper);
+}
+
+.hero {
+  min-height: 112svh;
+  padding-top: calc(var(--header-height) + clamp(4.5rem, 10vh, 8rem));
+  padding-bottom: clamp(7rem, 12vh, 11rem);
+  background: var(--cool-paper);
+}
+
+.hero::before {
+  display: none;
+}
+
+.heroCopy h1 span {
+  color: var(--action-orange-dark);
+}
+
+.heroColorField {
+  position: absolute;
+  z-index: -3;
+  inset: -2% -8vw -3rem 1%;
+  background: var(--label-lime);
+  clip-path: polygon(17% 0, 100% 5%, 96% 91%, 0 100%);
+}
+
+.heroPidotecaSheet {
+  top: 5%;
+  right: 0;
+  width: 84%;
+  box-shadow: 0 26px 52px rgba(23, 27, 24, 0.22);
+}
+
+.heroSportSheet {
+  right: 36%;
+  bottom: 1%;
+  padding: clamp(0.55rem, 0.9vw, 0.75rem);
+  color: white;
+  background: var(--action-orange);
+  box-shadow: 0 24px 48px rgba(78, 35, 24, 0.24);
+}
+
+.heroRoute {
+  filter: drop-shadow(0 8px 12px rgba(45, 15, 8, 0.14));
+}
+
+.pidoteca {
+  min-height: 100svh;
+  padding-top: clamp(9rem, 14vw, 14rem);
+  padding-bottom: clamp(10rem, 15vw, 15rem);
+  color: var(--bench-graphite);
+  background: #ebe7dd;
+}
+
+.productHeading {
+  align-items: start;
+}
+
+.productHeading h2 span {
+  color: var(--action-orange-dark);
+}
+
+.productIntro > p {
+  color: var(--graphite-soft);
+}
+
+.primaryCta {
+  color: white;
+  background: var(--bench-graphite);
+  box-shadow: 0 16px 30px rgba(23, 27, 24, 0.18);
+}
+
+.primaryCta:hover {
+  background: var(--action-orange-dark);
+}
+
+.pidotecaFlow {
+  margin-top: clamp(6rem, 11vw, 11rem);
+  border-top-color: var(--bench-graphite);
+  border-bottom-color: rgba(23, 27, 24, 0.42);
+}
+
+.pidotecaFlow li + li {
+  border-left-color: rgba(23, 27, 24, 0.24);
+}
+
+.flowNumber {
+  background: var(--label-lime);
+}
+
+.pidotecaFlow svg {
+  color: var(--action-orange-dark);
+}
+
+.pidotecaFlow p {
+  color: var(--graphite-soft);
+}
+
+.sportApp {
+  min-height: 100svh;
+  padding-top: clamp(10rem, 15vw, 15rem);
+}
+
+.trainingPhoto::after {
+  background: rgba(123, 67, 37, 0.12);
+}
+
+.sportDashboard > span,
+.connectedStrip svg {
+  color: var(--action-orange-dark);
+}
+
+.noteSource {
+  background: #343a34;
+}
+
+.waitlistInputRow button {
+  background: var(--bench-graphite);
+}
+
+.waitlistInputRow button:hover:not(:disabled) {
+  background: #333a34;
+}
+
+.waitlistInputRow input:focus-visible {
+  outline-color: var(--action-orange-dark);
+}
+
+.waitlistConsent input {
+  accent-color: var(--action-orange-dark);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding-bottom: 7rem;
+  }
+
+  .heroColorField {
+    inset: 0 -9vw -2rem -2%;
+  }
+
+  .pidoteca,
+  .sportApp {
+    min-height: auto;
+    padding-top: clamp(7rem, 16vw, 10rem);
+  }
+
+  .pidotecaFlow li + li {
+    border-top-color: rgba(23, 27, 24, 0.24);
+  }
+}
+
+@media (max-width: 620px) {
+  .hero {
+    background: var(--cool-paper);
+  }
+
+  .heroColorField {
+    inset: 1rem -14vw -1rem -5%;
+  }
+
+  .heroPidotecaSheet {
+    top: 7%;
+    right: -1%;
+    width: 95%;
+  }
+
+  .heroSportSheet {
+    right: 30%;
+    bottom: 1%;
+    width: 70%;
+  }
+
+  .pidoteca {
+    padding-bottom: 8rem;
+  }
+
+  .pidotecaFlow {
+    margin-top: 5rem;
+  }
+}
+
+
+/* products-page anchor offsets */
+.pidoteca,
+.sportApp,
+.waitlist {
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+/* desktop Pidoteca side ledger */
+@media (min-width: 1024px) {
+  .pidotecaDetails {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.72fr);
+    gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: stretch;
+    margin-top: clamp(4.5rem, 9vw, 8.5rem);
+  }
+
+  .pidotecaJourney {
+    width: 100%;
+    margin: 0;
+  }
+
+  .pidotecaFlow {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+  }
+
+  .pidotecaFlow li {
+    flex: 1;
+    min-height: 0;
+    padding: clamp(1.5rem, 2.4vw, 2.4rem) 0;
+  }
+
+  .pidotecaFlow li + li {
+    padding-left: 0;
+    border-top: 1px solid rgba(23, 27, 24, 0.24);
+    border-left: 0;
+  }
+
+  .pidotecaFlow h3 {
+    font-size: clamp(1.45rem, 1.8vw, 2rem);
+  }
+}
