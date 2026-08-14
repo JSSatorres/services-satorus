@@ -6,6 +6,18 @@ import { SiteFooter } from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Aviso legal",
   description: "Aviso legal del sitio web de Satorus.",
+  alternates: { canonical: "/aviso-legal" },
+  openGraph: {
+    title: "Aviso legal | Satorus",
+    description: "Aviso legal del sitio web de Satorus.",
+    url: "/aviso-legal",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Aviso legal | Satorus",
+    description: "Aviso legal del sitio web de Satorus.",
+  },
 };
 
 export default function LegalNoticePage() {

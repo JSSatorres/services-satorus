@@ -3,17 +3,22 @@ import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/atkinson-hyperlegible-next";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion-provider";
+import { absoluteUrl, siteUrl } from "@/lib/site";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.satorus.es";
+const socialImage = absoluteUrl("/opengraph-image");
+const socialImageAlt = "Satorus — Tu negocio, menos enredado";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(`${siteUrl}/`),
   title: {
     default: "Satorus | Webs y automatizaciones para pymes",
     template: "%s | Satorus",
   },
   description:
     "Webs, herramientas a medida y automatizaciones para pymes, explicadas sin tecnicismos.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Satorus — Tu negocio, menos enredado",
     description:
@@ -22,12 +27,21 @@ export const metadata: Metadata = {
     siteName: "Satorus",
     locale: "es_ES",
     type: "website",
+    images: [
+      {
+        url: socialImage,
+        width: 1200,
+        height: 630,
+        alt: socialImageAlt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Satorus — Tu negocio, menos enredado",
     description:
       "Webs, herramientas a medida y automatizaciones para pymes, explicadas sin tecnicismos.",
+    images: [{ url: socialImage, alt: socialImageAlt }],
   },
   robots: {
     index: true,

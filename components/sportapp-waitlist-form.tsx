@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, LoaderCircle, Mail } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import styles from "@/app/productos/productos.module.css";
 
 type FormStatus =
@@ -12,9 +12,13 @@ type FormStatus =
 
 export function SportAppWaitlistForm() {
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
+  const submittingRef = useRef(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+
+    submittingRef.current = true;
     const form = event.currentTarget;
     const formData = new FormData(form);
 
@@ -54,13 +58,19 @@ export function SportAppWaitlistForm() {
             ? error.message
             : "No hemos podido apuntarte. Prueba por correo.",
       });
+    } finally {
+      submittingRef.current = false;
     }
   }
 
   const sending = status.kind === "sending";
 
   return (
-    <form className={styles.waitlistForm} onSubmit={handleSubmit} noValidate>
+    <form
+      className={styles.waitlistForm}
+      onSubmit={handleSubmit}
+      aria-busy={sending}
+    >
       <div className={styles.waitlistInputRow}>
         <label htmlFor="sportapp-waitlist-email">Tu correo</label>
         <div>
@@ -108,7 +118,12 @@ export function SportAppWaitlistForm() {
         </span>
       </label>
 
-      <div className={styles.waitlistStatus} aria-live="polite" data-kind={status.kind}>
+      <div
+        className={styles.waitlistStatus}
+        aria-live="polite"
+        role={status.kind === "error" ? "alert" : "status"}
+        data-kind={status.kind}
+      >
         {status.kind === "success" && (
           <>
             <Check aria-hidden="true" size={18} />

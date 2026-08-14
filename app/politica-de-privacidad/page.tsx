@@ -6,6 +6,18 @@ import { SiteFooter } from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Política de privacidad",
   description: "Política de privacidad y protección de datos de Satorus.",
+  alternates: { canonical: "/politica-de-privacidad" },
+  openGraph: {
+    title: "Política de privacidad | Satorus",
+    description: "Política de privacidad y protección de datos de Satorus.",
+    url: "/politica-de-privacidad",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Política de privacidad | Satorus",
+    description: "Política de privacidad y protección de datos de Satorus.",
+  },
 };
 
 export default function PrivacyPage() {

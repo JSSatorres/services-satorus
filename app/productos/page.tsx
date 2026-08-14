@@ -23,11 +23,22 @@ export const metadata: Metadata = {
   title: "Productos",
   description:
     "Conoce Pidoteca y SportApp, dos productos de Satorus creados para ordenar el trabajo cotidiano de restaurantes y clubes deportivos.",
+  alternates: {
+    canonical: "/productos",
+  },
   openGraph: {
     title: "Productos de Satorus",
     description:
       "Pidoteca conecta el turno de un restaurante. SportApp conecta el trabajo completo de un club deportivo.",
+    url: "/productos",
     images: [{ url: "/products/pidoteca-dashboard.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Productos de Satorus",
+    description:
+      "Pidoteca conecta el turno de un restaurante. SportApp conecta el trabajo completo de un club deportivo.",
+    images: ["/products/pidoteca-dashboard.png"],
   },
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, LoaderCircle, Mail } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 type FormStatus =
   | { kind: "idle" }
@@ -11,9 +11,13 @@ type FormStatus =
 
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
+  const submittingRef = useRef(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+
+    submittingRef.current = true;
     const form = event.currentTarget;
     const formData = new FormData(form);
 
@@ -54,13 +58,15 @@ export function ContactForm() {
             ? error.message
             : "No hemos podido enviar el mensaje. Prueba por correo.",
       });
+    } finally {
+      submittingRef.current = false;
     }
   }
 
   const sending = status.kind === "sending";
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
+    <form className="contact-form" onSubmit={handleSubmit} aria-busy={sending}>
       <div className="form-pair">
         <label>
           <span>Tu nombre</span>
@@ -90,6 +96,7 @@ export function ContactForm() {
           name="email"
           type="email"
           autoComplete="email"
+          inputMode="email"
           spellCheck={false}
           required
         />
@@ -134,7 +141,12 @@ export function ContactForm() {
         )}
       </button>
 
-      <div className="form-status" aria-live="polite" data-kind={status.kind}>
+      <div
+        className="form-status"
+        aria-live="polite"
+        role={status.kind === "error" ? "alert" : "status"}
+        data-kind={status.kind}
+      >
         {status.kind === "success" && status.message}
         {status.kind === "error" && (
           <>

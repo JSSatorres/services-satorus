@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { jsonResponse, readJsonRequest } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 
@@ -14,36 +14,29 @@ function clean(value: unknown, maxLength: number) {
 }
 
 export async function POST(request: Request) {
-  let payload: WaitlistPayload;
-
-  try {
-    payload = (await request.json()) as WaitlistPayload;
-  } catch {
-    return NextResponse.json(
-      { message: "No hemos podido leer la solicitud. Revisa el correo." },
-      { status: 400 },
-    );
-  }
+  const parsed = await readJsonRequest<WaitlistPayload>(request);
+  if (!parsed.ok) return parsed.response;
+  const payload = parsed.value;
 
   const email = clean(payload.email, 160).toLowerCase();
   const website = clean(payload.website, 200);
   const consent = payload.consent === true;
 
   if (website) {
-    return NextResponse.json({ message: "Ya estás en la lista." });
+    return jsonResponse({ message: "Ya estás en la lista." });
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json(
+    return jsonResponse(
       { message: "Escribe un correo válido para poder avisarte." },
-      { status: 400 },
+      400,
     );
   }
 
   if (!consent) {
-    return NextResponse.json(
+    return jsonResponse(
       { message: "Necesitamos que aceptes la política de privacidad para avisarte." },
-      { status: 400 },
+      400,
     );
   }
 
@@ -52,37 +45,45 @@ export async function POST(request: Request) {
   const to = process.env.CONTACT_TO_EMAIL ?? "hola@satorus.es";
 
   if (!apiKey || !from) {
-    return NextResponse.json(
+    return jsonResponse(
       {
         message:
           "La lista aún no está conectada. Escríbenos a hola@satorus.es y te apuntamos.",
       },
-      { status: 503 },
+      503,
     );
   }
 
   const resend = new Resend(apiKey);
-  const { error } = await resend.emails.send({
-    from,
-    to,
-    replyTo: email,
-    subject: "Nueva solicitud para probar SportApp",
-    text: `Nueva solicitud para la lista de espera de SportApp.\n\nCorreo: ${email}`,
-  });
+  try {
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      replyTo: email,
+      subject: "Nueva solicitud para probar SportApp",
+      text: `Nueva solicitud para la lista de espera de SportApp.\n\nCorreo: ${email}`,
+    });
 
-  if (error) {
-    console.error("No se ha podido enviar la solicitud de SportApp", error.name);
-    return NextResponse.json(
-      {
+    if (!error) {
+      return jsonResponse({
         message:
-          "No hemos podido apuntarte ahora. Escríbenos a hola@satorus.es y lo hacemos a mano.",
-      },
-      { status: 502 },
+          "Ya estás en la lista. Te avisaremos cuando SportApp esté listo para probar.",
+      });
+    }
+
+    console.error("No se ha podido enviar la solicitud de SportApp", error.name);
+  } catch (error) {
+    console.error(
+      "No se ha podido conectar con el servicio de correo",
+      error instanceof Error ? error.name : "UnknownError",
     );
   }
 
-  return NextResponse.json({
-    message:
-      "Ya estás en la lista. Te avisaremos cuando SportApp esté listo para probar.",
-  });
+  return jsonResponse(
+    {
+      message:
+        "No hemos podido apuntarte ahora. Escríbenos a hola@satorus.es y lo hacemos a mano.",
+    },
+    502,
+  );
 }

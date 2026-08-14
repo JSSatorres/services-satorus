@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 const links = [
@@ -15,14 +15,56 @@ const links = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", open);
     return () => document.body.classList.remove("menu-open");
   }, [open]);
 
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 901px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setOpen(false);
+    };
+
+    closeOnDesktop();
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  function handleMenuKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!open) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      menuButtonRef.current?.focus();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusable = Array.from(
+      headerRef.current?.querySelectorAll<HTMLElement>(
+        '.menu-button, #mobile-navigation a[href]',
+      ) ?? [],
+    ).filter((element) => !element.hasAttribute("disabled"));
+    const first = focusable[0];
+    const last = focusable.at(-1);
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  }
+
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef} onKeyDown={handleMenuKeyDown}>
       <Link className="wordmark" href="/" aria-label="Satorus, volver al inicio" translate="no">
         <BrandLogo />
       </Link>
@@ -41,6 +83,7 @@ export function SiteHeader() {
       </Link>
 
       <button
+        ref={menuButtonRef}
         className="menu-button"
         type="button"
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -51,7 +94,12 @@ export function SiteHeader() {
         {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
       </button>
 
-      <div className="mobile-nav" id="mobile-navigation" data-open={open}>
+      <div
+        className="mobile-nav"
+        id="mobile-navigation"
+        data-open={open}
+        inert={!open ? true : undefined}
+      >
         <nav aria-label="Navegación móvil">
           {links.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>

@@ -8,7 +8,7 @@ export function Hero() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="hero" id="top" aria-labelledby="hero-title">
+    <section className="hero" aria-labelledby="hero-title">
       <motion.div
         className="hero-photo"
         initial={reduceMotion ? false : { clipPath: "inset(0 0 8% 0)" }}
