@@ -133,9 +133,9 @@ export function SportAppWaitlistForm() {
         {status.kind === "error" && (
           <>
             {status.message}{" "}
-            <a href="mailto:hola@satorus.es?subject=Lista%20de%20espera%20SportApp">
+            <a href="mailto:info@satorus.es?subject=Lista%20de%20espera%20SportApp">
               <Mail aria-hidden="true" size={16} />
-              Escribir a hola@satorus.es
+              Escribir a info@satorus.es
             </a>
           </>
         )}

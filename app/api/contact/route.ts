@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     return jsonResponse(
       {
         message:
-          "El formulario aún no está conectado. Escríbenos directamente a hola@satorus.es.",
+          "El formulario aún no está conectado. Escríbenos directamente a info@satorus.es.",
       },
       503,
     );
@@ -106,18 +106,23 @@ export async function POST(request: Request) {
       });
     }
 
-    console.error("No se ha podido enviar el formulario de contacto", error.name);
+    console.error(
+      "No se ha podido enviar el formulario de contacto",
+      error.name,
+      error.message,
+    );
   } catch (error) {
     console.error(
       "No se ha podido conectar con el servicio de correo",
       error instanceof Error ? error.name : "UnknownError",
+      error instanceof Error ? error.message : "",
     );
   }
 
   return jsonResponse(
     {
       message:
-        "El mensaje no ha salido. Escríbenos directamente a hola@satorus.es.",
+        "El mensaje no ha salido. Escríbenos directamente a info@satorus.es.",
     },
     502,
   );

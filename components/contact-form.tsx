@@ -151,9 +151,9 @@ export function ContactForm() {
         {status.kind === "error" && (
           <>
             {status.message}{" "}
-            <a href="mailto:hola@satorus.es">
+            <a href="mailto:info@satorus.es">
               <Mail aria-hidden="true" size={16} />
-              Escribir a hola@satorus.es
+              Escribir a info@satorus.es
             </a>
           </>
         )}

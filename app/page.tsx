@@ -251,7 +251,7 @@ export default function Home() {
               Describe qué haces ahora, dónde pierdes tiempo y qué te gustaría
               que ocurriera. Con eso basta para empezar.
             </p>
-            <a href="mailto:hola@satorus.es">hola@satorus.es</a>
+            <a href="mailto:info@satorus.es">info@satorus.es</a>
           </div>
           <ContactForm />
           </section>

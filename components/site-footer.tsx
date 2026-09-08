@@ -19,8 +19,8 @@ export function SiteFooter() {
       <nav aria-label="Enlaces legales">
         <Link href="/aviso-legal">Aviso legal</Link>
         <Link href="/politica-de-privacidad">Privacidad</Link>
-        <Link href="mailto:hola@satorus.es">
-          hola@satorus.es
+        <Link href="mailto:info@satorus.es">
+          info@satorus.es
           <ArrowUpRight aria-hidden="true" size={16} />
         </Link>
       </nav>

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     return jsonResponse(
       {
         message:
-          "La lista aún no está conectada. Escríbenos a hola@satorus.es y te apuntamos.",
+          "La lista aún no está conectada. Escríbenos a info@satorus.es y te apuntamos.",
       },
       503,
     );
@@ -72,18 +72,22 @@ export async function POST(request: Request) {
       });
     }
 
-    console.error("No se ha podido enviar la solicitud de SportApp", error.name);
+    console.error(
+      "No se ha podido enviar la solicitud de SportApp",
+      error.name,
+      error.message,
+    );
   } catch (error) {
     console.error(
       "No se ha podido conectar con el servicio de correo",
-      error instanceof Error ? error.name : "UnknownError",
+      error instanceof Error ? error.message : "",
     );
   }
 
   return jsonResponse(
     {
       message:
-        "No hemos podido apuntarte ahora. Escríbenos a hola@satorus.es y lo hacemos a mano.",
+        "No hemos podido apuntarte ahora. Escríbenos a info@satorus.es y lo hacemos a mano.",
     },
     502,
   );
