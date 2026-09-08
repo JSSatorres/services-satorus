@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { contactRecipients } from "@/lib/email-recipients";
 import { jsonResponse, readJsonRequest } from "@/lib/api-request";
 
 export const runtime = "nodejs";
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
-  const to = process.env.CONTACT_TO_EMAIL ?? "hola@satorus.es";
+  const to = contactRecipients();
 
   if (!apiKey || !from) {
     return jsonResponse(
