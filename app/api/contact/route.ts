@@ -35,7 +35,10 @@ export async function POST(request: Request) {
 
   // Los bots suelen completar este campo oculto. Respondemos sin enviar nada.
   if (website) {
-    return jsonResponse({ message: "Mensaje enviado." });
+    return jsonResponse({
+      message:
+        "Hemos recibido tu consulta. Te contactaremos en el correo que nos has indicado.",
+    });
   }
 
   if (name.length < 2) {
@@ -102,7 +105,8 @@ export async function POST(request: Request) {
 
     if (!error) {
       return jsonResponse({
-        message: "Mensaje enviado. Te responderemos lo antes posible.",
+        message:
+          "Hemos recibido tu consulta. Te contactaremos en el correo que nos has indicado.",
       });
     }
 

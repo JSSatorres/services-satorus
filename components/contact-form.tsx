@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, LoaderCircle, Mail } from "lucide-react";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 type FormStatus =
   | { kind: "idle" }
@@ -11,7 +11,29 @@ type FormStatus =
 
 export function ContactForm() {
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
+  const formRef = useRef<HTMLFormElement>(null);
   const submittingRef = useRef(false);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    if (!("IntersectionObserver" in window)) return;
+
+    form.dataset.motionReady = "true";
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+
+        form.dataset.settled = "true";
+        observer.disconnect();
+      },
+      { threshold: 0.18 },
+    );
+
+    observer.observe(form);
+    return () => observer.disconnect();
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,7 +70,9 @@ export function ContactForm() {
       form.reset();
       setStatus({
         kind: "success",
-        message: result.message ?? "Mensaje enviado. Te responderemos lo antes posible.",
+        message:
+          result.message ??
+          "Hemos recibido tu consulta. Te contactaremos en el correo que nos has indicado.",
       });
     } catch (error) {
       setStatus({
@@ -66,7 +90,14 @@ export function ContactForm() {
   const sending = status.kind === "sending";
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit} aria-busy={sending}>
+    <form
+      ref={formRef}
+      className="contact-form"
+      onSubmit={handleSubmit}
+      aria-busy={sending}
+      data-motion-ready="false"
+      data-settled="false"
+    >
       <div className="form-pair">
         <label>
           <span>Tu nombre</span>
@@ -103,15 +134,16 @@ export function ContactForm() {
       </label>
 
       <label>
-        <span>¿Qué te está frenando?</span>
+        <span>¿Qué te gustaría mejorar?</span>
         <textarea
           name="message"
           rows={5}
           minLength={20}
           maxLength={2000}
-          placeholder="Por ejemplo: los pedidos llegan por WhatsApp y luego los copiamos a mano…"
+          placeholder="Por ejemplo: recibimos consultas por varios sitios y nos cuesta responder y hacer seguimiento."
           required
         />
+        <small className="field-hint">Con unas frases basta para empezar.</small>
       </label>
 
       <label className="honeypot" aria-hidden="true">
@@ -135,7 +167,7 @@ export function ContactForm() {
           </>
         ) : (
           <>
-            Enviar mi mensaje
+            Enviar consulta
             <ArrowRight aria-hidden="true" size={23} />
           </>
         )}
@@ -147,6 +179,11 @@ export function ContactForm() {
         role={status.kind === "error" ? "alert" : "status"}
         data-kind={status.kind}
       >
+        {status.kind === "success" && (
+          <span className="form-receipt" aria-hidden="true">
+            RECIBIDO
+          </span>
+        )}
         {status.kind === "success" && status.message}
         {status.kind === "error" && (
           <>

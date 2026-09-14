@@ -182,6 +182,16 @@ La interfaz permanece plana por defecto. La profundidad aparece cuando la escena
 
 **The Material Makes Depth Rule.** Toda sombra necesita un objeto físico reconocible; una superficie editorial no flota por defecto.
 
+## Motion implementation
+
+La home mantiene la tesis de "taller en movimiento": el hero presenta el paso del enredo al orden, el cable naranja reaparece entre secciones como continuidad acotada, y cada problema o servicio responde a cursor, foco, toque y teclado con una consecuencia visual. La única historia larga de scroll es la transformación central en tres actos: «La consulta entra», «El trabajo se ordena» y «Tu equipo sigue». Navegación, FAQ, CTA y formulario aportan feedback breve y físico.
+
+`motion/react` se limita a entradas, estados y microinteracciones. GSAP con ScrollTrigger se reserva exclusivamente para esa historia central de escritorio; no gobierna el resto de la página. Con movimiento reducido, los estados finales siguen visibles y no se activa la secuencia de scroll ni el vídeo.
+
+La implementación retiró las cortinas de la home, el `clipPath` del hero, `hero-route`, el wipe anterior de la historia y el cambio de `padding` en el hover de servicios. Sus sustitutos son `HeroMedia`, `RouteSketch`, `InteractiveFrictions`, `ServiceShowcase`, la historia de tres actos, `ProcessRoute` y los refinamientos del header, FAQ y formulario.
+
+El vídeo final sigue siendo una dependencia externa: no se ha generado ni simulado. Mientras `NEXT_PUBLIC_HERO_VIDEO_READY` esté ausente o sea `false`, el hero muestra solo el póster y no solicita vídeo. La activación consiste únicamente en copiar `public/videos/satorus-hero-loop.webm` y `public/videos/satorus-hero-loop.mp4`, y establecer exactamente `NEXT_PUBLIC_HERO_VIDEO_READY=true`.
+
 ## Shapes
 
 Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles funcionales repiten esquinas discretas (`control`), mientras la acción hero adopta una cabeza redondeada y un arranque recto para parecer el extremo del cable. Círculos y cápsulas completas quedan reservados a puntos de recorrido, ruta y marcadores. Fotografías y papeles pueden inclinarse o recortarse en diagonal cuando la materialidad lo justifica.

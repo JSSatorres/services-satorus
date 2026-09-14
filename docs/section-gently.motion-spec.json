@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "source": {
+    "url": "https://codepen.io/moussamamadou/full/XJWrMEx",
+    "region": "Relevo de secciones a pantalla completa: la sección saliente queda fija y la entrante la cubre.",
+    "selector": "[data-work='item']",
+    "referenceImages": []
+  },
+  "destination": "components/section-curtain-stack.tsx",
+  "fidelity": "behavior",
+  "surface": "dom",
+  "architecture": {
+    "scrollModel": "native",
+    "stateModel": "timeline",
+    "coordinateSystems": [
+      "document",
+      "viewport"
+    ],
+    "continuity": "Cada panel se pinea con pinSpacing:false y el siguiente sube por encima con z-index mayor. No hay clones: el DOM real es el único que se ve, así que nunca aparece contenido duplicado."
+  },
+  "engine": {
+    "detected": [
+      "GSAP",
+      "ScrollTrigger",
+      "Lenis"
+    ],
+    "chosen": "GSAP ScrollTrigger"
+  },
+  "triggers": [
+    "El relevo empieza cuando el borde superior de la sección entrante toca el borde inferior de la ventana.",
+    "El relevo termina, y el panel saliente se despina, cuando ese borde llega al borde superior de la ventana; el recorrido mide por tanto una altura de viewport exacta.",
+    "La entrada visible sólo consume el primer 55% del recorrido (ENTRANCE_TRAVEL); el 45% restante es reposo: la sección ya colocada se queda quieta y sola en pantalla antes de que arranque el relevo siguiente. El recorrido no se puede alargar sin romper 'una sección = una pantalla', así que el reposo se consigue repartiéndolo, no añadiendo scroll."
+  ],
+  "actors": [
+    {
+      "id": "outgoing-panel",
+      "initial": "Panel real pineado, cubriendo el viewport completo.",
+      "final": "Atenuado por una capa de grafito al 26%; nunca se desplaza ni se escala, para que no deje ver el lienzo del documento."
+    },
+    {
+      "id": "incoming-panel",
+      "initial": "Panel real bajo el borde inferior. En los turnos laterales entra completamente desplazado a un lado (100%) con escala 1,06, y con el ascenso del scroll cancelado: se queda clavado arriba y sólo se mueve en horizontal. En los turnos frontales sube desde el borde inferior con un translateY en píxeles (nunca yPercent: hay paneles más altos que el viewport y el recorrido siempre mide una altura de ventana).",
+      "final": "Colocado al 55% del recorrido y quieto hasta el final; ocupa el viewport sin transform inline, que se limpia al salir del rango."
+    },
+    {
+      "id": "incoming-title",
+      "initial": "h1/h2 desplazado hacia abajo y al 25% de opacidad.",
+      "final": "En su sitio, opaco."
+    }
+  ],
+  "timeline": {
+    "durationMs": null,
+    "labels": [
+      "relay"
+    ],
+    "steps": [
+      {
+        "id": "dim-outgoing",
+        "targets": [
+          "outgoing-panel"
+        ],
+        "atMs": 0,
+        "durationMs": 550,
+        "properties": [
+          "--curtain-dim"
+        ],
+        "easing": "none (scrub)",
+        "confidence": "source"
+      },
+      {
+        "id": "slide-incoming-lateral",
+        "targets": [
+          "incoming-panel"
+        ],
+        "atMs": 0,
+        "durationMs": 550,
+        "properties": [
+          "translateX",
+          "scale"
+        ],
+        "easing": "power2.out (scrub)",
+        "confidence": "source",
+        "notes": "Sólo en los turnos laterales. Termina en 550: a partir de ahí el panel está colocado y empieza el reposo."
+      },
+      {
+        "id": "cancel-scroll-rise-lateral",
+        "targets": [
+          "incoming-panel"
+        ],
+        "atMs": 0,
+        "durationMs": 1000,
+        "properties": [
+          "translateY (contra-ascenso)"
+        ],
+        "easing": "lineal (scrub)",
+        "confidence": "source",
+        "notes": "Ocupa el recorrido ENTERO, también el tramo de reposo. Comprimirlo dejaría al panel subiendo sin nada que lo compense y se saldría por el borde superior."
+      },
+      {
+        "id": "rise-incoming-front",
+        "targets": [
+          "incoming-panel"
+        ],
+        "atMs": 0,
+        "durationMs": 550,
+        "properties": [
+          "translateY"
+        ],
+        "easing": "power2.out (scrub)",
+        "confidence": "source",
+        "notes": "Sólo en los turnos frontales. De 0 a -alturaVentana*(1-0,55): sumado al ascenso natural del scroll, deja el panel colocado justo en 550."
+      },
+      {
+        "id": "hold-incoming-front",
+        "targets": [
+          "incoming-panel"
+        ],
+        "atMs": 550,
+        "durationMs": 450,
+        "properties": [
+          "translateY (contra-ascenso)"
+        ],
+        "easing": "lineal (scrub)",
+        "confidence": "source",
+        "notes": "Reposo del turno frontal: cancela exactamente el ascenso natural restante. Consecutivo al anterior, nunca solapado: dos tweens simultáneos sobre la misma propiedad pelean."
+      },
+      {
+        "id": "settle-title",
+        "targets": [
+          "incoming-title"
+        ],
+        "atMs": 187,
+        "durationMs": 231,
+        "properties": [
+          "translateY",
+          "opacity"
+        ],
+        "easing": "power2.out (scrub)",
+        "confidence": "source",
+        "notes": "143 en los turnos frontales. Reescalado por ENTRANCE_TRAVEL para que caiga dentro de la entrada visible y no invada el reposo."
+      }
+    ]
+  },
+  "directionCycle": [
+    "right",
+    "bottom",
+    "left",
+    "bottom"
+  ],
+  "responsive": [
+    {
+      "viewport": "desktop",
+      "behavior": "Desplazamiento lateral del 100% con escala 1,06 y sin rotación."
+    },
+    {
+      "viewport": "mobile",
+      "behavior": "Mismo desplazamiento lateral del 100%, escala 1,03."
+    }
+  ],
+  "reducedMotion": {
+    "strategy": "static-final-state",
+    "behavior": "No se activa el stack: sin pin, sin transform y sin capa de atenuación; el documento fluye normal."
+  },
+  "constraints": [
+    "Las entradas laterales cancelan el ascenso que el scroll produce por sí solo: sin esa compensación el panel subía y se desplazaba a la vez y la entrada salía en diagonal a 45°. La cancelación es lineal y exacta porque el relevo mide justo una altura de viewport.",
+    "Toda sección tiene que quedarse quieta y sola en pantalla antes de que la siguiente asome. Como cada panel mide una pantalla y se pinea con pinSpacing:false, el píxel en el que una sección termina de colocarse es el mismo en el que arranca el relevo siguiente: el reposo sale de comprimir la entrada visible en el primer 55% del recorrido, no de alargarlo.",
+    "El tramo de reposo se implementa siempre como una cancelación LINEAL del ascenso natural, nunca como una animación: es geometría, no estética.",
+    "Sin rotación en las entradas laterales: un panel inclinado deslizando de lado deja cuñas sin cubrir arriba y abajo.",
+    "El transform sólo existe mientras el relevo está en rango; al salir se limpia con clearProps y en onRefreshInit. Si quedara aplicado, la superficie sería bloque contenedor y rompería los pins anidados y el vídeo fijo del hero.",
+    "El panel saliente nunca se mueve ni se escala: cualquier desplazamiento suyo dejaba ver el fondo del documento por el lado contrario.",
+    "Cada superficie fija su color desde el background computado de su propia sección, para evitar destellos de color entre paneles.",
+    "No se reutilizan imágenes, tipografías, Lenis ni ningún recurso remoto de la referencia."
+  ],
+  "evidence": [
+    ".clone-animation/curtain-fix/ — barridos antes/después a 1440x900 y 390x844, cortes a mitad de cada relevo y verificación del pin anidado.",
+    "Comprobación automática de cobertura: ninguna banda del viewport queda sin panel que la cubra en todo el recorrido de escritorio.",
+    ".clone-animation/lenis/replica/lateral/ — mediciones que confirman `top: 0` constante durante los relevos laterales.",
+    "docs/plans/2026-09-13-relevo-reposo-secciones.md — barridos de los 14 relevos (7 a 390x844 y 7 a 1440x900) con el progreso a partir del cual cada sección queda colocada y el scroll de reposo resultante (380-443px)."
+  ]
+}

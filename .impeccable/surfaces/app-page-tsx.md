@@ -51,3 +51,11 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 Aprobada por el usuario el 31/07/2026: `.impeccable/mocks/home-b-diagonal-route.png`.
 
 Debe conservarse la composición editorial diagonal, la fotografía cenital de objetos cotidianos, la ruta naranja que entra y sale de la escena, y la sensación de oficio humano. El mockup es una estrella polar, no una captura literal: los textos y controles serán HTML semántico; la imagen material se producirá como recurso raster independiente; la diagonal, la ruta y sus estados se construirán con CSS y SVG para mantener respuesta y movimiento.
+
+## Estado de implementación y verificación
+
+La implementación de código de la home está **COMPLETA** y la reverificación standard ha pasado. El movimiento conserva una sola narración: taller en el hero, cable entre secciones, respuestas accesibles de problemas y servicios, historia central de tres actos en escritorio y feedback breve de navegación, FAQ, CTA y formulario. `motion/react` cubre entradas, estados y microinteracciones; GSAP + ScrollTrigger solo la historia central ligada al scroll en escritorio.
+
+Se retiraron las cortinas de home, el `clipPath` del hero, `hero-route`, el wipe anterior y el hover que modificaba el `padding` de servicios. `HeroMedia`, `RouteSketch`, `InteractiveFrictions`, `ServiceShowcase`, la historia de tres actos, `ProcessRoute` y los refinamientos de header, FAQ y formulario ocupan esos roles.
+
+El vídeo es una dependencia externa **PENDIENTE**. No se generó ni simuló recurso alguno. Con `NEXT_PUBLIC_HERO_VIDEO_READY` ausente o en `false`, el hero muestra únicamente el póster y realiza cero solicitudes de vídeo. Para activarlo se deben copiar `public/videos/satorus-hero-loop.webm` y `public/videos/satorus-hero-loop.mp4`, y establecer exactamente `NEXT_PUBLIC_HERO_VIDEO_READY=true`.

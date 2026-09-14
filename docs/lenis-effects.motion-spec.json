@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "source": {
+    "url": "https://lenis.dev/",
+    "region": "Home completa: hero, why, rethink, solution y featuring.",
+    "selector": "main > section",
+    "referenceImages": []
+  },
+  "destination": "components/smooth-scroll.tsx, components/masked-headings.tsx, components/scroll-progress-rail.tsx, components/plain-talk.tsx, components/interactive-frictions.tsx, components/process-route.tsx, components/roll-label.tsx",
+  "fidelity": "behavior",
+  "surface": "dom",
+  "architecture": {
+    "scrollModel": "smooth",
+    "stateModel": "timeline",
+    "coordinateSystems": ["document", "viewport", "element"],
+    "continuity": "Cada escena se fija con `position: sticky` dentro de una pista de altura conocida, igual que la referencia. No se usa el pin de ScrollTrigger dentro del curtain: sus paneles conservan un transform identidad de GSAP y eso los convierte en bloque contenedor, así que un pin anidado se anclaría al panel en vez de al viewport."
+  },
+  "engine": {
+    "detected": ["Lenis", "WebGL"],
+    "chosen": "Lenis + GSAP ScrollTrigger/SplitText"
+  },
+  "triggers": [
+    "Scroll vertical continuo; cada pista abre en `top top` y cierra en `bottom bottom`.",
+    "Los titulares revelan una sola vez al entrar al 88% del viewport.",
+    "El roll de los CTA responde a hover y a foco de teclado."
+  ],
+  "actors": [
+    { "id": "smooth-scroll", "initial": "Scroll nativo.", "final": "Scroll interpolado con duración 1,05 y cola exponencial; el táctil se deja nativo." },
+    { "id": "scroll-rail", "initial": "Pulgar proporcional a la parte visible del documento.", "final": "Recorre el raíl según el progreso." },
+    { "id": "masked-headings", "initial": "Cada línea del titular bajo su propia máscara, a +108%.", "final": "En su sitio, escalonadas 85 ms." },
+    { "id": "plain-talk-zoom", "initial": "Frase a escala 1 con párrafo y boceto visibles.", "final": "Frase a escala 3,4 desde su borde izquierdo; lo demás retirado antes." },
+    { "id": "friction-deck", "initial": "Cada tarjeta a +0,42 alturas de viewport en diagonal, invisible.", "final": "Posada en abanico con 26px/62px de separación, todas a la vista." },
+    { "id": "process-rail", "initial": "Raíl de 4 pasos con el cable sin dibujar.", "final": "Desplazado en X hasta el último paso, cable completo." },
+    { "id": "roll-label", "initial": "Texto visible, copia idéntica justo debajo.", "final": "La pista sube un 100% y entra la copia." }
+  ],
+  "timeline": {
+    "durationMs": null,
+    "labels": ["reveal", "zoom", "deck", "rail"],
+    "steps": [
+      { "id": "mask-lines", "targets": ["masked-headings"], "atMs": 0, "durationMs": 900, "properties": ["translateY"], "easing": "expo.out", "stagger": { "order": "start", "amountMs": 85 }, "confidence": "source" },
+      { "id": "zoom-statement", "targets": ["plain-talk-zoom"], "atMs": 0, "durationMs": 1000, "properties": ["scale", "opacity"], "easing": "none (scrub)", "confidence": "source" },
+      { "id": "deal-cards", "targets": ["friction-deck"], "atMs": 0, "durationMs": 340, "properties": ["translateX", "translateY", "opacity"], "easing": "power2.out (scrub)", "stagger": { "order": "start", "amountMs": 220 }, "confidence": "source" },
+      { "id": "slide-rail", "targets": ["process-rail"], "atMs": 0, "durationMs": 1000, "properties": ["translateX", "stroke-dashoffset"], "easing": "none (scrub)", "confidence": "source" }
+    ]
+  },
+  "responsive": [
+    { "viewport": "desktop", "behavior": "Todos los efectos activos; pista del zoom 235svh, de la baraja 260svh y del recorrido 300svh." },
+    { "viewport": "mobile", "behavior": "Sin baraja y sin recorrido horizontal: ambas secciones vuelven a su apilado vertical. El zoom se queda en escala 2,4 sobre 200svh." }
+  ],
+  "reducedMotion": {
+    "strategy": "static-final-state",
+    "behavior": "Lenis no se monta, no hay troceado de titulares, ni baraja, ni recorrido horizontal, ni roll. El raíl de progreso se mantiene porque no es movimiento decorativo."
+  },
+  "constraints": [
+    "Se eligió Lenis frente a ScrollSmoother de GSAP porque ScrollSmoother traslada su contenedor con un transform y eso rompería el vídeo fijo del hero y los pins del curtain. Lenis interpola el scroll nativo sin transformar el documento.",
+    "SplitText se ejecuta tras `document.fonts.ready` y lanza un `ScrollTrigger.refresh()`: trocear cambia la altura de los titulares y, sin refrescar, los demás triggers quedan desplazados.",
+    "El header salta de sección con `jumpToScrollTop`, que usa el motor de scroll activo en lugar de `window.scrollTo`.",
+    "No se descarga ni reutiliza ninguna imagen, vídeo, tipografía, shader ni recurso remoto de lenis.dev: sólo se replica la mecánica."
+  ],
+  "evidence": [
+    ".clone-animation/lenis/lenis.dev-home/ — inventario, frames de referencia y mediciones de transform.",
+    ".clone-animation/lenis/replica/ — barridos de la réplica en 1440x900 y 390x844, más movimiento reducido.",
+    "Barrido automático: sin desbordamiento horizontal y sin errores de consola en escritorio, móvil y movimiento reducido."
+  ]
+}
