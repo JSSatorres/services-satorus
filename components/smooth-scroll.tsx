@@ -20,6 +20,11 @@ export function SmoothScroll() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     gsap.registerPlugin(ScrollTrigger);
+    // En móvil, ocultar/mostrar la barra de direcciones del navegador dispara
+    // un `resize` en `window`, y ScrollTrigger llama a `refresh()` por
+    // defecto ante ese evento: eso puede interrumpir un relevo de
+    // `SectionCurtainStack` en marcha a mitad de gesto.
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
     const lenis = new Lenis({
       // Curva de amortiguación: rápida al soltar y con una cola larga, que es

@@ -4,14 +4,18 @@ import { useRef, useState, type ReactNode } from "react"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import Image from "next/image"
 
 type ProcessStep = {
   title: string
   body: string
+  image: string
+  imageAlt: string
 }
 
 type ProcessRouteProps = {
   heading: ReactNode
+  intro: ReactNode
   steps: ProcessStep[]
 }
 
@@ -52,7 +56,7 @@ const REACH_LEAD = 0.12
  * centro del siguiente—, así que el trazo pasa exactamente por donde va la
  * vista y termina en el último pin, ni antes ni después.
  */
-export function ProcessRoute({ heading, steps }: ProcessRouteProps) {
+export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [motionEnabled, setMotionEnabled] = useState(false)
   const [progress, setProgress] = useState(1)
@@ -171,35 +175,77 @@ export function ProcessRoute({ heading, steps }: ProcessRouteProps) {
   // los pasos, no los pasos.
   const lastStep = Math.max(1, steps.length - 1)
   const drawn = motionEnabled ? progress * lastStep : lastStep
+  const activeStep = motionEnabled
+    ? Math.min(lastStep, Math.floor(drawn + REACH_LEAD))
+    : 0
 
   return (
     <div className="process-route" ref={sectionRef}>
       <div className="process-track">
         <div className="process-stage">
-          <div className="process-heading">{heading}</div>
+          <div className="process-hero">
+            <div className="process-heading">
+              {heading}
+              <p className="process-intro">{intro}</p>
+            </div>
 
-          <ol className="process-steps">
-            {steps.map((step, index) => {
-              const fill = Math.min(1, Math.max(0, drawn - index))
+            <div className="process-media">
+              <div className="process-visual" aria-hidden="true">
+                {steps.map((step, index) => (
+                  <figure
+                    className="process-photo"
+                    data-current={index === activeStep || undefined}
+                    data-past={index < activeStep || undefined}
+                    key={step.image}
+                  >
+                    <Image
+                      src={step.image}
+                      alt=""
+                      fill
+                      priority={index === 0}
+                      sizes="(max-width: 900px) 100vw, min(42vw, 42rem)"
+                    />
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </div>
 
-              return (
-                <li
-                  key={step.title}
-                  data-reached={drawn + REACH_LEAD >= index || undefined}
-                  style={{ "--step-fill": fill } as React.CSSProperties}
-                >
-                  <span className="step-pin" aria-hidden="true">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <p className="process-step-answer">{stepAnswers[index]}</p>
-                    <h3>{step.title}</h3>
-                    <p>{step.body}</p>
-                  </div>
-                </li>
-              )
-            })}
-          </ol>
+          <div className="process-journey">
+            <ol
+              className="process-steps"
+              style={{ "--steps-count": steps.length } as React.CSSProperties}
+            >
+              {steps.map((step, index) => {
+                const fill = Math.min(1, Math.max(0, drawn - index))
+
+                return (
+                  <li
+                    key={step.title}
+                    data-reached={drawn + REACH_LEAD >= index || undefined}
+                    style={{ "--step-fill": fill } as React.CSSProperties}
+                  >
+                    <span className="step-pin" aria-hidden="true">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <figure className="process-step-photo">
+                        <Image
+                          src={step.image}
+                          alt={step.imageAlt}
+                          fill
+                          sizes="(max-width: 900px) calc(100vw - 6rem), 1px"
+                        />
+                      </figure>
+                      <p className="process-step-answer">{stepAnswers[index]}</p>
+                      <h3>{step.title}</h3>
+                      <p>{step.body}</p>
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
         </div>
       </div>
     </div>

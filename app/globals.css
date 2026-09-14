@@ -1990,21 +1990,21 @@ html[data-hero-motion="prepare"]
 .project-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.5rem, 3vw, 3rem);
+  gap: clamp(1.25rem, 2.4vw, 2.5rem);
 }
 
 .project-card {
   display: grid;
   grid-template-rows: auto auto auto 1fr auto;
-  gap: 0.85rem;
-  padding: clamp(1rem, 1.8vw, 1.6rem);
+  gap: clamp(0.8rem, 1.1vw, 1.05rem);
+  padding: clamp(0.8rem, 1.4vw, 1.25rem);
   background: var(--cool-paper);
-  border: 2px solid var(--bench-graphite);
+  border: 1px solid var(--bench-graphite);
 }
 
 .project-shot {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--paper-muted);
   border: 1px solid var(--line);
@@ -2012,7 +2012,14 @@ html[data-hero-motion="prepare"]
 
 .project-shot img {
   object-fit: cover;
-  object-position: top center;
+  object-position: center;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover .project-shot img {
+    transform: scale(1.035);
+  }
 }
 
 .project-label {
@@ -2062,25 +2069,43 @@ html[data-hero-motion="prepare"]
   background: var(--label-lime);
 }
 
-.process-heading {
+.process-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.65fr);
-  align-items: end;
-  gap: clamp(2rem, 8vw, 10rem);
+  grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+  align-items: stretch;
+  align-self: stretch;
+  gap: clamp(2.5rem, 5vw, 6rem);
+  width: 100%;
+  min-height: 0;
+  padding-bottom: clamp(1.5rem, 3svh, 2.75rem);
+}
+
+.process-heading {
+  align-self: center;
+  justify-self: start;
+  width: min(100%, 42rem);
 }
 
 .process-heading h2 {
-  max-width: 10ch;
+  max-width: 11ch;
   margin: 0;
-  font-size: clamp(2.6rem, min(6vw, 6.6svh), 6.4rem);
-  line-height: 0.86;
+  font-size: clamp(3.2rem, 5vw, 5.6rem);
+  line-height: 0.88;
 }
 
-.process-heading p {
-  max-width: 36ch;
-  margin: 0;
+.process-media {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  justify-self: center;
+}
+
+.process-intro {
+  max-width: 34ch;
+  margin: clamp(1.25rem, 2.4svh, 2rem) 0 0;
   font-size: clamp(1rem, min(1.45vw, 2.1svh), 1.35rem);
   font-weight: 540;
+  line-height: 1.42;
 }
 
 /* Recorrido horizontal: la pista da el scroll, la escena se queda quieta y el
@@ -2110,31 +2135,78 @@ html[data-hero-motion="prepare"]
      y arrastra consigo el titular de la fila de arriba —el mismo carril
      que `overflow: hidden` deberia esconder. */
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
-  align-content: start;
-  gap: clamp(1.25rem, 3svh, 2.5rem);
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: stretch;
+  gap: 0;
   height: 100svh;
-  padding: calc(var(--header-height) + clamp(1rem, 3svh, 2rem)) 0
-    clamp(1rem, 3svh, 2rem);
+  padding: calc(var(--header-height) + clamp(1rem, 2.5svh, 1.75rem)) 0 0;
   overflow: hidden;
+}
+
+.process-visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(14rem, 34svh, 26rem);
+  overflow: hidden;
+  background: var(--paper-muted);
+  border: 1px solid var(--bench-graphite);
+  box-shadow: 0 22px 44px rgba(76, 34, 9, 0.2);
+}
+
+.process-photo {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transform: translateX(8%) scale(1.025);
+  transition: opacity 460ms ease, transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.process-photo[data-past] {
+  transform: translateX(-8%) scale(1.025);
+}
+
+.process-photo[data-current] {
+  z-index: 1;
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.process-photo img,
+.process-step-photo img {
+  object-fit: cover;
+}
+
+.process-journey {
+  margin-inline: calc(-1 * var(--page-pad));
+  padding: clamp(1.25rem, 2.4svh, 2rem) var(--page-pad)
+    clamp(4rem, 9svh, 5.5rem);
+  background: var(--label-lime);
+  border-top: 2px solid var(--bench-graphite);
 }
 
 .process-steps {
   /* Geometria del cable. Vive aqui —y no en cada regla— porque el trazo se
      dibuja tramo a tramo sobre los pasos: todos necesitan las mismas medidas y
      en movil cambian las tres a la vez. */
-  --process-gap: clamp(1.5rem, 4vw, 4rem);
+  --process-gap: clamp(1rem, 2.4vw, 3rem);
   --pin-center: 2rem;
   --rail-thickness: 12px;
   --rail-outline: 18px;
-  --rail-pending: color-mix(in srgb, var(--action-orange) 42%, var(--label-lime));
+  --rail-pending: color-mix(in srgb, var(--action-orange) 28%, var(--cool-paper));
 
   position: relative;
-  display: flex;
+  display: grid;
+  /* Columnas repartidas a partes iguales dentro del ancho disponible: las
+     cuatro tarjetas siempre caben en pantalla, nunca se salen del viewport.
+     `--steps-count` lo fija el componente segun cuantos pasos reciba. */
+  grid-template-columns: repeat(var(--steps-count, 4), minmax(0, 1fr));
   align-items: start;
-  align-self: center;
+  align-self: end;
   gap: var(--process-gap);
-  width: max-content;
+  width: 100%;
+  max-width: none;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2142,7 +2214,11 @@ html[data-hero-motion="prepare"]
 }
 
 .process-steps > li {
-  flex: 0 0 clamp(310px, 32vw, 430px);
+  min-width: 0;
+}
+
+.process-step-photo {
+  display: none;
 }
 
 /* Cable: un tramo por paso, del centro de su pin al centro del siguiente. Se
@@ -2195,7 +2271,7 @@ html[data-hero-motion="prepare"]
   place-items: center;
   width: 4rem;
   height: 4rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
   color: white;
   background: var(--bench-graphite);
   border: 6px solid var(--action-orange);
@@ -2244,9 +2320,9 @@ html[data-hero-motion="prepare"]
 
 .process-steps h3 {
   max-width: 13ch;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.7rem;
   font-family: var(--font-display-family);
-  font-size: clamp(2rem, 2.8vw, 3.05rem);
+  font-size: clamp(1.85rem, 2.35vw, 2.75rem);
   font-variation-settings: "wdth" 84, "wght" 720;
   letter-spacing: -0.035em;
   line-height: 0.95;
@@ -2260,6 +2336,8 @@ html[data-hero-motion="prepare"]
 .process-steps p {
   max-width: 31ch;
   margin: 0;
+  font-size: clamp(1rem, 1.05vw, 1.12rem);
+  line-height: 1.4;
 }
 
 /* FAQ */
@@ -2389,6 +2467,11 @@ html[data-hero-motion="prepare"]
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  /* El panel de cortina siempre mide una pantalla, así que el sobrante existe
+     igual: lo que cambia es dónde cae. Centrado, el aire se reparte arriba y
+     abajo en vez de acumularse entero bajo el formulario, con el footer
+     pegado justo debajo. */
+  align-content: center;
   gap: clamp(3rem, 8vw, 9rem);
   padding: var(--section-pad) var(--page-pad);
   color: var(--cool-paper);
@@ -2884,21 +2967,21 @@ html[data-hero-motion="prepare"]
     grid-template-columns: minmax(0, 1fr);
     grid-auto-rows: auto;
     align-content: start;
-    gap: min(0.75rem, 1.4svh);
+    gap: clamp(1rem, 2.2svh, 1.4rem);
     min-height: 0;
   }
 
-  /* Las filas se miden por su contenido: la caja de una pantalla degrada
-     creciendo, nunca recortando la ficha. La captura se lleva el ajuste. */
+  /* Cada puerta conserva una escena generosa: en móvil se lee como un
+     cartel táctil y no como una ficha de escritorio comprimida. */
   .project-card {
     grid-template-rows: auto auto auto auto auto;
-    gap: min(0.4rem, 0.8svh);
-    padding: min(0.65rem, 1.2svh) 0.8rem;
+    gap: 0.7rem;
+    padding: 0.8rem;
   }
 
   .project-shot {
-    aspect-ratio: auto;
-    height: min(10rem, 13svh);
+    aspect-ratio: 16 / 10;
+    height: auto;
   }
 
   .project-label {
@@ -2906,13 +2989,14 @@ html[data-hero-motion="prepare"]
   }
 
   .project-card h3 {
-    font-size: min(1.3rem, 4.8vw, 2.6svh);
+    font-size: clamp(1.7rem, 7vw, 2.25rem);
+    line-height: 0.94;
   }
 
   .project-card > p,
   .project-card > a {
-    font-size: var(--m-body);
-    line-height: 1.32;
+    font-size: max(0.94rem, var(--m-body));
+    line-height: 1.38;
   }
 
   .site-header {
@@ -3558,8 +3642,42 @@ html[data-hero-motion="prepare"]
   }
 
   .services-heading p,
-  .process-heading p {
+  .process-intro {
     max-width: 48ch;
+  }
+
+  /* En móvil la sección deja de ser una escena fija: cada fase conserva su
+     propia foto y su texto justo debajo, para que el recorrido sea natural al
+     leerlo con el dedo. */
+  .process-section {
+    display: block;
+    min-height: 0;
+    padding: calc(var(--header-height) + 2rem) var(--page-pad) 0;
+  }
+
+  .process-heading {
+    margin-bottom: 2rem;
+    padding-bottom: 0;
+  }
+
+  .process-hero {
+    display: block;
+    padding-bottom: 0;
+  }
+
+  .process-media {
+    display: none;
+  }
+
+  .process-intro {
+    margin: 1rem 0 0;
+    font-size: var(--m-lead);
+    line-height: 1.35;
+  }
+
+  .process-journey {
+    margin-inline: calc(-1 * var(--page-pad));
+    padding: 1.5rem var(--page-pad) 4rem;
   }
 
   /* Pista de scroll del recorrido. El cable se llena al ritmo del dedo, y para
@@ -3572,23 +3690,25 @@ html[data-hero-motion="prepare"]
      mide de mas es recorrido, no contenido. Es la unica seccion que lo lleva
      porque es la unica cuyo contenido se dibuja con el scroll. */
   .section-gently-enabled .section-gently-panel:has(.process-section) {
-    min-height: 175svh;
+    min-height: 0;
   }
 
   .section-gently-enabled
     .section-gently-panel:has(.process-section)
     > .section-curtain-surface {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    min-height: 100svh;
+    --curtain-panel-background: var(--label-lime);
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
 
   .section-gently-enabled
     .section-gently-panel:has(.process-section)
     > .section-curtain-surface
     > section {
-    min-height: 100svh;
+    min-height: 0;
   }
 
   /* Sin recorrido horizontal en móvil: la pista y la escena se desactivan y
@@ -3610,22 +3730,27 @@ html[data-hero-motion="prepare"]
     overflow: visible;
   }
 
+  .process-visual {
+    display: none;
+  }
+
   .process-steps {
-    /* El pin encoge a 2.4rem, asi que su centro —y con el todo el cable— baja
-       a 1.2rem. El grosor tambien baja: el trazo de escritorio ocupaba casi la
-       mitad del ancho del pin pequeno. */
-    --process-gap: min(1.35rem, 2.1svh);
-    --pin-center: 1.2rem;
-    --rail-thickness: 10px;
-    --rail-outline: 16px;
+    /* El pin encoge a 2.2rem, asi que su centro —y con el todo el cable— baja
+       a 1.1rem. El grosor tambien baja: el trazo de escritorio ocupaba casi la
+       mitad del ancho del pin pequeno.
+       El hueco entre pasos sube un poco respecto al pin: el cartel de
+       respuesta gira unos grados y ese giro le saca las esquinas fuera de su
+       propia caja, así que con el hueco justo llegaba a pisar el párrafo del
+       paso anterior. */
+    --process-gap: min(1.7rem, 2.6svh);
+    --pin-center: 1.1rem;
+    --rail-thickness: 9px;
+    --rail-outline: 15px;
 
     display: grid;
     grid-template-columns: 1fr;
     width: auto;
-  }
-
-  .process-steps > li {
-    flex: initial;
+    max-width: none;
   }
 
   /* El cable se pone de pie: mismo tramo por paso, ahora del pin de arriba al
@@ -3656,16 +3781,27 @@ html[data-hero-motion="prepare"]
 
   .process-steps li {
     display: grid;
-    grid-template-columns: 2.4rem 1fr;
-    gap: 0.7rem;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.65rem;
+  }
+
+  .process-step-photo {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    margin: 0 0 0.8rem;
+    overflow: hidden;
+    background: var(--paper-muted);
+    border: 1px solid var(--bench-graphite);
   }
 
   .step-pin {
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 2.2rem;
+    height: 2.2rem;
     margin: 0;
-    border-width: 4px;
-    font-size: 0.95rem;
+    border-width: 3px;
+    font-size: 0.88rem;
   }
 
   .process-steps h3 {
@@ -3685,6 +3821,17 @@ html[data-hero-motion="prepare"]
     margin: 0 0 min(0.35rem, 0.6svh);
     padding: 0.28rem 0.4rem;
     font-size: min(0.78rem, 3vw, 1.6svh);
+    /* Menos giro que en escritorio: aqui el hueco con el paso anterior es
+       mucho mas corto y el giro entero sacaba la esquina de la caja fuera de
+       su sitio, hacia el parrafo de arriba. */
+    transform: rotate(-1deg);
+  }
+
+  .process-steps li[data-reached="true"] .process-step-answer {
+    /* Sin el `translateY` de escritorio: aqui ese levantamiento es lo que
+       hacia que el cartel del paso alcanzado invadiera el texto del paso
+       anterior. */
+    transform: rotate(1deg);
   }
 
   .service-showcase {
@@ -4021,7 +4168,9 @@ html[data-hero-motion="prepare"]
   }
 
   .project-shot {
-    height: min(5rem, 10svh);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
   }
 
   .plain-talk-copy h2 {
@@ -4227,22 +4376,22 @@ html[data-hero-motion="prepare"]
      que se aprieta es el espacio entre ellos y el calibre del cable, nunca el
      texto. El cuarto paso tiene que verse entero antes del relevo. */
   .process-steps {
-    --process-gap: min(0.9rem, 1.6svh);
-    --pin-center: 1.05rem;
-    --rail-thickness: 9px;
-    --rail-outline: 14px;
+    --process-gap: min(1.1rem, 1.85svh);
+    --pin-center: 1rem;
+    --rail-thickness: 8px;
+    --rail-outline: 13px;
   }
 
   .process-steps li {
-    grid-template-columns: 2.1rem 1fr;
-    gap: 0.6rem;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.55rem;
   }
 
   .step-pin {
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 2rem;
+    height: 2rem;
     border-width: 3px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .process-steps h3 {

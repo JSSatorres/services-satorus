@@ -459,6 +459,27 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
           flushPendingRefresh();
         };
 
+        // Cuando `abortTakeover()` llama a esto —siempre desde dentro de
+        // `onRefreshInit`, es decir, en mitad de un `ScrollTrigger.refresh()` en
+        // curso— saltar el scroll y llamar a `ScrollTrigger.update()` aquí mismo
+        // reentra en el refresh que nos ha llamado y deja el panel clavado en su
+        // posición de partida en vez de aterrizar en su sitio (medido: ver
+        // docs/plans/2026-09-14-fix-salto-relevo-movil.md, sección Diagnóstico).
+        // Matar la timeline y limpiar el transform sigue siendo síncrono —tiene que
+        // pasar antes de que `ScrollTrigger` termine de medir—, pero el salto de
+        // scroll se difiere un frame, igual que ya hace `flushPendingRefresh`.
+        const settleDeferred = (target: number) => {
+          takeover.abort = null;
+          takeover.active = false;
+          resetPair(pair);
+          window.requestAnimationFrame(() => {
+            if (disposed) return;
+            jumpToScrollTop(target);
+            ScrollTrigger.update();
+            flushPendingRefresh();
+          });
+        };
+
         if (direction === 1) {
           // El scroll no se toca al empezar. Antes se saltaba a `from` con la
           // timeline todavía en progreso 0 —sin nada cubriendo la pantalla—, y
@@ -469,7 +490,7 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
           // único salto es el de `settle`, y ese va tapado por el panel.
           const timeline = buildTimeline(pair, direction);
           pair.timeline = timeline;
-          takeover.abort = () => settle(to);
+          takeover.abort = () => settleDeferred(to);
           timeline.eventCallback("onComplete", () => settle(to));
           timeline.play(0);
           return;
@@ -484,7 +505,7 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
 
         const timeline = buildTimeline(pair, direction);
         pair.timeline = timeline;
-        takeover.abort = () => settle(from);
+        takeover.abort = () => settleDeferred(from);
         timeline.eventCallback("onReverseComplete", () => settle(from));
         timeline.progress(1, true);
         timeline.reverse();

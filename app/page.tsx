@@ -4,7 +4,6 @@ import { ContactForm } from "@/components/contact-form"
 import { DesktopScrollStory } from "@/components/desktop-scroll-story"
 import { Hero } from "@/components/hero"
 import { MobileFlowReveal } from "@/components/mobile-flow-reveal"
-import { PidotecaJourneyScene } from "@/components/pidoteca-journey-scene"
 import { PlainTalk } from "@/components/plain-talk"
 import { ProcessRoute } from "@/components/process-route"
 import { SectionCurtainStack } from "@/components/section-curtain-stack"
@@ -16,43 +15,57 @@ const steps = [
   {
     title: "Entendemos tu negocio",
     body: "Nos cuentas cómo trabajas, qué quieres conseguir y dónde encuentras dificultades. Revisamos también las herramientas que ya utilizas.",
+    image: "/images/process-discovery.png",
+    imageAlt:
+      "Reunión de escucha entre el equipo de Satorus y una clienta en torno a una mesa de trabajo",
   },
   {
     title: "Definimos la propuesta",
     body: "Concretamos la solución, el alcance, la inversión y los plazos. Sabes qué incluye el proyecto antes de empezar.",
+    image: "/images/process-proposal.png",
+    imageAlt:
+      "Consultora entrega una propuesta visual a un cliente en una mesa de trabajo",
   },
   {
     title: "Construimos y probamos contigo",
     body: "Revisas la solución con ejemplos de tu día a día. Ajustamos lo necesario para que encaje con el trabajo real.",
+    image: "/images/process-cocreate.png",
+    imageAlt:
+      "Equipo de Satorus y cliente revisan juntos una aplicación en una pantalla",
   },
   {
     title: "La ponemos en marcha",
     body: "Te explicamos cómo utilizarla y dejamos acordados el soporte y el mantenimiento que necesite.",
+    image: "/images/process-momentum.png",
+    imageAlt:
+      "Equipo de una pequeña empresa trabaja con agilidad usando su nuevo sistema",
   },
 ]
 
 const projects = [
   {
-    id: "pidoteca",
-    label: "Producto propio · Restaurantes",
-    title: "Del pedido al trabajo de sala y cocina.",
+    id: "apps",
+    label: "Apps a medida",
+    title: "Del móvil al escritorio, una herramienta que encaja contigo.",
     description:
-      "Pidoteca conecta carta, pedidos y gestión para que las distintas partes del restaurante puedan trabajar con la misma información.",
-    href: "/productos#pidoteca",
-    linkLabel: "Conocer Pidoteca",
-    image: "/products/pidoteca-dashboard.png",
-    imageAlt: "Tablero de mesas y pedidos de Pidoteca",
+      "Diseñamos aplicaciones para equipos, clientes y gestión: deporte, restauración, lectura y el siguiente reto de tu negocio.",
+    href: "/productos",
+    linkLabel: "Explora nuestros proyectos",
+    image: "/images/apps-showcase.png",
+    imageAlt:
+      "Composición ilustrativa de aplicaciones para deporte, restauración y lectura en móvil y escritorio",
   },
   {
-    id: "sportapp",
-    label: "Producto propio · En desarrollo",
-    title: "El trabajo del club, conectado.",
+    id: "webs",
+    label: "Webs con carácter",
+    title: "Una web que invita a entrar y hace fácil elegirte.",
     description:
-      "Estamos desarrollando SportApp para reunir equipos, entrenadores, sesiones y documentos, y facilitar que la información del campo llegue a quienes gestionan el club.",
-    href: "/productos#sportapp",
-    linkLabel: "Descubrir SportApp",
-    image: "/products/sportapp-training.png",
-    imageAlt: "Equipo de fútbol entrenando en el campo mientras el entrenador sigue la sesión",
+      "De la energía de Entrolla2 a la mirada personal de Ángel Mendoza: diseñamos webs que cuentan bien quién eres y por qué elegirte.",
+    href: "/productos",
+    linkLabel: "Explora nuestros proyectos",
+    image: "/images/webs-showcase.png",
+    imageAlt:
+      "Composición ilustrativa de una web para hostelería y una web de portfolio profesional en portátil y móvil",
   },
 ]
 
@@ -129,10 +142,10 @@ export default function Home() {
             aria-labelledby="projects-title"
           >
             <div className="projects-heading">
-              <h2 id="projects-title">Lo que ya hemos construido.</h2>
+              <h2 id="projects-title">Una idea puede acabar en una app o en una web.</h2>
               <p>
-                Desarrollamos productos propios para resolver necesidades
-                concretas de restaurantes y clubes deportivos.
+                Dos puertas de entrada a lo que hacemos. Dentro de cada
+                proyecto, todo el detalle.
               </p>
               <a className="projects-cta" href="/productos">
                 Mira todos nuestros proyectos
@@ -144,16 +157,12 @@ export default function Home() {
               {projects.map((project) => (
                 <article className="project-card" key={project.id}>
                   <div className="project-shot">
-                    {project.id === "pidoteca" ? (
-                      <PidotecaJourneyScene compact />
-                    ) : (
-                      <Image
-                        src={project.image}
-                        alt={project.imageAlt}
-                        fill
-                        sizes="(max-width: 900px) 90vw, 42vw"
-                      />
-                    )}
+                    <Image
+                      src={project.image}
+                      alt={project.imageAlt}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 46vw"
+                    />
                   </div>
                   <span className="project-label">{project.label}</span>
                   <h3>{project.title}</h3>
@@ -174,12 +183,12 @@ export default function Home() {
         >
           <ProcessRoute
             heading={
+              <h2 id="process-title">Una mejora concreta. Un plan claro.</h2>
+            }
+            intro={
               <>
-                <h2 id="process-title">Una mejora concreta. Un plan claro.</h2>
-                <p>
-                  Antes de construir, acordamos qué queremos mejorar, qué
-                  vamos a entregar y cómo comprobaremos que funciona.
-                </p>
+                Antes de construir, acordamos qué queremos mejorar, qué vamos a
+                entregar y cómo comprobaremos que funciona.
               </>
             }
             steps={steps}
