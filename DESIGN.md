@@ -182,6 +182,16 @@ La interfaz permanece plana por defecto. La profundidad aparece cuando la escena
 
 **The Material Makes Depth Rule.** Toda sombra necesita un objeto físico reconocible; una superficie editorial no flota por defecto.
 
+## Motion implementation
+
+La home mantiene la tesis de "taller en movimiento": el hero presenta el paso del enredo al orden, el cable naranja reaparece entre secciones como continuidad acotada, y cada problema o servicio responde a cursor, foco, toque y teclado con una consecuencia visual. La única historia larga de scroll es la transformación central en tres actos: «La consulta entra», «El trabajo se ordena» y «Tu equipo sigue». Navegación, FAQ, CTA y formulario aportan feedback breve y físico.
+
+`motion/react` se limita a entradas, estados y microinteracciones. GSAP con ScrollTrigger se reserva exclusivamente para esa historia central de escritorio; no gobierna el resto de la página. Con movimiento reducido, los estados finales siguen visibles y no se activa la secuencia de scroll ni el vídeo.
+
+La implementación retiró las cortinas de la home, el `clipPath` del hero, `hero-route`, el wipe anterior de la historia y el cambio de `padding` en el hover de servicios. Sus sustitutos son `HeroMedia`, `RouteSketch`, `InteractiveFrictions`, `ServiceShowcase`, la historia de tres actos, `ProcessRoute` y los refinamientos del header, FAQ y formulario.
+
+El vídeo final sigue siendo una dependencia externa: no se ha generado ni simulado. Mientras `NEXT_PUBLIC_HERO_VIDEO_READY` esté ausente o sea `false`, el hero muestra solo el póster y no solicita vídeo. La activación consiste únicamente en copiar `public/videos/satorus-hero-loop.webm` y `public/videos/satorus-hero-loop.mp4`, y establecer exactamente `NEXT_PUBLIC_HERO_VIDEO_READY=true`.
+
 ## Shapes
 
 Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles funcionales repiten esquinas discretas (`control`), mientras la acción hero adopta una cabeza redondeada y un arranque recto para parecer el extremo del cable. Círculos y cápsulas completas quedan reservados a puntos de recorrido, ruta y marcadores. Fotografías y papeles pueden inclinarse o recortarse en diagonal cuando la materialidad lo justifica.
@@ -225,6 +235,13 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 ### FAQ Disclosure
 
 - **Style:** preguntas entre divisores grafito, con un signo más construido con dos trazos; al abrir, el trazo vertical rota hasta formar un menos. La respuesta mantiene una longitud máxima de 62ch.
+
+### Catálogo de proyectos
+
+- **Dos familias, dos atmósferas:** Apps conserva el papel frío y presenta cada producto como una hoja de trabajo; Webs cambia a grafito y usa ventanas de navegador como piezas de exposición.
+- **Escalable sin huecos falsos:** los proyectos se renderizan desde `lib/project-catalog.ts`. Añadir un caso amplía su lista sin exigir tarjetas vacías ni una retícula cerrada.
+- **La captura es evidencia:** las fichas usan pantallas y fotografías reales de cada proyecto. El texto explica problema, dirección y decisiones sin atribuir métricas o resultados no medidos.
+- **Profundidad progresiva:** `/productos` sirve como índice breve. Cada elemento abre una ficha larga; Lector Bilingüe conserva su página propia y Pidoteca, SportApp, Ángel Mendoza y Enrolla2 cuentan ahora con una ruta dedicada.
 
 ### Route & Process Markers
 

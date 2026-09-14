@@ -1,0 +1,13 @@
+.splitScene { display:grid; grid-template-columns:1.25fr .75fr; gap:clamp(1rem,2vw,2rem); align-items:end; }
+.splitScene figure { margin:0; }
+.splitScene figcaption { padding-top:.7rem; font-weight:720; }
+.training,.dashboard { position:relative; overflow:hidden; border:1px solid var(--bench-graphite); }
+.training { height:clamp(25rem,50vw,48rem); }
+.dashboard { height:clamp(19rem,32vw,31rem); background:#eef0f4; transform:rotate(-2deg); box-shadow:0 1.5rem 3rem rgba(23,27,24,.14); }
+.training img { object-fit:cover; }
+.dashboard img { object-fit:contain; }
+.waitlist { padding:var(--section-pad) var(--page-pad); display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,8vw,8rem); align-items:center; background:var(--paper-muted); }
+.waitlist h2 { max-width:10ch; margin:.5rem 0 1.2rem; font:760 clamp(3rem,6vw,6rem)/.88 var(--font-display-family); letter-spacing:-.055em; }
+.waitlist>div>p:last-child { max-width:37rem; font-size:1.1rem; }
+.formSheet { padding:clamp(1.4rem,3vw,3rem); background:var(--cool-paper); border:1px solid var(--bench-graphite); box-shadow:1rem 1rem 0 var(--action-orange); }
+@media (max-width:800px) { .splitScene,.waitlist { grid-template-columns:1fr; } .training,.dashboard { height:min(90vw,34rem); transform:none; } }

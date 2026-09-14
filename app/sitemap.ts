@@ -4,6 +4,11 @@ import { absoluteUrl } from "@/lib/site";
 const publicRoutes = [
   "/",
   "/productos",
+  "/productos/pidoteca",
+  "/productos/sportapp",
+  "/lector-bilingue",
+  "/proyectos/angel-mendoza",
+  "/proyectos/enrolla2",
   "/aviso-legal",
   "/politica-de-privacidad",
 ];

@@ -1,28 +1,32 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/atkinson-hyperlegible-next";
 import "./globals.css";
+import { MaskedHeadings } from "@/components/masked-headings";
 import { MotionProvider } from "@/components/motion-provider";
+import { ScrollProgressRail } from "@/components/scroll-progress-rail";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
 const socialImage = absoluteUrl("/opengraph-image");
-const socialImageAlt = "Satorus — Tu negocio, menos enredado";
+const socialImageAlt = "Satorus — Tu negocio puede llegar más lejos";
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${siteUrl}/`),
   title: {
-    default: "Satorus | Webs y automatizaciones para pymes",
+    default: "Satorus | Webs, herramientas e IA para pymes",
     template: "%s | Satorus",
   },
   description:
-    "Webs, herramientas a medida y automatizaciones para pymes, explicadas sin tecnicismos.",
+    "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas. Te ayudamos a captar clientes, atender mejor y reducir el trabajo manual.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Satorus — Tu negocio, menos enredado",
+    title: "Satorus — Tu negocio puede llegar más lejos",
     description:
-      "Webs, herramientas a medida y automatizaciones para pymes, explicadas sin tecnicismos.",
+      "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas.",
     url: siteUrl,
     siteName: "Satorus",
     locale: "es_ES",
@@ -38,9 +42,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Satorus — Tu negocio, menos enredado",
+    title: "Satorus — Tu negocio puede llegar más lejos",
     description:
-      "Webs, herramientas a medida y automatizaciones para pymes, explicadas sin tecnicismos.",
+      "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas.",
     images: [{ url: socialImage, alt: socialImageAlt }],
   },
   robots: {
@@ -63,14 +67,26 @@ FORM: Taller en movimiento, opción B aprobada, semilla b92b95d0.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->`;
 
+/* Sin JavaScript nadie retira `data-hero-motion` ni arranca GSAP: el hero se muestra entero. */
+const heroMotionFallback = `html[data-hero-motion="prepare"] .hero-kinetic-brand,
+html[data-hero-motion="prepare"] .hero-kinetic-copy { visibility: visible !important; }`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" data-hero-motion="prepare" suppressHydrationWarning>
       <body id="top">
+        <Script id="prepare-hero-motion" strategy="beforeInteractive">
+          {`if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            delete document.documentElement.dataset.heroMotion;
+          }`}
+        </Script>
+        <noscript>
+          <style>{heroMotionFallback}</style>
+        </noscript>
         <div
           hidden
           aria-hidden="true"
@@ -80,6 +96,9 @@ export default function RootLayout({
         <a className="skip-link" href="#contenido">
           Saltar al contenido
         </a>
+        <SmoothScroll />
+        <ScrollProgressRail />
+        <MaskedHeadings />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>

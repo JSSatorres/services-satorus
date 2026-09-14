@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Satorus — Tu negocio, menos enredado";
+export const alt = "Satorus — Tu negocio puede llegar más lejos";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -113,8 +113,8 @@ export default function OpenGraphImage() {
             lineHeight: 0.86,
           }}
         >
-          <div style={{ display: "flex" }}>Tu negocio,</div>
-          <div style={{ display: "flex" }}>menos enredado.</div>
+          <div style={{ display: "flex" }}>Tu negocio puede</div>
+          <div style={{ display: "flex" }}>llegar más lejos.</div>
         </div>
 
         <div
@@ -127,7 +127,8 @@ export default function OpenGraphImage() {
             lineHeight: 1.25,
           }}
         >
-          Webs, herramientas y automatizaciones para pymes, explicadas sin tecnicismos.
+          Webs, herramientas e inteligencia artificial para pequeñas y medianas
+          empresas.
         </div>
       </div>
 

@@ -144,7 +144,13 @@ function PhoneScreen({ activeStep }: { activeStep: number }) {
   );
 }
 
-function JourneyScene({ className = "" }: { className?: string }) {
+function JourneyScene({
+  className = "",
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const reduceMotion = useReducedMotion();
   const [activeStep, setActiveStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -167,23 +173,30 @@ function JourneyScene({ className = "" }: { className?: string }) {
 
   return (
     <figure
-      className={`${styles.journey} ${className}`.trim()}
-      aria-labelledby="pidoteca-journey-caption"
+      className={`${styles.journey} ${compact ? styles.compact : ""} ${className}`.trim()}
+      aria-labelledby={compact ? undefined : "pidoteca-journey-caption"}
+      aria-label={
+        compact
+          ? "Animación: un cliente escanea el QR de su mesa y pide desde la carta de Pidoteca en el móvil"
+          : undefined
+      }
     >
-      <div className={styles.frame}>
-        <div className={styles.frameHeader}>
-          <span>Así vive el pedido tu cliente</span>
-          <button
-            type="button"
-            onClick={() => setIsPaused((paused) => !paused)}
-            aria-label={isPaused ? "Reproducir animación" : "Pausar animación"}
-          >
-            {isPaused ? <Play aria-hidden="true" size={14} /> : <Pause aria-hidden="true" size={14} />}
-            {isPaused ? "Reproducir" : "Pausar"}
-          </button>
-        </div>
+      <div className={`${styles.frame} ${compact ? styles.frameCompact : ""}`.trim()}>
+        {compact ? null : (
+          <div className={styles.frameHeader}>
+            <span>Así vive el pedido tu cliente</span>
+            <button
+              type="button"
+              onClick={() => setIsPaused((paused) => !paused)}
+              aria-label={isPaused ? "Reproducir animación" : "Pausar animación"}
+            >
+              {isPaused ? <Play aria-hidden="true" size={14} /> : <Pause aria-hidden="true" size={14} />}
+              {isPaused ? "Reproducir" : "Pausar"}
+            </button>
+          </div>
+        )}
 
-        <div className={styles.stage}>
+        <div className={`${styles.stage} ${compact ? styles.stageCompact : ""}`.trim()}>
           <motion.div
             className={styles.stageImage}
             animate={{ scale: activeStep === 0 ? 1.035 : 1 }}
@@ -199,20 +212,22 @@ function JourneyScene({ className = "" }: { className?: string }) {
           </motion.div>
           <div className={styles.stageShade} aria-hidden="true" />
 
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={activeStep}
-              className={styles.stepCopy}
-              initial={{ opacity: 0, clipPath: "inset(0 0 22% 0)" }}
-              animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.38, ease: SCENE_EASE }}
-            >
-              <span><StepIcon aria-hidden="true" size={16} />Paso {activeStep + 1} de 4</span>
-              <strong>{step.title}</strong>
-              <p>{step.detail}</p>
-            </motion.div>
-          </AnimatePresence>
+          {compact ? null : (
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeStep}
+                className={styles.stepCopy}
+                initial={{ opacity: 0, clipPath: "inset(0 0 22% 0)" }}
+                animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.38, ease: SCENE_EASE }}
+              >
+                <span><StepIcon aria-hidden="true" size={16} />Paso {activeStep + 1} de 4</span>
+                <strong>{step.title}</strong>
+                <p>{step.detail}</p>
+              </motion.div>
+            </AnimatePresence>
+          )}
 
           <span className={styles.tableLabel}>Mesa 12</span>
 
@@ -259,39 +274,49 @@ function JourneyScene({ className = "" }: { className?: string }) {
           </motion.div>
         </div>
 
-        <div className={styles.stepNav} aria-label="Pasos del pedido">
-          {journeySteps.map(({ label, icon: Icon }, index) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => selectStep(index)}
-              aria-pressed={activeStep === index}
-            >
-              <Icon aria-hidden="true" size={18} />
-              <span>{label}</span>
-              {activeStep === index && !isPaused ? (
-                <motion.i
-                  aria-hidden="true"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: STEP_DURATION_MS / 1000, ease: "linear" }}
-                />
-              ) : null}
-            </button>
-          ))}
-        </div>
+        {compact ? null : (
+          <div className={styles.stepNav} aria-label="Pasos del pedido">
+            {journeySteps.map(({ label, icon: Icon }, index) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => selectStep(index)}
+                aria-pressed={activeStep === index}
+              >
+                <Icon aria-hidden="true" size={18} />
+                <span>{label}</span>
+                {activeStep === index && !isPaused ? (
+                  <motion.i
+                    aria-hidden="true"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: STEP_DURATION_MS / 1000, ease: "linear" }}
+                  />
+                ) : null}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <figcaption id="pidoteca-journey-caption">
-        Recorrido real del producto: de la mesa al equipo, sin cambiar de herramienta.
-      </figcaption>
+      {compact ? null : (
+        <figcaption id="pidoteca-journey-caption">
+          Recorrido real del producto: de la mesa al equipo, sin cambiar de herramienta.
+        </figcaption>
+      )}
     </figure>
   );
 }
 
-export function PidotecaJourneyScene({ className }: { className?: string }) {
+export function PidotecaJourneyScene({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   return (
     <MotionConfig reducedMotion="user">
-      <JourneyScene className={className} />
+      <JourneyScene className={className} compact={compact} />
     </MotionConfig>
   );
 }

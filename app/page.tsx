@@ -1,86 +1,107 @@
-import { ArrowDown, ArrowRight } from "lucide-react"
 import Image from "next/image"
+import { ArrowUpRight } from "lucide-react"
+import { BusinessBottleneck } from "@/components/business-bottleneck"
 import { ContactForm } from "@/components/contact-form"
-import { DesktopScrollStory } from "@/components/desktop-scroll-story"
 import { Hero } from "@/components/hero"
-import { MobileFlowReveal } from "@/components/mobile-flow-reveal"
+import { PlainTalk } from "@/components/plain-talk"
+import { ProcessRoute } from "@/components/process-route"
 import { SectionCurtainStack } from "@/components/section-curtain-stack"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 
-const frictions = [
-  "Un presupuesto se queda enterrado en WhatsApp.",
-  "Copias el mismo pedido en dos o tres sitios.",
-  "La web existe, pero no trae conversaciones.",
-  "Cuando alguien falta, nadie sabe dónde estaba todo.",
-]
-
-const services = [
-  {
-    name: "Una web que vende por ti",
-    type: "Web",
-    description:
-      "Explica en segundos qué haces, para quién y cuál es el siguiente paso. Clara en móvil, rápida y fácil de mantener.",
-  },
-  {
-    name: "Una herramienta que encaja",
-    type: "A medida",
-    description:
-      "Presupuestos, pedidos, clientes o partes de trabajo en un lugar hecho alrededor de tu forma de trabajar.",
-  },
-  {
-    name: "Tareas que dejan de perseguirte",
-    type: "Automatización",
-    description:
-      "Respuestas, avisos, documentos y pasos repetidos que pueden quedar preparados o hacerse solos, siempre con control.",
-  },
-]
-
 const steps = [
   {
-    title: "Hablamos el idioma de tu negocio",
-    body: "Nos cuentas qué haces ahora, qué se atasca y qué tendría que pasar para que el día fuese más sencillo.",
+    title: "Entendemos tu negocio",
+    body: "Nos cuentas cómo trabajas, qué quieres conseguir y dónde encuentras dificultades. Revisamos también las herramientas que ya utilizas.",
+    image: "/images/process-discovery.png",
+    imageAlt:
+      "Reunión de escucha entre el equipo de Satorus y una clienta en torno a una mesa de trabajo",
   },
   {
-    title: "Dibujamos el recorrido antes de construir",
-    body: "Ves una propuesta clara: qué entra, qué ocurre y qué resultado sale. Sin capas, siglas ni sorpresas.",
+    title: "Definimos la propuesta",
+    body: "Concretamos la solución, el alcance, la inversión y los plazos. Sabes qué incluye el proyecto antes de empezar.",
+    image: "/images/process-proposal.png",
+    imageAlt:
+      "Consultora entrega una propuesta visual a un cliente en una mesa de trabajo",
   },
   {
-    title: "Empezamos por lo que más desbloquea",
-    body: "La solución se divide en partes que puedas entender, revisar y usar desde el principio.",
+    title: "Construimos y probamos contigo",
+    body: "Revisas la solución con ejemplos de tu día a día. Ajustamos lo necesario para que encaje con el trabajo real.",
+    image: "/images/process-cocreate.png",
+    imageAlt:
+      "Equipo de Satorus y cliente revisan juntos una aplicación en una pantalla",
   },
   {
-    title: "La tecnología se queda en su sitio",
-    body: "Tú mantienes el control del negocio. Nosotros nos encargamos de que lo técnico funcione y siga teniendo sentido.",
+    title: "La ponemos en marcha",
+    body: "Te explicamos cómo utilizarla y dejamos acordados el soporte y el mantenimiento que necesite.",
+    image: "/images/process-momentum.png",
+    imageAlt:
+      "Equipo de una pequeña empresa trabaja con agilidad usando su nuevo sistema",
+  },
+]
+
+const projects = [
+  {
+    id: "apps",
+    label: "Apps a medida",
+    title: "Del móvil al escritorio, una herramienta que encaja contigo.",
+    description:
+      "Diseñamos aplicaciones para equipos, clientes y gestión: deporte, restauración, lectura y el siguiente reto de tu negocio.",
+    href: "/productos#apps",
+    linkLabel: "Ver las apps",
+    image: "/images/apps-showcase.png",
+    imageAlt:
+      "Composición ilustrativa de aplicaciones para deporte, restauración y lectura en móvil y escritorio",
+  },
+  {
+    id: "webs",
+    label: "Webs con carácter",
+    title: "Una web que invita a entrar y hace fácil elegirte.",
+    description:
+      "De la energía de Enrolla2 a la mirada personal de Ángel Mendoza: diseñamos webs que cuentan bien quién eres y por qué elegirte.",
+    href: "/productos#webs",
+    linkLabel: "Ver las webs",
+    image: "/images/webs-showcase.png",
+    imageAlt:
+      "Composición ilustrativa de una web para hostelería y una web de portfolio profesional en portátil y móvil",
   },
 ]
 
 const faqs = [
   {
-    question:
-      "No sé si necesito una web, un programa o inteligencia artificial.",
+    question: "¿Necesito saber de programación o inteligencia artificial?",
     answer:
-      "No necesitas decidirlo antes de hablar. Empezamos por el problema y elegimos después la solución más sencilla que lo resuelva. La IA solo entra si aporta algo útil.",
+      "Puedes empezar explicándonos qué haces y qué te gustaría mejorar. Nosotros traducimos esa necesidad en una propuesta que puedas entender y valorar.",
   },
   {
-    question: "¿Tengo que cambiar las herramientas que ya usa mi empresa?",
+    question: "¿Podemos aprovechar mi web y mis herramientas actuales?",
     answer:
-      "No necesariamente. Primero revisamos lo que ya tienes. Muchas veces el mayor cambio consiste en conectar mejor esas herramientas o quitar pasos duplicados.",
+      "Primero revisamos lo que ya tienes. La solución puede consistir en mejorarlo, conectarlo con otras herramientas o desarrollar únicamente la parte que falta.",
   },
   {
-    question: "¿Trabajas solo con empresas grandes?",
+    question: "¿La inteligencia artificial tiene sentido para cualquier tarea?",
     answer:
-      "La web está pensada precisamente para pymes: negocios donde el tiempo de cada persona cuenta y una tarea repetida termina ocupando demasiado espacio.",
+      "Su utilidad depende de la tarea y de la información disponible. Valoramos dónde puede ayudarte y cuándo basta con una automatización sencilla.",
+  },
+  {
+    question: "¿Qué ocurre si la IA se equivoca?",
+    answer:
+      "Puede cometer errores. Por eso definimos qué información utiliza, cómo probamos sus respuestas y qué pasos necesitan revisión antes de utilizarlas o enviarlas.",
+  },
+  {
+    question: "¿Qué pasa con los datos de mi negocio?",
+    answer:
+      "Antes de incorporar una herramienta, revisamos qué información necesita y cómo se tratará. Las condiciones de acceso, uso y conservación forman parte de la definición de la solución.",
   },
   {
     question: "¿Cuánto cuesta y cuánto tarda?",
     answer:
-      "Depende del alcance. Después de entender el problema, la propuesta deja por escrito qué se va a hacer, qué queda fuera, cuánto cuesta y qué tiempos manejamos antes de empezar.",
+      "La inversión y los plazos se concretan después de conocer tu caso. La propuesta detalla el trabajo incluido y los costes de herramientas externas o mantenimiento que correspondan.",
   },
   {
     question: "¿Puedo empezar por una parte pequeña?",
     answer:
-      "La propuesta puede organizarse por fases para empezar por el atasco que más tiempo o más oportunidades está consumiendo.",
+      "Sí. Podemos plantear una primera fase centrada en una necesidad concreta y valorar después qué merece la pena ampliar.",
   },
 ]
 
@@ -88,125 +109,74 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main id="contenido">
+      <main id="contenido" data-reveal-scope="lines">
         <SectionCurtainStack>
-          <Hero />
-
-          <section className="plain-talk" aria-labelledby="plain-talk-title">
-          <div className="plain-talk-copy">
-            <h2 id="plain-talk-title">
-              Hablamos claro.
-              <br />
-              Te entiendes tú.
-            </h2>
-            <p>
-              Aquí no hay tecnicismos. No hace falta pedir una “arquitectura de
-              agentes”. Basta con decir: “los pedidos llegan por tres sitios y
-              perdemos tiempo copiándolos”.
-            </p>
-          </div>
-
-          <div className="route-sketch" aria-hidden="true">
-            <svg viewBox="0 0 720 400" preserveAspectRatio="xMidYMid meet">
-              <path d="M42 220 C128 72 216 340 318 190 S530 74 676 188" />
-              <path className="route-arrow" d="M630 146 L682 188 L630 226" />
-            </svg>
-            <span className="sketch-start">Lo que te frena</span>
-            <span className="sketch-end">Un recorrido claro</span>
-          </div>
-          </section>
-
-          <section
-          className="friction-section"
-          id="que-resolvemos"
-          aria-labelledby="friction-title"
-        >
-          <figure className="friction-photo">
-            <Image
-              src="/images/daily-tangle.png"
-              alt="Mesa vista desde arriba con notas, un móvil y un cable naranja enredado."
-              fill
-              sizes="(max-width: 900px) 100vw, 52vw"
-            />
-            <span className="photo-tape">¿Te suena?</span>
-          </figure>
-
-          <div className="friction-copy">
-            <h2 id="friction-title">
-              Si tu día depende de acordarte de todo, algo se puede ordenar.
-            </h2>
-            <div className="friction-list">
-              {frictions.map((item) => (
-                <p key={item}>
-                  <span aria-hidden="true" />
-                  {item}
-                </p>
-              ))}
-            </div>
-            <a href="#contacto">
-              Cuéntanos cuál es el tuyo
-              <ArrowDown aria-hidden="true" size={22} />
-            </a>
-          </div>
-          </section>
-
-          <section
-          className="services-section"
-          id="servicios"
-          aria-labelledby="services-title"
-        >
-          <div className="services-heading">
-            <h2 id="services-title">
-              No te vendemos tecnología. Resolvemos el atasco.
-            </h2>
-            <p>
-              Incluimos inteligencia artificial cuando mejora el resultado. Si
-              una regla sencilla lo hace mejor, usamos una regla sencilla.
-            </p>
-          </div>
-
-          <div className="service-ledger">
-            {services.map((service) => (
-              <article key={service.name} className="service-row">
-                <span className="service-type">{service.type}</span>
-                <h3>{service.name}</h3>
-                <p>{service.description}</p>
-                <ArrowRight aria-hidden="true" size={29} strokeWidth={1.8} />
-              </article>
-            ))}
-          </div>
-          </section>
-
-          <DesktopScrollStory />
-          <MobileFlowReveal />
+        <Hero />
 
           <section
           className="process-section"
           id="como-trabajamos"
           aria-labelledby="process-title"
         >
-          <div className="process-heading">
-            <h2 id="process-title">Nos cuentas el lío. Dibujamos la salida.</h2>
-            <p>
-              El trabajo empieza por tu día a día, no por una herramienta que
-              haya que venderte.
-            </p>
-          </div>
-
-          <ol className="process-steps">
-            {steps.map((step, index) => (
-              <li key={step.title}>
-                <span className="step-pin" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <ProcessRoute
+            heading={
+              <h2 id="process-title">Una mejora concreta. Un plan claro.</h2>
+            }
+            intro={
+              <>
+                Antes de construir, acordamos qué queremos mejorar, qué vamos a
+                entregar y cómo comprobaremos que funciona.
+              </>
+            }
+            steps={steps}
+          />
           </section>
+
+          <section
+            className="projects-section"
+            id="proyectos"
+            aria-labelledby="projects-title"
+          >
+            <div className="projects-heading">
+              <h2 id="projects-title">Una idea puede acabar en una app o en una web.</h2>
+              <div className="projects-heading-aside">
+                <p>
+                  Dos puertas de entrada a lo que hacemos. Dentro de cada
+                  proyecto, todo el detalle.
+                </p>
+                <a className="projects-cta" href="/productos">
+                  Mira algunos de nuestros proyectos
+                  <ArrowUpRight aria-hidden="true" size={20} />
+                </a>
+              </div>
+            </div>
+
+            <div className="project-list">
+              {projects.map((project) => (
+                <article className="project-card" key={project.id}>
+                  <div className="project-shot">
+                    <Image
+                      src={project.image}
+                      alt={project.imageAlt}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 46vw"
+                    />
+                  </div>
+                  <span className="project-label">{project.label}</span>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <a href={project.href}>
+                    {project.linkLabel}
+                    <ArrowUpRight aria-hidden="true" size={20} />
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <PlainTalk />
+
+          <BusinessBottleneck />
 
           <section
           className="faq-section"
@@ -214,9 +184,7 @@ export default function Home() {
           aria-labelledby="faq-title"
         >
           <div className="faq-heading">
-            <h2 id="faq-title">
-              Las dudas que suelen aparecer antes de hablar.
-            </h2>
+            <h2 id="faq-title">Antes de dar el paso.</h2>
             <p>
               Si la tuya no está aquí, escríbenos como la explicarías a alguien
               de tu equipo.
@@ -243,13 +211,12 @@ export default function Home() {
         >
           <div className="contact-copy">
             <h2 id="contact-title">
-              Cuéntanos qué te frena.
-              <br />
-              Aunque todavía no sepas cómo se llama.
+              Veamos cuál puede ser tu siguiente paso.
             </h2>
             <p>
-              Describe qué haces ahora, dónde pierdes tiempo y qué te gustaría
-              que ocurriera. Con eso basta para empezar.
+              Cuéntanos a qué se dedica tu negocio y qué te gustaría mejorar.
+              Revisaremos tu consulta y te contactaremos para entender mejor lo
+              que necesitas.
             </p>
             <a href="mailto:info@satorus.es">info@satorus.es</a>
           </div>

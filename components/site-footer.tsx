@@ -14,7 +14,9 @@ export function SiteFooter() {
         >
           <BrandLogo />
         </Link>
-        <p>Webs, herramientas y automatizaciones para pymes.</p>
+        <p>
+          Webs, herramientas e inteligencia artificial al servicio de tu negocio.
+        </p>
       </div>
       <nav aria-label="Enlaces legales">
         <Link href="/aviso-legal">Aviso legal</Link>

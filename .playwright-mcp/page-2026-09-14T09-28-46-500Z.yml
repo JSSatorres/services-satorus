@@ -1,0 +1,246 @@
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido" [ref=e2] [cursor=pointer]:
+    - /url: "#contenido"
+  - progressbar "Progreso de lectura"
+  - banner [ref=e3]:
+    - link "Satorus, volver al inicio" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e9]: satorus.
+    - navigation "Navegación principal" [ref=e10]:
+      - link "Soluciones" [ref=e11] [cursor=pointer]:
+        - /url: /#servicios
+      - link "IA aplicada" [ref=e12] [cursor=pointer]:
+        - /url: /#ia-aplicada
+      - link "Proyectos" [ref=e13] [cursor=pointer]:
+        - /url: /#proyectos
+      - link "Cómo trabajamos" [ref=e14] [cursor=pointer]:
+        - /url: /#como-trabajamos
+    - generic [ref=e15]:
+      - link "Mira todos nuestros proyectos" [ref=e16] [cursor=pointer]:
+        - /url: /productos
+        - generic [ref=e18]:
+          - generic [ref=e19]: Mira todos nuestros proyectos
+          - generic [aria-hidden] [ref=e20]: Mira todos nuestros proyectos
+      - link "Hablemos de tu negocio" [ref=e24] [cursor=pointer]:
+        - /url: /#contacto
+        - generic [ref=e26]:
+          - generic [ref=e27]: Hablemos de tu negocio
+          - generic [aria-hidden] [ref=e28]: Hablemos de tu negocio
+  - main [ref=e32]:
+    - generic [ref=e33]:
+      - region [ref=e36]:
+        - generic:
+          - img "Mesa vista desde arriba con notas, un móvil y un cable naranja enredado."
+        - generic [ref=e37]:
+          - heading "Satorus.es. Tu negocio puede llegar más lejos." [level=1] [ref=e38]
+          - paragraph [ref=e39]: Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas. Te ayudamos a aprovechar la tecnología para captar clientes, atender mejor y reducir el trabajo manual. Diseñamos y ponemos en marcha la solución que encaja con tu negocio.
+          - paragraph [ref=e41]: Cuéntanos qué quieres mejorar. Te ayudamos a encontrar por dónde empezar.
+        - link "Hablemos de tu negocio" [ref=e42] [cursor=pointer]:
+          - /url: "#contacto"
+          - generic [ref=e44]:
+            - generic [ref=e45]: Hablemos de tu negocio
+            - generic [aria-hidden] [ref=e46]: Hablemos de tu negocio
+      - region [ref=e51]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - heading "La IA abre nuevas posibilidades." [level=2] [ref=e56]: La IA abrenuevas posibilidades.
+            - paragraph [ref=e57]: Preparar una respuesta, reunir información o avanzar un presupuesto son tareas en las que la tecnología puede ayudarte. Identificamos dónde aportaría una mejora concreta a tu negocio y puedes empezar por ahí y ampliar cuando tenga sentido.
+          - generic [aria-hidden]:
+            - generic: Una tarea del día
+            - generic: Una mejora concreta
+      - region [ref=e60]:
+        - generic [ref=e61]:
+          - heading "Qué podemos mejorar contigo." [level=2] [ref=e62]
+          - paragraph [ref=e63]: Partimos de lo que quieres conseguir y elegimos la combinación adecuada de web, herramientas y automatización.
+        - generic [ref=e64]:
+          - button "Web Una web que ayuda a elegirte Presenta lo que haces con claridad, muestra el valor de tu negocio y facilita que te pidan información, una cita o un presupuesto." [pressed] [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]: Web
+            - generic [ref=e67]:
+              - generic [ref=e68]: Una web que ayuda a elegirte
+              - generic [ref=e69]: Presenta lo que haces con claridad, muestra el valor de tu negocio y facilita que te pidan información, una cita o un presupuesto.
+          - button "A medida Una herramienta adaptada a tu trabajo Reúne presupuestos, pedidos, clientes o tareas en un lugar pensado para tu forma de trabajar. La información queda disponible para quien la necesita." [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]: A medida
+            - generic [ref=e74]:
+              - generic [ref=e75]: Una herramienta adaptada a tu trabajo
+              - generic [ref=e76]: Reúne presupuestos, pedidos, clientes o tareas en un lugar pensado para tu forma de trabajar. La información queda disponible para quien la necesita.
+          - button "Automatización Automatizar con IA para avanzar Conecta herramientas, automatiza recordatorios y utiliza la IA para preparar respuestas o trabajar con documentos. Definimos qué puede hacerse automáticamente y qué necesita tu revisión." [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: Automatización
+            - generic [ref=e81]:
+              - generic [ref=e82]: Automatizar con IA para avanzar
+              - generic [ref=e83]: Conecta herramientas, automatiza recordatorios y utiliza la IA para preparar respuestas o trabajar con documentos. Definimos qué puede hacerse automáticamente y qué necesita tu revisión.
+          - complementary "Antes y después de tu web (Web)" [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]: Antes y después de tu web
+              - paragraph [ref=e89]: Web
+            - img "Un navegador pasa de un mensaje confuso a una página clara con un botón visible para pedir cita." [ref=e90]:
+              - generic [ref=e91]:
+                - generic [ref=e96]: satorus.es
+                - generic [ref=e97]:
+                  - strong [ref=e98]: ¿Qué hacemos?
+                  - generic [ref=e99]: Soluciones para todo
+                  - generic [ref=e100]: Escríbenos si quieres
+                - generic [ref=e101]:
+                  - generic [ref=e102]: Taller de bicicletas
+                  - strong [ref=e103]: Reparamos tu bici sin marearte.
+                  - paragraph [ref=e104]: Trae tu bici, dinos qué falla y te damos cita.
+                  - generic [ref=e105]: Pedir cita
+      - region [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - paragraph [ref=e111]: Automatización con IA
+            - heading "Una consulta llega. El siguiente paso queda preparado." [level=2] [ref=e112]
+            - paragraph [ref=e113]: La tecnología prepara el trabajo. Tú mantienes la decisión.
+          - figure "Escena ilustrativa de una posible aplicación · responde al scroll" [ref=e114]:
+            - img "Mesa con notas y tareas desordenadas antes de simplificar el proceso." [ref=e116]
+            - img "Mesa ordenada después de convertir las tareas en un recorrido claro." [ref=e118]
+            - generic [ref=e121]: Consulta
+            - generic [aria-hidden] [ref=e122]:
+              - text: Nueva consulta
+              - strong [ref=e123]: Presupuesto · Web
+            - generic [aria-hidden] [ref=e124]: Borrador listo
+          - generic [ref=e126]:
+            - article [ref=e127]:
+              - generic [ref=e128]: "01"
+              - heading "La solicitud queda registrada" [level=3] [ref=e129]
+              - paragraph [ref=e130]: Un cliente escribe desde tu web. Su consulta y sus datos se reúnen en un lugar donde puedes darles seguimiento.
+            - article [ref=e131]:
+              - generic [ref=e132]: "02"
+              - heading "La IA prepara un borrador" [level=3] [ref=e133]
+              - paragraph [ref=e134]: Con la información definida sobre tus servicios prepara una respuesta inicial y señala lo que falta.
+            - article [ref=e135]:
+              - generic [ref=e136]: "03"
+              - heading "Tú revisas y continúas" [level=3] [ref=e137]
+              - paragraph [ref=e138]: Compruebas la propuesta, ajustas y decides qué enviar.
+            - link "Hablemos de tu negocio" [ref=e139] [cursor=pointer]:
+              - /url: "#contacto"
+      - region [ref=e146]:
+        - generic [ref=e147]:
+          - heading "Lo que ya hemos construido." [level=2] [ref=e148]
+          - paragraph [ref=e149]: Desarrollamos productos propios para resolver necesidades concretas de restaurantes y clubes deportivos.
+          - link "Mira todos nuestros proyectos" [ref=e150] [cursor=pointer]:
+            - /url: /productos
+        - generic [ref=e154]:
+          - article [ref=e155]:
+            - 'figure "Animación: un cliente escanea el QR de su mesa y pide desde la carta de Pidoteca en el móvil" [ref=e157]':
+              - generic [ref=e159]:
+                - img "Cliente en una mesa de restaurante consultando Pidoteca desde el móvil" [ref=e161]
+                - generic [ref=e163]: Mesa 12
+                - generic [ref=e168]:
+                  - generic [ref=e169]: Pidoteca
+                  - strong [ref=e170]: Tu mesa está lista
+                  - generic [ref=e178]: Enfoca el código de la mesa con la cámara.
+                - generic [ref=e179]:
+                  - generic [ref=e180]: Pedido recibido
+                  - generic [ref=e183]:
+                    - generic [ref=e184]: Cocina
+                    - generic [ref=e187]: Barra
+            - generic [ref=e191]: Producto propio · Restaurantes
+            - heading "Del pedido al trabajo de sala y cocina." [level=3] [ref=e192]
+            - paragraph [ref=e193]: Pidoteca conecta carta, pedidos y gestión para que las distintas partes del restaurante puedan trabajar con la misma información.
+            - link "Conocer Pidoteca" [ref=e194] [cursor=pointer]:
+              - /url: /productos#pidoteca
+          - article [ref=e198]:
+            - img "Equipo de fútbol entrenando en el campo mientras el entrenador sigue la sesión" [ref=e200]
+            - generic [ref=e201]: Producto propio · En desarrollo
+            - heading "El trabajo del club, conectado." [level=3] [ref=e202]
+            - paragraph [ref=e203]: Estamos desarrollando SportApp para reunir equipos, entrenadores, sesiones y documentos, y facilitar que la información del campo llegue a quienes gestionan el club.
+            - link "Descubrir SportApp" [ref=e204] [cursor=pointer]:
+              - /url: /productos#sportapp
+      - region [ref=e210]:
+        - generic [ref=e213]:
+          - generic [ref=e214]:
+            - heading "Una mejora concreta. Un plan claro." [level=2] [ref=e215]
+            - paragraph [ref=e216]: Antes de construir, acordamos qué queremos mejorar, qué vamos a entregar y cómo comprobaremos que funciona.
+          - list [ref=e217]:
+            - listitem [ref=e218]:
+              - generic [aria-hidden] [ref=e219]: "1"
+              - generic [ref=e220]:
+                - paragraph [ref=e221]: Te escuchamos.
+                - heading "Entendemos tu negocio" [level=3] [ref=e222]
+                - paragraph [ref=e223]: Nos cuentas cómo trabajas, qué quieres conseguir y dónde encuentras dificultades. Revisamos también las herramientas que ya utilizas.
+            - listitem [ref=e224]:
+              - generic [aria-hidden] [ref=e225]: "2"
+              - generic [ref=e226]:
+                - paragraph [ref=e227]: Lo dejamos por escrito.
+                - heading "Definimos la propuesta" [level=3] [ref=e228]
+                - paragraph [ref=e229]: Concretamos la solución, el alcance, la inversión y los plazos. Sabes qué incluye el proyecto antes de empezar.
+            - listitem [ref=e230]:
+              - generic [aria-hidden] [ref=e231]: "3"
+              - generic [ref=e232]:
+                - paragraph [ref=e233]: Lo pruebas tú.
+                - heading "Construimos y probamos contigo" [level=3] [ref=e234]
+                - paragraph [ref=e235]: Revisas la solución con ejemplos de tu día a día. Ajustamos lo necesario para que encaje con el trabajo real.
+            - listitem [ref=e236]:
+              - generic [aria-hidden] [ref=e237]: "4"
+              - generic [ref=e238]:
+                - paragraph [ref=e239]: Tú sigues al mando.
+                - heading "La ponemos en marcha" [level=3] [ref=e240]
+                - paragraph [ref=e241]: Te explicamos cómo utilizarla y dejamos acordados el soporte y el mantenimiento que necesite.
+      - region [ref=e244]:
+        - generic [ref=e245]:
+          - heading "Antes de dar el paso." [level=2] [ref=e246]
+          - paragraph [ref=e247]: Si la tuya no está aquí, escríbenos como la explicarías a alguien de tu equipo.
+        - generic [ref=e248]:
+          - group [ref=e249]:
+            - generic "¿Necesito saber de programación o inteligencia artificial?" [ref=e250] [cursor=pointer]
+          - group [ref=e252]:
+            - generic "¿Podemos aprovechar mi web y mis herramientas actuales?" [ref=e253] [cursor=pointer]
+          - group [ref=e255]:
+            - generic "¿La inteligencia artificial tiene sentido para cualquier tarea?" [ref=e256] [cursor=pointer]
+          - group [ref=e258]:
+            - generic "¿Qué ocurre si la IA se equivoca?" [ref=e259] [cursor=pointer]
+          - group [ref=e261]:
+            - generic "¿Qué pasa con los datos de mi negocio?" [ref=e262] [cursor=pointer]
+          - group [ref=e264]:
+            - generic "¿Cuánto cuesta y cuánto tarda?" [ref=e265] [cursor=pointer]
+          - group [ref=e267]:
+            - generic "¿Puedo empezar por una parte pequeña?" [ref=e268] [cursor=pointer]
+      - region [ref=e272]:
+        - generic [ref=e273]:
+          - heading "Veamos cuál puede ser tu siguiente paso." [level=2] [ref=e274]
+          - paragraph [ref=e275]: Cuéntanos a qué se dedica tu negocio y qué te gustaría mejorar. Revisaremos tu consulta y te contactaremos para entender mejor lo que necesitas.
+          - link "info@satorus.es" [ref=e276] [cursor=pointer]:
+            - /url: mailto:info@satorus.es
+        - generic [ref=e277]:
+          - generic [ref=e278]:
+            - generic [ref=e279]:
+              - generic [ref=e280]: Tu nombre
+              - textbox "Tu nombre" [ref=e281]
+            - generic [ref=e282]:
+              - generic [ref=e283]: Tu empresa (opcional)
+              - textbox "Tu empresa (opcional)" [ref=e284]
+          - generic [ref=e285]:
+            - generic [ref=e286]: Tu correo
+            - textbox "Tu correo" [ref=e287]
+          - generic [ref=e288]:
+            - generic [ref=e289]: ¿Qué te gustaría mejorar?
+            - textbox "¿Qué te gustaría mejorar? Con unas frases basta para empezar." [ref=e290]:
+              - /placeholder: "Por ejemplo: recibimos consultas por varios sitios y nos cuesta responder y hacer seguimiento."
+            - generic [ref=e291]: Con unas frases basta para empezar.
+          - generic [aria-hidden] [ref=e292]:
+            - generic [ref=e293]: Tu web
+            - textbox [ref=e294]
+          - generic [ref=e295]:
+            - checkbox "He leído la política de privacidad y acepto que Satorus use estos datos para responderme." [ref=e296]
+            - generic [ref=e297]:
+              - text: He leído la
+              - link "política de privacidad" [ref=e298] [cursor=pointer]:
+                - /url: /politica-de-privacidad
+              - text: y acepto que Satorus use estos datos para responderme.
+          - button "Enviar consulta" [ref=e299] [cursor=pointer]
+          - status [ref=e303]
+  - contentinfo [ref=e304]:
+    - generic [ref=e305]:
+      - link "Satorus, volver al inicio" [ref=e306] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e311]: satorus.
+      - paragraph [ref=e312]: Webs, herramientas e inteligencia artificial al servicio de tu negocio.
+    - navigation "Enlaces legales" [ref=e313]:
+      - link "Aviso legal" [ref=e314] [cursor=pointer]:
+        - /url: /aviso-legal
+      - link "Privacidad" [ref=e315] [cursor=pointer]:
+        - /url: /politica-de-privacidad
+      - link "info@satorus.es" [ref=e316] [cursor=pointer]:
+        - /url: mailto:info@satorus.es
+    - paragraph [ref=e320]: © 2026 Satorus
+  - button "Open Next.js Dev Tools" [ref=e326] [cursor=pointer]

@@ -91,6 +91,11 @@
   transform: translateX(6px);
 }
 
+.productJump a:nth-child(2):hover {
+  background: var(--label-lime);
+  transform: translateX(6px);
+}
+
 .productJump a:last-child:hover {
   background: var(--action-orange);
   transform: translateX(6px);
