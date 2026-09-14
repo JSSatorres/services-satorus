@@ -236,6 +236,13 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 
 - **Style:** preguntas entre divisores grafito, con un signo más construido con dos trazos; al abrir, el trazo vertical rota hasta formar un menos. La respuesta mantiene una longitud máxima de 62ch.
 
+### Catálogo de proyectos
+
+- **Dos familias, dos atmósferas:** Apps conserva el papel frío y presenta cada producto como una hoja de trabajo; Webs cambia a grafito y usa ventanas de navegador como piezas de exposición.
+- **Escalable sin huecos falsos:** los proyectos se renderizan desde `lib/project-catalog.ts`. Añadir un caso amplía su lista sin exigir tarjetas vacías ni una retícula cerrada.
+- **La captura es evidencia:** las fichas usan pantallas y fotografías reales de cada proyecto. El texto explica problema, dirección y decisiones sin atribuir métricas o resultados no medidos.
+- **Profundidad progresiva:** `/productos` sirve como índice breve. Cada elemento abre una ficha larga; Lector Bilingüe conserva su página propia y Pidoteca, SportApp, Ángel Mendoza y Enrolla2 cuentan ahora con una ruta dedicada.
+
 ### Route & Process Markers
 
 - **Style:** trazos de extremos redondeados, ruta naranja y pines grafito circulares con borde naranja; en móvil, el recorrido conserva los pines aunque desaparezca la línea horizontal.

@@ -1,15 +1,13 @@
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
+import { BusinessBottleneck } from "@/components/business-bottleneck"
 import { ContactForm } from "@/components/contact-form"
-import { DesktopScrollStory } from "@/components/desktop-scroll-story"
 import { Hero } from "@/components/hero"
-import { MobileFlowReveal } from "@/components/mobile-flow-reveal"
 import { PlainTalk } from "@/components/plain-talk"
 import { ProcessRoute } from "@/components/process-route"
 import { SectionCurtainStack } from "@/components/section-curtain-stack"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
-import { ServiceShowcase } from "@/components/service-showcase"
 
 const steps = [
   {
@@ -49,8 +47,8 @@ const projects = [
     title: "Del móvil al escritorio, una herramienta que encaja contigo.",
     description:
       "Diseñamos aplicaciones para equipos, clientes y gestión: deporte, restauración, lectura y el siguiente reto de tu negocio.",
-    href: "/productos",
-    linkLabel: "Explora nuestros proyectos",
+    href: "/productos#apps",
+    linkLabel: "Ver las apps",
     image: "/images/apps-showcase.png",
     imageAlt:
       "Composición ilustrativa de aplicaciones para deporte, restauración y lectura en móvil y escritorio",
@@ -60,9 +58,9 @@ const projects = [
     label: "Webs con carácter",
     title: "Una web que invita a entrar y hace fácil elegirte.",
     description:
-      "De la energía de Entrolla2 a la mirada personal de Ángel Mendoza: diseñamos webs que cuentan bien quién eres y por qué elegirte.",
-    href: "/productos",
-    linkLabel: "Explora nuestros proyectos",
+      "De la energía de Enrolla2 a la mirada personal de Ángel Mendoza: diseñamos webs que cuentan bien quién eres y por qué elegirte.",
+    href: "/productos#webs",
+    linkLabel: "Ver las webs",
     image: "/images/webs-showcase.png",
     imageAlt:
       "Composición ilustrativa de una web para hostelería y una web de portfolio profesional en portátil y móvil",
@@ -115,26 +113,24 @@ export default function Home() {
         <SectionCurtainStack>
         <Hero />
 
-          <PlainTalk />
-
           <section
-          className="services-section"
-          id="servicios"
-          aria-labelledby="services-title"
+          className="process-section"
+          id="como-trabajamos"
+          aria-labelledby="process-title"
         >
-          <div className="services-heading">
-            <h2 id="services-title">Qué podemos mejorar contigo.</h2>
-            <p>
-              Partimos de lo que quieres conseguir y elegimos la combinación
-              adecuada de web, herramientas y automatización.
-            </p>
-          </div>
-
-          <ServiceShowcase />
+          <ProcessRoute
+            heading={
+              <h2 id="process-title">Una mejora concreta. Un plan claro.</h2>
+            }
+            intro={
+              <>
+                Antes de construir, acordamos qué queremos mejorar, qué vamos a
+                entregar y cómo comprobaremos que funciona.
+              </>
+            }
+            steps={steps}
+          />
           </section>
-
-          <DesktopScrollStory />
-          <MobileFlowReveal />
 
           <section
             className="projects-section"
@@ -143,14 +139,16 @@ export default function Home() {
           >
             <div className="projects-heading">
               <h2 id="projects-title">Una idea puede acabar en una app o en una web.</h2>
-              <p>
-                Dos puertas de entrada a lo que hacemos. Dentro de cada
-                proyecto, todo el detalle.
-              </p>
-              <a className="projects-cta" href="/productos">
-                Mira todos nuestros proyectos
-                <ArrowUpRight aria-hidden="true" size={20} />
-              </a>
+              <div className="projects-heading-aside">
+                <p>
+                  Dos puertas de entrada a lo que hacemos. Dentro de cada
+                  proyecto, todo el detalle.
+                </p>
+                <a className="projects-cta" href="/productos">
+                  Mira algunos de nuestros proyectos
+                  <ArrowUpRight aria-hidden="true" size={20} />
+                </a>
+              </div>
             </div>
 
             <div className="project-list">
@@ -176,24 +174,9 @@ export default function Home() {
             </div>
           </section>
 
-          <section
-          className="process-section"
-          id="como-trabajamos"
-          aria-labelledby="process-title"
-        >
-          <ProcessRoute
-            heading={
-              <h2 id="process-title">Una mejora concreta. Un plan claro.</h2>
-            }
-            intro={
-              <>
-                Antes de construir, acordamos qué queremos mejorar, qué vamos a
-                entregar y cómo comprobaremos que funciona.
-              </>
-            }
-            steps={steps}
-          />
-          </section>
+          <PlainTalk />
+
+          <BusinessBottleneck />
 
           <section
           className="faq-section"

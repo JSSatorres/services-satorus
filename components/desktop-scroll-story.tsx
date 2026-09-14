@@ -80,7 +80,16 @@ export function DesktopScrollStory() {
               start: "top top",
               end: () => `+=${Math.round(window.innerHeight * 1.85)}`,
               pin: storyStage,
-              pinReparent: true,
+              // Sin `pinReparent`: sacaba la escena del panel de cortina y la
+              // colgaba del `<body>`, y ahi `position: fixed` con `z-index: auto`
+              // pinta POR ENCIMA de `.section-curtain-stack` (posicionado con
+              // `z-index: auto` y antes en el DOM). Al subir de FAQ a la historia,
+              // el relevo devuelve el scroll al final del pin, la escena se
+              // reactivaba y tapaba el panel de FAQ que estaba cubriendo: un
+              // fogonazo de pantalla entera (medido con `elementsFromPoint`).
+              // Lo pedia el curtain antiguo, que dejaba transform fijo en las
+              // superficies; el de ahora las deja limpias en reposo, asi que el
+              // pin se ancla al viewport sin salir de su panel.
               scrub: 0.45,
               anticipatePin: 1,
               invalidateOnRefresh: true,

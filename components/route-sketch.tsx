@@ -27,16 +27,16 @@ export function RouteSketch() {
 
   return (
     <div ref={sketchRef} className="route-sketch" aria-hidden="true">
-      <svg viewBox="0 0 720 400" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="0 0 1200 300" preserveAspectRatio="none">
         <motion.path
-          d="M42 220 C128 72 216 340 318 190 S530 74 676 188"
+          d="M-30 188 C160 258 286 64 492 158 S790 252 952 76 S1128 130 1230 184"
           initial={false}
           animate={{ pathLength: routeState }}
           transition={shouldAnimate ? routeTransition : { duration: 0 }}
         />
         <motion.path
           className="route-arrow"
-          d="M630 146 L682 188 L630 226"
+          d="M1180 144 L1230 184 L1180 224"
           initial={false}
           animate={{ opacity: routeState, pathLength: routeState }}
           transition={
@@ -52,7 +52,7 @@ export function RouteSketch() {
         animate={{ opacity: labelState }}
         transition={shouldAnimate ? { duration: 0.2, delay: 0.08 } : { duration: 0 }}
       >
-        Una tarea del día
+        Esperar
       </motion.span>
       <motion.span
         className="sketch-end"
@@ -60,7 +60,7 @@ export function RouteSketch() {
         animate={{ opacity: labelState }}
         transition={shouldAnimate ? { duration: 0.2, delay: 1.3 } : { duration: 0 }}
       >
-        Una mejora concreta
+        Avanzar
       </motion.span>
     </div>
   )

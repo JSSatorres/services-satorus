@@ -32,7 +32,9 @@ const HEADING_STAGGER_SPAN = 0.42;
 const GESTURE_GAP_MS = 90;
 const TOUCH_THRESHOLD = 30;
 // Margen para comparar posiciones de scroll contra las fronteras calculadas.
-const EDGE_EPSILON = 2;
+// ScrollTrigger las calcula en coma flotante y el documento las alcanza en
+// enteros de pixel, asi que "estar en la frontera" no puede ser una igualdad.
+const EDGE_EPSILON = 3;
 
 // Alterna lado / frente / lado opuesto para que ninguna entrada se repita seguida.
 const DIRECTIONS: EntranceDirection[] = ["right", "bottom", "left", "bottom"];
@@ -385,27 +387,130 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
       }
 
       // ── Relevo por gesto ────────────────────────────────────────────────
-      // Las fronteras nunca se solapan y son adyacentes cuando una sección mide
-      // justo un viewport, así que la búsqueda va por el extremo que todavía
-      // queda por cruzar en el sentido del gesto: eso deja un único par válido
-      // incluso estando parado exactamente encima de una frontera.
+      // Entre `relay.start` —el último punto en el que la sección saliente
+      // todavía cubre la pantalla entera— y `relay.end` hay una pantalla de
+      // scroll que NO le pertenece al documento: es exactamente el tramo que la
+      // animación del relevo sustituye. Que el documento se colase ahí por su
+      // cuenta era la causa común de las dos averías que se veían. Bajando, la
+      // sección siguiente asomaba por abajo antes de entrar de lado, y si la
+      // inercia llegaba lejos el relevo arrancaba con la saliente ya casi fuera:
+      // la entrada lateral pasaba sobre el lienzo del documento en vez de sobre
+      // la sección. Subiendo, el relevo tenía que rebobinar el scroll hasta el
+      // borde, y ese rebobinado —hasta una pantalla entera, medido— se veía como
+      // un fogonazo antes de que empezase la animación.
+      //
+      // Por eso el par se busca EN la frontera y no dentro de la zona: así el
+      // relevo arranca siempre desde la misma geometría. Mantener la zona
+      // inalcanzable es trabajo de `guardBoundary`.
       function findForwardPair(scroll: number) {
-        for (const pair of pairs) {
-          if (pair.relay.end > scroll + EDGE_EPSILON) {
-            return scroll >= pair.relay.start - EDGE_EPSILON ? pair : null;
+        return pairs.find((pair) => Math.abs(scroll - pair.relay.start) <= EDGE_EPSILON) ?? null;
+      }
+
+      function findBackwardPair(scroll: number) {
+        return pairs.find((pair) => Math.abs(scroll - pair.relay.end) <= EDGE_EPSILON) ?? null;
+      }
+
+      function isInsideRelay(value: number, pair: Pair) {
+        return value > pair.relay.start + EDGE_EPSILON && value < pair.relay.end - EDGE_EPSILON;
+      }
+
+      // La primera frontera que cruzaría el trayecto `from → target`.
+      function boundaryBetween(from: number, target: number) {
+        if (target > from) {
+          for (const pair of pairs) {
+            const edge = pair.relay.start;
+            if (edge >= from - EDGE_EPSILON && target > edge + EDGE_EPSILON) return edge;
           }
+          return null;
+        }
+
+        for (let index = pairs.length - 1; index >= 0; index -= 1) {
+          const edge = pairs[index].relay.end;
+          if (edge <= from + EDGE_EPSILON && target < edge - EDGE_EPSILON) return edge;
         }
         return null;
       }
 
-      function findBackwardPair(scroll: number) {
-        for (let index = pairs.length - 1; index >= 0; index -= 1) {
-          const pair = pairs[index];
-          if (pair.relay.start < scroll - EDGE_EPSILON) {
-            return scroll <= pair.relay.end + EDGE_EPSILON ? pair : null;
-          }
+      // Lenis interpola: entre dos muescas de rueda sigue moviendo el documento
+      // por inercia. Mirar dónde ESTÁ el scroll cuando llega el gesto llega
+      // tarde —para entonces la inercia ya ha cruzado la frontera—, así que aquí
+      // se mira dónde VA: `targetScroll`, el acumulador sobre el que Lenis suma
+      // la siguiente muesca. Recortarlo al borde hace que la inercia frene justo
+      // al final de la sección y que sólo un gesto nuevo, ya desde la frontera,
+      // cruce.
+      // Un gesto que apunta MÁS ALLÁ de la frontera no se tira: se recorta el
+      // recorrido al borde y se guarda la intención. Cuando el documento llega
+      // al borde, el relevo se reproduce solo. Sin esto, un golpe de rueda dado
+      // a media sección dejaba el scroll parado al final de la sección y había
+      // que rematar con un segundo gesto: el relevo se sentía atascado.
+      let pendingCross: { edge: number; direction: 1 | -1 } | null = null;
+
+      // Un único guardia, una vez por frame y ANTES de que Lenis avance —de ahí
+      // el `prioritize` al darlo de alta en el ticker—.
+      //
+      // El recorte no puede colgarse del evento de rueda: el navegador vacía la
+      // cola de microtareas ENTRE listener y listener, así que un
+      // `queueMicrotask` desde nuestro listener en captura corre antes de que
+      // Lenis haya atendido esa misma rueda y lee un destino que todavía es el
+      // de la muesca anterior. Medido: el recorte llegaba una muesca tarde y el
+      // documento se colaba dentro de la zona igualmente. Desde el ticker el
+      // destino ya está puesto y Lenis todavía no ha movido nada.
+      function guardBoundary() {
+        if (disposed || takeover.active || isCurtainTakeoverSuspended()) return;
+
+        const lenis = getLenis();
+        if (!lenis) return;
+
+        const scroll = lenis.animatedScroll;
+        const target = lenis.targetScroll;
+
+        // 1. El destino se sale de la sección: se recorta al borde y se anota
+        //    que el gesto quería cruzar. `programmatic: false` para que Lenis
+        //    mueva también su `targetScroll`, que es el acumulador sobre el que
+        //    suma la muesca siguiente; si se quedara pasado la frontera, el
+        //    gesto siguiente arrancaría ya desde dentro de la zona.
+        const crossing = boundaryBetween(scroll, target);
+        if (crossing !== null) {
+          pendingCross = { edge: crossing, direction: target > scroll ? 1 : -1 };
+          lenis.scrollTo(crossing, { programmatic: false, force: true });
         }
-        return null;
+
+        // 2. Si el documento ha dejado de ir hacia ese borde —el usuario ha
+        //    cambiado de idea a media inercia— la intención caduca.
+        if (pendingCross) {
+          const heading =
+            pendingCross.direction === 1
+              ? target >= pendingCross.edge - EDGE_EPSILON
+              : target <= pendingCross.edge + EDGE_EPSILON;
+          if (!heading) pendingCross = null;
+        }
+
+        // 3. El viaje hasta el borde ha terminado: se cobra la intención.
+        if (pendingCross && Math.abs(scroll - pendingCross.edge) <= EDGE_EPSILON) {
+          const { direction } = pendingCross;
+          pendingCross = null;
+          const pair = findPair(direction);
+          if (pair) runTakeover(pair, direction);
+          return;
+        }
+
+        // 4. Rescate, para lo que no pasa por el gesto suavizado: la inercia
+        //    nativa del táctil (`syncTouch: false`), arrastrar la barra de
+        //    scroll, un `refresh` que recoloca las fronteras bajo los pies o el
+        //    navegador restaurando la posición al recargar. Mientras el scroll
+        //    lo mueva el navegador no se le lleva la contraria: se espera a que
+        //    pare.
+        if (lenis.isScrolling === "native") return;
+
+        const trapped = pairs.find((item) => isInsideRelay(scroll, item));
+        // Si el destino ya está fuera, la inercia está saliendo sola.
+        if (!trapped || !isInsideRelay(target, trapped)) return;
+
+        const nearest =
+          scroll - trapped.relay.start <= trapped.relay.end - scroll
+            ? trapped.relay.start
+            : trapped.relay.end;
+        lenis.scrollTo(nearest, { programmatic: false, force: true });
       }
 
       function findPair(direction: 1 | -1) {
@@ -430,6 +535,9 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
         const to = pair.relay.end;
         if (!(to > from)) return;
 
+        // Sea quien sea el que lo dispare, el relevo agota la intención: si no,
+        // al aterrizar en el borde de destino el guardia encadenaría otro.
+        pendingCross = null;
         takeover.active = true;
         // Matar la inercia pendiente de Lenis antes de empezar, o seguiría
         // moviendo el documento por debajo de la animación.
@@ -587,6 +695,11 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
       window.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
       window.addEventListener("touchmove", onTouchMove, capture);
       window.addEventListener("keydown", onKeyDown, capture);
+      // El tercer argumento es `prioritize`: lo coloca a la cabeza del ticker,
+      // por delante del `lenis.raf` que engancha `SmoothScroll`. Así el recorte
+      // del destino se aplica en el mismo frame en que Lenis va a avanzar, y el
+      // documento no llega a asomarse dentro de la zona ni un fotograma.
+      gsap.ticker.add(guardBoundary, false, true);
 
       ScrollTrigger.sort();
       const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -611,6 +724,7 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
         window.removeEventListener("touchstart", onTouchStart, { capture: true });
         window.removeEventListener("touchmove", onTouchMove, capture);
         window.removeEventListener("keydown", onKeyDown, capture);
+        gsap.ticker.remove(guardBoundary);
         root?.removeEventListener("toggle", onToggle, true);
         window.cancelAnimationFrame(refreshFrame);
         pairs.forEach((pair) => {

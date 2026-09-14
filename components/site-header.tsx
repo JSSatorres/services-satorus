@@ -13,8 +13,7 @@ import { RollLabel } from "@/components/roll-label";
 import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-motion";
 
 const links = [
-  { href: "/#servicios", label: "Soluciones" },
-  { href: "/#ia-aplicada", label: "IA aplicada" },
+  { href: "/#diagnostico", label: "Soluciones" },
   { href: "/#proyectos", label: "Proyectos" },
   { href: "/#como-trabajamos", label: "Cómo trabajamos" },
 ];
@@ -27,14 +26,9 @@ function getSectionId(href: string) {
   return href.startsWith("/#") ? href.slice(2) : null;
 }
 
-// La demostración de IA vive en dos secciones excluyentes —escritorio y móvil—
-// y un `id` no puede repetirse. El enlace apunta al de escritorio y aquí se
-// resuelve la variante que esté visible en cada ancho.
 function getSectionElements(sectionId: string) {
-  return [
-    document.getElementById(sectionId),
-    document.getElementById(`${sectionId}-movil`),
-  ].filter((section): section is HTMLElement => section !== null);
+  const section = document.getElementById(sectionId);
+  return section ? [section] : [];
 }
 
 function findVisibleSection(sectionId: string) {
@@ -371,7 +365,7 @@ export function SiteHeader() {
 
       <div className="header-actions">
         <Link className="header-secondary-cta" href="/productos">
-          <RollLabel>Mira todos nuestros proyectos</RollLabel>
+          <RollLabel>Mira algunos de nuestros proyectos</RollLabel>
           <ArrowUpRight aria-hidden="true" size={18} strokeWidth={2.2} />
         </Link>
 
@@ -432,7 +426,7 @@ export function SiteHeader() {
             data-active={pathname === "/productos"}
             onClick={() => setOpen(false)}
           >
-            Mira todos nuestros proyectos
+            Mira algunos de nuestros proyectos
             <ArrowUpRight aria-hidden="true" size={21} />
           </Link>
           <Link

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowRight } from "lucide-react";
 import { RouteSketch } from "@/components/route-sketch";
 
 /**
@@ -35,6 +36,7 @@ export function PlainTalk() {
       const track = section?.querySelector<HTMLElement>(".plain-talk-track");
       const title = section?.querySelector<HTMLElement>(".plain-talk-copy h2");
       const lead = section?.querySelector<HTMLElement>(".plain-talk-copy p");
+      const cta = section?.querySelector<HTMLElement>(".plain-talk-cta");
       const sketch = section?.querySelector<HTMLElement>(".route-sketch");
       if (!section || !track || !title) return;
 
@@ -53,46 +55,23 @@ export function PlainTalk() {
       });
 
       if (mobile) {
-        // En movil la referencia no se puede copiar tal cual, y copiarla salia
-        // caro: con el origen a media altura el titular crecia hacia arriba y
-        // la cabecera fija se comia la primera linea, y con una escala de 2.4
-        // la tercera se salia por la derecha antes de poder leerla.
-        //
-        // Tres cambios, todos por el mismo motivo —que la frase se lea entera—:
-        //
-        // 1. El origen es la esquina superior izquierda: el titular queda
-        //    clavado justo debajo de la cabecera y crece hacia abajo. En una
-        //    columna de 390px el techo real antes de cortar la ultima linea
-        //    esta en torno a 1.16, que es justo la escala que se usa: crece,
-        //    pero la frase nunca se sale.
-        // 2. El boceto NO se retira. Es lo que ilustra la frase y lo que ocupa
-        //    la mitad inferior; sin el, al irse el parrafo quedaba el titular
-        //    solo arriba y dos tercios de naranja vacio. Se queda y sube al
-        //    hueco que deja el parrafo.
-        // 3. Titular y boceto salen juntos al final, no por separado.
-        timeline
-          .to([lead].filter(Boolean), { autoAlpha: 0, yPercent: 10, duration: 0.26 }, 0)
-          .to(title, { scale: 1.16, transformOrigin: "0% 0%", duration: 1 }, 0)
-          .to(
-            [sketch].filter(Boolean),
-            // Solo sube: escalarlo empujaba la etiqueta de la derecha, que ya
-            // vive pegada al borde, fuera de la pantalla.
-            { yPercent: -20, rotation: -1.5, duration: 0.85 },
-            0.05,
-          )
-          .to([title, sketch].filter(Boolean), { autoAlpha: 0, duration: 0.3 }, 0.6);
-      } else {
-        // Lo que acompaña se retira pronto para dejar la frase sola.
         timeline
           .to(
-            [lead, sketch].filter(Boolean),
-            { autoAlpha: 0, yPercent: 14, duration: 0.28, stagger: 0.06 },
+            [lead, cta, sketch].filter(Boolean),
+            { autoAlpha: 0, yPercent: 10, duration: 0.24, stagger: 0.035 },
             0,
           )
-          // Crece desde su borde izquierdo, a media altura: barre la pantalla de
-          // izquierda a derecha en vez de salirse por arriba.
-          .to(title, { scale: 3.4, transformOrigin: "0% 50%", duration: 1 }, 0)
-          .to(title, { autoAlpha: 0, duration: 0.2 }, 0.8);
+          .to(title, { scale: 1.8, transformOrigin: "0% 38%", duration: 1 }, 0)
+          .to(title, { autoAlpha: 0, duration: 0.22 }, 0.78);
+      } else {
+        timeline
+          .to(
+            [lead, cta, sketch].filter(Boolean),
+            { autoAlpha: 0, yPercent: 12, duration: 0.25, stagger: 0.04 },
+            0,
+          )
+          .to(title, { scale: 2.55, transformOrigin: "0% 42%", duration: 1 }, 0)
+          .to(title, { autoAlpha: 0, duration: 0.22 }, 0.78);
       }
     },
     { scope: sectionRef },
@@ -105,16 +84,24 @@ export function PlainTalk() {
           <div className="plain-talk-zoom">
             <div className="plain-talk-copy">
               <h2 id="plain-talk-title" data-reveal="off">
-                La IA abre
-                <br />
-                nuevas posibilidades.
+                <span className="plain-talk-intro">
+                  La inteligencia artificial
+                  <br />
+                  no va a esperarte.
+                </span>
+                <span className="plain-talk-punch">
+                  Tu competencia
+                  <br />
+                  tampoco.
+                </span>
               </h2>
               <p>
-                Preparar una respuesta, reunir información o avanzar un
-                presupuesto son tareas en las que la tecnología puede ayudarte.
-                Identificamos dónde aportaría una mejora concreta a tu negocio y
-                puedes empezar por ahí y ampliar cuando tenga sentido.
+                El momento de empezar no es mañana. Es antes que ellos.
               </p>
+              <a className="plain-talk-cta" href="#contacto">
+                Empezar ahora
+                <ArrowRight aria-hidden="true" size={20} />
+              </a>
             </div>
 
             <RouteSketch />
