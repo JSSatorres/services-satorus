@@ -627,6 +627,143 @@
   }
 }
 
+/* En la vitrina móvil, el teléfono cabe completo en el mismo marco 16:9
+   que usan las demás imágenes sticky. */
+@media (max-width: 860px) {
+  .journey.compact .frame {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .journey.compact .stage {
+    height: 100%;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  .journey.compact .stageImage img {
+    object-position: center 10%;
+  }
+
+  .journey.compact .stageShade {
+    background: none;
+  }
+
+  .journey.compact .phone {
+    top: 3%;
+    right: 2.5%;
+    width: auto;
+    height: 94%;
+    max-width: 34%;
+    aspect-ratio: 9 / 16;
+    padding: clamp(2px, .4vw, 5px);
+    border-radius: clamp(13px, 2vw, 27px);
+  }
+
+  .journey.compact .phoneScreen {
+    width: 111.111%;
+    height: 111.111%;
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
+
+  .journey.compact .phoneSent > strong {
+    font-size: 1.05rem;
+  }
+
+  .journey.compact .tableLabel {
+    bottom: 9%;
+    left: 42%;
+    font-size: 0.58rem;
+  }
+
+  .journey.compact .received,
+  .journey.compact .receivedRoute {
+    display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .journey.compact .phoneScreen {
+    width: 125%;
+    height: 125%;
+    transform: scale(0.8);
+  }
+
+  .journey.compact .phoneWelcome {
+    padding: 1.5rem .55rem .45rem;
+  }
+
+  .journey.compact .phoneWelcome > strong {
+    font-size: .95rem;
+  }
+
+  .journey.compact .phoneWelcome svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .journey.compact .phoneWelcome > small {
+    display: none;
+  }
+
+  .journey.compact .qrGrid {
+    gap: 1px;
+    padding: .35rem;
+  }
+
+  .journey.compact .phoneMenu {
+    padding: 1.5rem .4rem .35rem;
+  }
+
+  .journey.compact .phoneMenu header strong {
+    font-size: .78rem;
+  }
+
+  .journey.compact .phoneMenu header small {
+    display: none;
+  }
+
+  .journey.compact .dishes {
+    gap: .25rem;
+    margin-top: .4rem;
+  }
+
+  .journey.compact .dishes > div {
+    grid-template-columns: 22px 1fr auto;
+    gap: .2rem;
+    padding: .25rem;
+  }
+
+  .journey.compact .dishes i {
+    width: 22px;
+  }
+
+  .journey.compact .dishes em {
+    width: 16px;
+  }
+
+  .journey.compact .phoneSent {
+    padding: .5rem;
+  }
+
+  .journey.compact .phoneSent > span {
+    width: 34px;
+  }
+
+  .journey.compact .phoneSent > strong {
+    margin-top: .4rem;
+    font-size: .85rem;
+  }
+
+  .journey.compact .phoneSent > div {
+    margin-top: .4rem;
+    padding: .3rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .frameHeader button,
   .stepNav button {

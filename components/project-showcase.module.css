@@ -50,55 +50,26 @@
 
 .heading {
   display: grid;
-  grid-template-columns: auto minmax(16rem, 32rem);
+  grid-template-columns: minmax(0, 1.1fr) minmax(16rem, .9fr);
   justify-content: space-between;
   align-items: end;
   gap: clamp(1.5rem, 4vw, 4rem);
-  margin-bottom: clamp(4rem, 8vw, 8rem);
-}
-
-.headingMain {
-  display: flex;
-  align-items: flex-end;
-  gap: clamp(1.5rem, 3vw, 3rem);
+  margin-bottom: clamp(3.5rem, 6vw, 6rem);
 }
 
 .heading h2 {
   margin: 0.25rem 0 0;
+  max-width: 15ch;
   font-family: var(--font-display-family);
-  font-size: clamp(3.1rem, 6.8vw, 6rem);
-  line-height: 0.78;
-  letter-spacing: -0.065em;
+  font-size: clamp(3rem, 4.6vw, 5rem);
+  font-variation-settings: "wdth" 76, "wght" 790;
+  line-height: .95;
+  letter-spacing: -.04em;
 }
 
 .heading > p {
   margin: 0;
   font-size: clamp(1.05rem, 1.35vw, 1.3rem);
-}
-
-.legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  padding-bottom: 0.4rem;
-}
-
-.legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.82rem;
-  font-weight: 740;
-  white-space: nowrap;
-}
-
-.legend svg {
-  width: 1.15rem;
-  height: 1.15rem;
-}
-
-.legend b {
-  color: var(--action-orange);
 }
 
 .eyebrow {
@@ -117,7 +88,7 @@
   display: flex;
   flex-direction: column;
   gap: clamp(1.6rem, 4vw, 2.6rem);
-  max-width: 74rem;
+  max-width: 104rem;
   margin-inline: auto;
 }
 
@@ -139,9 +110,8 @@
 .frame {
   order: calc(var(--order) * 2 + 1);
   position: relative;
-  /* La proporción de la captura más apaisada del catálogo: así la de escritorio
-     entra entera y las demás sólo ceden alto, nunca se parten por los lados. */
-  aspect-ratio: 16 / 9;
+  /* Principal y detalles constituyen una sola pieza que viaja con la máscara. */
+  aspect-ratio: 6 / 5;
   margin-bottom: clamp(1rem, 3vw, 2rem);
   border-radius: clamp(0.85rem, 1.4vw, 1.3rem);
   overflow: hidden;
@@ -151,9 +121,27 @@
 .frameClip {
   position: absolute;
   inset: 0;
+  /* La separación comparte el tinte del escenario, no forma un marco de color. */
+  background: var(--stage-bg, var(--cool-paper));
+}
+
+.visualEnsemble {
+  display: grid;
+  grid-template-rows: minmax(0, 1.9fr) minmax(0, .65fr);
+  gap: .38rem;
+  height: 100%;
+  padding: .2rem;
+  box-sizing: border-box;
+}
+
+.primaryVisual {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--accent);
+  min-height: 0;
+  overflow: hidden;
+  background: #fffefa;
+  box-shadow: 0 .5rem 1.1rem rgba(23, 27, 24, .08);
 }
 
 .frameMedia {
@@ -164,15 +152,155 @@
 
 .frameMedia img {
   object-fit: cover;
+  object-position: left top;
+  transform-origin: left center;
+}
+
+.frame[data-project="enrolla2"] .frameMedia img {
   object-position: center top;
+  transform-origin: center;
+}
+
+.frame[data-project="enrolla2"] .frameMedia {
+  background: #80a99d;
+}
+
+.frameMedia .mobileImage { display: none; }
+
+.frame[data-image-fit="contain"] .frameMedia img {
+  object-fit: contain;
+  object-position: center;
+  transform-origin: center;
 }
 
 /* Capturas verticales (móvil): el respaldo de color hace de escenario y el
    móvil se ve entero, de alto a alto, en vez de recortado. */
-.frame[data-fit="contain"] img {
+.frame[data-fit="contain"] .frameMedia img {
   object-fit: contain;
   padding: clamp(0.6rem, 1.2vw, 1rem);
 }
+
+.detailRow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .38rem; min-height: 0; }
+.detailRow[data-count="1"] { grid-template-columns: minmax(0, 1fr); }
+.detailRow[data-count="3"] { grid-template-columns: minmax(0, .72fr) minmax(0, 1.35fr) minmax(0, .9fr); }
+.detailShot { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: #fffefa; box-shadow: 0 .4rem .9rem rgba(23, 27, 24, .07); }
+.detailMedia { position: relative; flex: 1; min-height: 0; background: color-mix(in srgb, var(--accent) 16%, white); }
+.detailMedia img { object-fit: cover; object-position: center top; }
+.detailMedia[data-focus="middle"] img { object-position: center 80%; }
+.detailMedia[data-focus="lower"] img { object-position: center 65%; }
+.detailMedia[data-fit="contain"] img { object-fit: contain; padding: .35rem; }
+.detailCaption { flex: none; padding: .3rem .6rem; color: var(--bench-graphite); font-size: .75rem; font-weight: 760; }
+
+/* Dos escenas del lector: capturas reales reunidas y pareja de idiomas ilustrada. */
+.lectorScreens {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(.25rem, .8vw, .65rem);
+  padding: .45rem .6rem 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 100%, #edf2b7, #f7f9e6 70%);
+}
+
+.lectorPhone {
+  position: relative;
+  flex: none;
+  height: 94%;
+  aspect-ratio: 430 / 932;
+  padding: 3px;
+  border: 2px solid #27312f;
+  border-bottom: 0;
+  border-radius: .65rem .65rem 0 0;
+  background: #27312f;
+  box-shadow: 0 .25rem .6rem rgba(23, 27, 24, .18);
+  overflow: hidden;
+}
+
+.lectorPhone:nth-child(2) { height: 100%; }
+.lectorPhone img { object-fit: fill; }
+
+.lectorLanguages {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: .45rem;
+  padding: .6rem clamp(.55rem, 1.2vw, 1rem);
+  background: radial-gradient(circle at 80% 10%, #edf2b7, #f7f9e6 64%);
+}
+
+.lectorLanguagesHeading {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  color: #293933;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.lectorLanguagesHeading svg { width: .9rem; height: .9rem; color: #687936; }
+
+.languagePair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: .35rem;
+}
+
+.languageChoice {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .4rem;
+  padding: .37rem .45rem;
+  border: 1px solid #cbd5a0;
+  border-radius: .45rem;
+  background: #fffefa;
+  box-shadow: 0 .15rem .35rem rgba(23, 27, 24, .07);
+}
+
+.languageChoice i {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 1.55rem;
+  height: 1.05rem;
+  border-radius: .15rem;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(23, 27, 24, .12);
+}
+
+.languageChoice span { display: grid; min-width: 0; line-height: 1.1; }
+.languageChoice strong { font-size: .72rem; }
+.languageChoice small { font-size: .59rem; color: #5a665a; }
+.languagePlus { color: #596b32; font-size: 1.1rem; font-weight: 700; }
+
+.flagUk {
+  background:
+    linear-gradient(90deg, transparent 39%, #c8102e 39% 61%, transparent 61%),
+    linear-gradient(0deg, transparent 36%, #c8102e 36% 64%, transparent 64%),
+    linear-gradient(90deg, transparent 33%, #fff 33% 67%, transparent 67%),
+    linear-gradient(0deg, transparent 27%, #fff 27% 73%, transparent 73%),
+    linear-gradient(33deg, transparent 43%, #fff 43% 57%, transparent 57%),
+    linear-gradient(-33deg, transparent 43%, #fff 43% 57%, transparent 57%),
+    #012169;
+}
+
+.flagSpain { background: linear-gradient(#aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75%); }
+.flagUs { background: repeating-linear-gradient(#b22234 0 8%, #fff 8% 16%); }
+.flagUs::before { content: ""; position: absolute; top: 0; left: 0; width: 45%; height: 54%; background: #3c3b6e; }
+.flagMexico { background: linear-gradient(90deg, #006847 0 33%, #fff 33% 67%, #ce1126 67%); }
+
+.frame[data-fit="contain"] .visualEnsemble {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .55fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+.frame[data-fit="contain"] .detailRow { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 
 /* Las webs se enseñan dentro de una ventana: es la distinción de un vistazo
    frente a las apps, que van en tarjeta limpia. */
@@ -229,11 +357,6 @@
   color: var(--accent);
 }
 
-.kind b {
-  font-weight: 780;
-  opacity: 0.5;
-}
-
 .status {
   padding: 0.28rem 0.6rem;
   border: 1px solid currentColor;
@@ -263,27 +386,37 @@
   width: min(100%, 32rem);
   margin: 0 0 1.45rem;
   border-top: 1px solid currentColor;
+  position: relative;
 }
+
+.story::before { content: ""; position: absolute; left: 1.02rem; top: 1.6rem; bottom: 1.6rem; width: 1px; background: var(--accent); }
 
 .story > div {
   display: grid;
-  grid-template-columns: minmax(6.5rem, 0.42fr) minmax(0, 1fr);
-  gap: 1rem;
+  gap: .3rem;
   padding: 0.8rem 0;
   border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
 }
 
 .story dt {
-  color: var(--graphite-soft);
-  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  color: var(--bench-graphite);
+  font-size: .9rem;
   font-weight: 770;
 }
 
+.stepNumber { position: relative; z-index: 1; display: inline-grid; place-items: center; flex: none; width: 2.1rem; height: 2.1rem; border: 1px solid var(--accent); border-radius: 50%; background: var(--stage-bg, var(--cool-paper)); color: var(--bench-graphite); font-size: .68rem; font-weight: 760; }
+
 .story dd {
-  margin: 0;
+  margin: 0 0 0 2.75rem;
   font-size: clamp(0.91rem, 1.08vw, 1.02rem);
   line-height: 1.37;
 }
+
+.mobileDetails { display: none; }
+.mobileDetail { display: none; }
 
 .link {
   display: inline-flex;
@@ -360,7 +493,7 @@
 /* Las capas ocupan el mismo rectángulo: con una sola sombra, la de la capa de
    abajo, basta para todo el bloque y no se suman unas sobre otras. */
 .stage[data-motion] .frame:last-child {
-  box-shadow: 0 1.6rem 3.4rem rgba(23, 27, 24, 0.2);
+  box-shadow: 0 1.2rem 2.8rem rgba(23, 27, 24, 0.13);
 }
 
 /* Reparto lateral: marco a la derecha, texto pasando a la izquierda. */
@@ -378,8 +511,8 @@
 }
 
 .stage[data-motion="side"] .visuals {
-  flex: 1 1 34rem;
-  max-width: 38rem;
+  flex: 1 1 40rem;
+  max-width: 52rem;
   /* Igual de alto que cada bloque de texto: de ahí sale el reparto exacto de
      un relevo por pantalla mientras el marco está quieto. */
   height: calc(100svh - var(--header-height));
@@ -398,6 +531,7 @@
   left: 0;
   right: 0;
   transform: translateY(-50%);
+  max-height: calc(100svh - var(--header-height) - 2rem);
 }
 
 /* Reparto apilado (móvil): el marco se queda pegado bajo la cabecera y el
@@ -434,21 +568,30 @@
 }
 
 @media (max-width: 860px) {
+  .frameMedia .desktopImage { display: none; }
+  .frameMedia .mobileImage { display: block; }
+  .frame { aspect-ratio: 16 / 9; }
+  .visualEnsemble,
+  .frame[data-fit="contain"] .visualEnsemble { display: block; padding: 0; }
+  .primaryVisual { height: 100%; box-shadow: none; }
+  .detailRow,
+  .frame[data-fit="contain"] .detailRow { display: none; }
+  .mobileDetails { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; width: min(100%, 32rem); margin: 0 0 1.4rem; }
+  .mobileDetail { display: block; width: auto; margin: 0; padding: .35rem; background: #fffefa; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); box-shadow: 0 .6rem 1.3rem rgba(23, 27, 24, .1); }
+  .mobileDetailMedia { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: color-mix(in srgb, var(--accent) 16%, white); }
+  .mobileDetailMedia img { object-fit: cover; object-position: center top; }
+  .mobileDetailMedia[data-focus="middle"] img { object-position: center 80%; }
+  .mobileDetailMedia[data-focus="lower"] img { object-position: center 65%; }
+  .mobileDetailMedia[data-fit="contain"] { aspect-ratio: 4 / 3; }
+  .mobileDetailMedia[data-fit="contain"] img { object-fit: contain; padding: .3rem; }
+  .mobileDetail figcaption { padding: .45rem .15rem .08rem; font-size: .8rem; font-weight: 760; }
+}
+
+@media (max-width: 860px) {
   .heading {
     grid-template-columns: 1fr;
   }
-
-  .headingMain {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.4rem;
-  }
-
-  .legend {
-    flex-direction: row;
-    gap: 1.2rem;
-    padding-bottom: 0;
-  }
+  .heading h2 { font-size: clamp(2.8rem, 8vw, 4rem); }
 }
 
 @media (max-width: 500px) {
@@ -456,19 +599,13 @@
     margin-bottom: 3.2rem;
   }
 
-  .heading h2 {
-    font-size: 3.6rem;
-  }
+  .heading h2 { font-size: clamp(2.8rem, 9vw, 3.3rem); }
 
   .info h3 {
     font-size: 2.75rem;
   }
 
-  .story > div {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-    padding: 0.6rem 0;
-  }
+  .story > div { padding: .6rem 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

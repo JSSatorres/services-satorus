@@ -1,5 +1,13 @@
 export type ProjectKind = "app" | "web";
 
+export type ProjectVisualDetail = {
+  image: string;
+  alt: string;
+  label: string;
+  portrait?: boolean;
+  focus?: "middle" | "lower";
+};
+
 export type ProjectCatalogItem = {
   slug: string;
   kind: ProjectKind;
@@ -7,11 +15,15 @@ export type ProjectCatalogItem = {
   eyebrow: string;
   status: string;
   summary: string;
+  challenge: string;
   improvement: string;
   reason: string;
   href: string;
   image: string;
+  mobileImage?: string;
   imageAlt: string;
+  imageFit?: "contain";
+  details: ProjectVisualDetail[];
   accent: "blue" | "orange" | "lime" | "cyan" | "rose";
   /** La captura es vertical (móvil): se muestra entera sobre su color, sin recortar. */
   portrait?: boolean;
@@ -28,11 +40,16 @@ export const appProjects: ProjectCatalogItem[] = [
     status: "Producto en uso",
     summary:
       "Carta, pedidos, sala, cocina y gestión conectados para que el turno avance sin reconstruirlo entre papeles y mensajes.",
+    challenge: "Conectar la carta y los pedidos con el trabajo de sala y cocina.",
     improvement: "La carta y los pedidos dejan de ir por un lado mientras sala y cocina van por otro.",
     reason: "Un mismo recorrido permite seguir el turno sin volver a juntar papeles y mensajes.",
     href: "/productos/pidoteca",
     image: "/projects/pidoteca/overview.png",
     imageAlt: "Landing y panel de gestión de Pidoteca",
+    details: [
+      { image: "/projects/pidoteca/customer-ordering-journey-wide.png", alt: "Recorrido de pedido de Pidoteca, de elegir un plato a revisar una cesta vacía", label: "De la carta al pedido" },
+      { image: "/projects/pidoteca/table-status-dashboard.png", alt: "Panel de Pidoteca con el estado de las mesas del restaurante", label: "Estado de mesas" },
+    ],
     accent: "blue",
   },
   {
@@ -43,13 +60,19 @@ export const appProjects: ProjectCatalogItem[] = [
     status: "Descarga gratuita",
     summary:
       "Una app para leer un EPUB en inglés con su versión en español siempre a mano, sin perder el hilo ni salir del libro.",
+    challenge: "Consultar una traducción sin abandonar el libro.",
     improvement: "Leer en inglés deja de exigir saltar a otra pantalla cada vez que aparece una duda.",
     reason: "La traducción acompaña al texto para que la consulta no rompa la lectura.",
     href: "/lector-bilingue",
-    image: "/products/lector-bilingue/05-traduccion-bilingue.png",
-    imageAlt: "Pantalla de lectura y traducción de Lector Bilingüe",
+    image: "/products/lector-bilingue/reading-tablet-desktop.webp",
+    mobileImage: "/products/lector-bilingue/reading-tablet-mobile.webp",
+    imageAlt: "Tablet Android con un libro abierto en inglés y español y una frase conectada entre ambos idiomas",
+    imageFit: "contain",
+    details: [
+      { image: "/products/lector-bilingue/08-biblioteca-con-libro.png", alt: "Biblioteca, lectura y consulta bilingüe de Lector Bilingüe", label: "Biblioteca · Lectura · Traducción", portrait: true },
+      { image: "/products/lector-bilingue/02-emparejar-libros.png", alt: "Formulario para emparejar un EPUB en inglés con otro en español", label: "Idiomas en pareja", portrait: true },
+    ],
     accent: "lime",
-    portrait: true,
   },
   {
     slug: "sportapp",
@@ -59,11 +82,16 @@ export const appProjects: ProjectCatalogItem[] = [
     status: "Acceso anticipado",
     summary:
       "Sedes, equipos, personas, sesiones y documentos reunidos para que el trabajo del club no se quede disperso.",
+    challenge: "Seguir la semana de un club entre sedes y equipos.",
     improvement: "La semana del club se puede consultar sin perseguir sesiones y documentos por separado.",
     reason: "Reunir la información por equipos y sedes facilita preparar el trabajo cotidiano.",
     href: "/productos/sportapp",
-    image: "/projects/sportapp/dashboard.png",
-    imageAlt: "Dashboard semanal de SportApp",
+    image: "/projects/sportapp/club-manager-relieved.webp",
+    imageAlt: "Responsable de un club deportivo sonríe mientras organiza la semana en una tablet junto al campo",
+    details: [
+      { image: "/projects/sportapp/nueva-sesion.png", alt: "Formulario de SportApp para planificar una nueva sesión de entrenamiento", label: "Sesiones en un mismo lugar" },
+      { image: "/projects/sportapp/documentos.png", alt: "Listado de documentos de SportApp asociado a las sedes y equipos", label: "Documentos por sede y equipo" },
+    ],
     accent: "orange",
   },
 ];
@@ -77,11 +105,17 @@ export const webProjects: ProjectCatalogItem[] = [
     status: "Web corporativa",
     summary:
       "Una web personal que convierte experiencia en una propuesta clara para clínicas y conduce hacia una primera conversación.",
+    challenge: "Explicar la propuesta de Ángel a quienes trabajan en una clínica.",
     improvement: "La experiencia de Ángel se entiende como una propuesta concreta para clínicas.",
     reason: "Ordenamos especialización, servicios y contacto para que quien llega sepa si encaja y cómo hablar con él.",
     href: "/proyectos/angel-mendoza",
     image: "/projects/angel-mendoza/site-desktop.png",
     imageAlt: "Página web de Ángel Mendoza vista en escritorio",
+    details: [
+      { image: "/projects/angel-mendoza/site-mobile.png", alt: "Web de Ángel Mendoza vista en móvil", label: "También en móvil", portrait: true },
+      { image: "/projects/angel-mendoza/angel-consulta.png", alt: "Sección de consulta de la web de Ángel Mendoza", label: "Camino al contacto" },
+      { image: "/projects/angel-mendoza/angel-expodental.png", alt: "Ángel Mendoza en un evento del sector dental", label: "Experiencia en el sector", portrait: true },
+    ],
     accent: "cyan",
     domain: "angelmendoza.es",
   },
@@ -93,11 +127,18 @@ export const webProjects: ProjectCatalogItem[] = [
     status: "Web de marca",
     summary:
       "Una experiencia digital con el mismo descaro que sus cinnamon rolls: producto, obrador, encargos y local en una sola ruta.",
+    challenge: "Mostrar los rolls y facilitar que quien llega pueda elegir y encargar.",
     improvement: "Los rolls despiertan el apetito, pero la web también ayuda a elegir y encargar.",
     reason: "Producto, carta, obrador y local forman un recorrido claro en vez de competir por atención.",
     href: "/proyectos/enrolla2",
-    image: "/projects/enrolla2/hero-desktop.png",
-    imageAlt: "Portada de la página web de Enrolla2",
+    image: "/projects/enrolla2/galeria-rolls-centrada.png",
+    mobileImage: "/projects/enrolla2/galeria-rolls-movil.png",
+    imageAlt: "Galería verde de Enrolla2 con fotos de cinnamon rolls dispuestas en abanico",
+    imageFit: "contain",
+    details: [
+      { image: "/projects/enrolla2/productos-carta.png", alt: "Sección de la carta de Enrolla2 con seis sabores de rolls", label: "La carta" },
+      { image: "/projects/enrolla2/opiniones-desktop.png", alt: "Opiniones de clientes de Enrolla2 publicadas en Google", label: "Opiniones en Google" },
+    ],
     accent: "rose",
     domain: "enrolla2.es · Valencia",
   },
