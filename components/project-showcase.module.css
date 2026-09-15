@@ -1,0 +1,379 @@
+/* Vitrina de proyectos con el marco fijo y relevo por máscara.
+   La columna de texto recorre todo el alto mientras el marco de imagen se
+   queda quieto: la imagen de arriba se retira de abajo hacia arriba y deja ver
+   la siguiente, que ya estaba debajo en la pila. Apps y webs van en el mismo
+   recorrido; lo que las distingue es la etiqueta de categoría y el marco (las
+   webs se enseñan dentro de una ventana de navegador).
+
+   El marco se queda quieto con `position: sticky`, no con el `pin` de
+   ScrollTrigger: el pin envuelve el elemento en un `pin-spacer` y, dentro de un
+   contenedor flex, colocaba su relleno en el lado equivocado antes de entrar y
+   después de salir, lo que daba un salto de ~1.600px en cada extremo. Sticky
+   cubre exactamente el mismo tramo (el escenario mide N bloques y el marco
+   mide uno) sin spacer ni medidas que recalcular. */
+
+.section {
+  padding: var(--section-pad) var(--page-pad);
+  background: var(--cool-paper);
+}
+
+/* Paleta por proyecto. El selector va anidado bajo `.section` a propósito:
+   `data-accent` también lo usan otras piezas del sitio y un selector de
+   atributo suelto en un módulo CSS no queda encapsulado. */
+.section [data-accent="blue"] {
+  --accent: #2948c7;
+  --accent-ink: #f2f1ea;
+  --stage-bg: #e8ecfa;
+}
+.section [data-accent="lime"] {
+  --accent: #dfe97a;
+  --accent-ink: #171b18;
+  --stage-bg: #f4f7dc;
+}
+.section [data-accent="orange"] {
+  --accent: #e56748;
+  --accent-ink: #171b18;
+  --stage-bg: #fbeae4;
+}
+.section [data-accent="cyan"] {
+  --accent: #29a8cd;
+  --accent-ink: #f2f1ea;
+  --stage-bg: #e6f4fa;
+}
+.section [data-accent="rose"] {
+  --accent: #e0466b;
+  --accent-ink: #f2f1ea;
+  --stage-bg: #fbe9ee;
+}
+
+/* Cabecera de sección */
+
+.heading {
+  display: grid;
+  grid-template-columns: auto minmax(16rem, 32rem);
+  justify-content: space-between;
+  align-items: end;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+.headingMain {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.heading h2 {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display-family);
+  font-size: clamp(3.6rem, 7.5vw, 7rem);
+  line-height: 0.78;
+  letter-spacing: -0.065em;
+}
+
+.heading > p {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding-bottom: 0.4rem;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 740;
+  white-space: nowrap;
+}
+
+.legend svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.legend b {
+  color: var(--action-orange);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Escenario: reposo (sin JS, movimiento reducido o pantalla estrecha).
+   Texto e imagen se intercalan en una sola columna, sin nada apilado ni
+   quieto, así que la sección se lee entera aunque la animación no corra. */
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 4vw, 2.6rem);
+  max-width: 74rem;
+  margin-inline: auto;
+}
+
+.column,
+.visuals {
+  display: contents;
+}
+
+.info {
+  order: calc(var(--order) * 2);
+  max-width: 36rem;
+  /* Sin el tinte de fondo (que sólo existe durante el relevo) el color del
+     proyecto necesita otro sitio donde identificarse. */
+  padding-left: clamp(0.9rem, 3vw, 1.2rem);
+  border-left: 3px solid var(--accent);
+}
+
+.frame {
+  order: calc(var(--order) * 2 + 1);
+  position: relative;
+  /* La proporción de la captura más apaisada del catálogo: así la de escritorio
+     entra entera y las demás sólo ceden alto, nunca se parten por los lados. */
+  aspect-ratio: 16 / 9;
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+  border-radius: clamp(0.85rem, 1.4vw, 1.3rem);
+  overflow: hidden;
+  box-shadow: 0 1.2rem 2.6rem rgba(23, 27, 24, 0.16);
+}
+
+.frameClip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--accent);
+}
+
+.frameMedia {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.frameMedia img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Capturas verticales (móvil): el respaldo de color hace de escenario y el
+   móvil se ve entero, de alto a alto, en vez de recortado. */
+.frame[data-fit="contain"] img {
+  object-fit: contain;
+  padding: clamp(0.6rem, 1.2vw, 1rem);
+}
+
+/* Las webs se enseñan dentro de una ventana: es la distinción de un vistazo
+   frente a las apps, que van en tarjeta limpia. */
+.browserBar {
+  flex: none;
+  height: 2.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.36rem;
+  padding: 0 0.7rem;
+  background: #f7f7f4;
+  color: #353a35;
+  border-bottom: 1px solid #ccd0ca;
+}
+
+.browserBar i {
+  width: 0.48rem;
+  height: 0.48rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.browserBar span {
+  margin-left: 0.45rem;
+  font-size: 0.72rem;
+}
+
+/* Copia de cada proyecto */
+
+.infoHead {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+
+.kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.34rem 0.75rem 0.34rem 0.6rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 40px;
+  font-size: 0.72rem;
+  font-weight: 780;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kind svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--accent);
+}
+
+.kind b {
+  font-weight: 780;
+  opacity: 0.5;
+}
+
+.status {
+  padding: 0.28rem 0.6rem;
+  border: 1px solid currentColor;
+  border-radius: 40px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.info h3 {
+  margin: 0.55rem 0 0.9rem;
+  font: 760 clamp(2.4rem, 4.6vw, 4rem) / 0.92 var(--font-display-family);
+  letter-spacing: -0.05em;
+}
+
+.summary {
+  margin: 0 0 1.9rem;
+  max-width: 32rem;
+  font-size: clamp(1.02rem, 1.2vw, 1.14rem);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  padding: 0.95rem 1.35rem;
+  border-radius: 40px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 760;
+  text-decoration: none;
+  transition: transform 200ms ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  transform: translateY(-2px);
+}
+
+.link svg {
+  transition: transform 180ms ease;
+}
+
+.link:hover svg,
+.link:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+/* Escenario: animado. Sólo lo activa el componente cuando hay ancho de sobra
+   y el usuario no ha pedido menos movimiento; si no, manda el bloque de
+   arriba y no queda nada apilado fuera de la vista. */
+
+.stage[data-motion="on"] {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+.stage[data-motion="on"] .column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 22rem;
+  min-width: 18rem;
+}
+
+.stage[data-motion="on"] .visuals {
+  display: block;
+  position: sticky;
+  top: var(--header-height);
+  align-self: flex-start;
+  flex: 1 1 34rem;
+  max-width: 38rem;
+  /* Igual de alto que cada bloque de texto: de ahí sale el reparto exacto de
+     un relevo por pantalla mientras el marco está quieto. */
+  height: calc(100svh - var(--header-height));
+}
+
+.stage[data-motion="on"] .info {
+  height: calc(100svh - var(--header-height));
+  padding-left: 0;
+  border-left: 0;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+}
+
+.stage[data-motion="on"] .frame {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  transform: translateY(-50%);
+  box-shadow: none;
+}
+
+/* Las capas ocupan el mismo rectángulo: con una sola sombra, la de la capa de
+   abajo, basta para todo el bloque y no se suman unas sobre otras. */
+.stage[data-motion="on"] .frame:last-child {
+  box-shadow: 0 1.6rem 3.4rem rgba(23, 27, 24, 0.2);
+}
+
+@media (max-width: 860px) {
+  .heading {
+    grid-template-columns: 1fr;
+  }
+
+  .headingMain {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.4rem;
+  }
+
+  .legend {
+    flex-direction: row;
+    gap: 1.2rem;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .heading {
+    margin-bottom: 3.2rem;
+  }
+
+  .heading h2 {
+    font-size: 3.6rem;
+  }
+
+  .info h3 {
+    font-size: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .link svg {
+    transition: none;
+  }
+}

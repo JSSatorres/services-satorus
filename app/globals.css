@@ -814,12 +814,30 @@ html[data-hero-motion="prepare"]
   padding: calc(var(--header-height) + clamp(1rem, 2.5svh, 2rem)) var(--page-pad)
     clamp(1.25rem, 3svh, 2.5rem);
   overflow: hidden;
+
+  /* Unidad de composición de la escena. Cuerpos de texto, hueco entre las dos
+     líneas del titular y banda del boceto se miden todos en múltiplos de esta
+     unidad, así que la escena conserva las proporciones de la referencia a
+     cualquier tamaño en vez de descuadrarse cuando el ancho crece y las
+     tipografías tocan su techo.
+
+     Se calibra contra la escena de referencia (1440x900): allí 1 unidad = 1vw
+     y el bloque de texto mide 40 unidades de alto. El segundo término descuenta
+     cabecera y paddings (~9rem) y reparte el alto restante entre 42 (esas 40
+     unidades más un margen de respiro), de modo que en pantallas anchas y bajas
+     manda la altura y nada se sale de la escena. */
+  --pt-unit: min(1vw, calc((100svh - 9rem) / 42));
 }
 
+/* El ancho útil de la referencia son 92 unidades (100vw menos los dos
+   `--page-pad`). Pasado el punto en que las tipografías dejan de crecer, seguir
+   estirando la caja dejaría el titular flotando en la mitad izquierda, así que
+   la escena se limita a ese ancho de diseño y se centra. */
 .plain-talk-zoom {
   position: relative;
   height: 100%;
-  width: 100%;
+  width: min(100%, calc(92 * var(--pt-unit)));
+  margin-inline: auto;
 }
 
 .plain-talk-copy {
@@ -850,21 +868,22 @@ html[data-hero-motion="prepare"]
 
 .plain-talk-intro {
   max-width: none;
-  font-size: clamp(2.35rem, 3.65vw, 4.45rem);
+  font-size: calc(3.65 * var(--pt-unit));
   line-height: 0.88;
   white-space: nowrap;
 }
 
+/* Las 10 unidades de hueco son las que ocupa la banda del boceto. */
 .plain-talk-punch {
-  margin-top: clamp(6.8rem, 16svh, 10rem);
-  font-size: clamp(5.4rem, 10.8vw, 12rem);
+  margin-top: calc(10 * var(--pt-unit));
+  font-size: calc(10.8 * var(--pt-unit));
   line-height: 0.72;
 }
 
 .plain-talk-copy p {
   max-width: 48ch;
-  margin: clamp(1rem, 2.2svh, 1.5rem) 0 0;
-  font-size: clamp(1.05rem, 1.45vw, 1.45rem);
+  margin: calc(1.4 * var(--pt-unit)) 0 0;
+  font-size: max(1.05rem, calc(1.45 * var(--pt-unit)));
   font-weight: 560;
   line-height: 1.35;
 }
@@ -872,16 +891,16 @@ html[data-hero-motion="prepare"]
 .plain-talk-cta {
   display: inline-flex;
   align-items: center;
-  gap: 1.4rem;
-  min-height: 50px;
-  margin-top: clamp(0.85rem, 1.8svh, 1.25rem);
-  padding: 0.7rem 1rem 0.7rem 1.35rem;
+  gap: 1.55em;
+  min-height: max(50px, calc(3.47 * var(--pt-unit)));
+  margin-top: calc(1.15 * var(--pt-unit));
+  padding: 0.78em 1.11em 0.78em 1.5em;
   color: var(--bench-graphite);
   background: var(--cool-paper);
   border: 2px solid var(--bench-graphite);
   border-radius: 999px;
   font-family: var(--font-display-family);
-  font-size: clamp(0.9rem, 1vw, 1.05rem);
+  font-size: max(0.9rem, var(--pt-unit));
   font-variation-settings: "wdth" 84, "wght" 760;
   line-height: 1;
   text-transform: uppercase;
@@ -894,13 +913,22 @@ html[data-hero-motion="prepare"]
   transform: translateY(-2px);
 }
 
+/* La banda ocupa el hueco entre las dos líneas del titular. El bloque de texto
+   está centrado y mide 40 unidades, así que arranca en `50% - 20u`; el enunciado
+   se lleva las primeras 6.4 y el hueco las 10 siguientes. Como el trazo no llena
+   la banda entera (el viewBox reserva aire arriba y abajo), `50% - 13.35u` es lo
+   que deja la curva centrada en ese hueco en vez de cruzando el enunciado.
+
+   Se sangra a todo el viewport aunque la escena esté limitada a su ancho de
+   diseño, para que la línea siga saliendo por los dos lados. Sin `transform`:
+   ese canal lo usa GSAP para retirar el boceto durante el zoom. */
 .route-sketch {
   position: absolute;
   z-index: 1;
-  top: clamp(7rem, 17.5svh, 18rem);
-  right: calc(var(--page-pad) * -1);
-  left: calc(var(--page-pad) * -1);
-  height: clamp(8.5rem, 22svh, 13.5rem);
+  top: calc(50% - 13.35 * var(--pt-unit));
+  left: calc((100% - 100vw) / 2);
+  width: 100vw;
+  height: calc(12.35 * var(--pt-unit));
   isolation: isolate;
   pointer-events: none;
 }
@@ -917,28 +945,32 @@ html[data-hero-motion="prepare"]
 .route-sketch path {
   fill: none;
   stroke: var(--bench-graphite);
-  stroke-width: 10;
+  /* `non-scaling-stroke` mide el grosor en píxeles de pantalla, así que se
+     escala con la unidad para no quedarse fino junto a un titular enorme. */
+  stroke-width: max(10px, calc(0.7 * var(--pt-unit)));
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
 .route-sketch .route-arrow {
-  stroke-width: 8;
+  stroke-width: max(8px, calc(0.56 * var(--pt-unit)));
 }
 
 .route-sketch span {
   position: absolute;
   z-index: 2;
-  max-width: 10rem;
-  padding: 0.85rem 1rem;
+  max-width: 8em;
+  padding: 0.68em 0.8em;
   background: var(--cool-paper);
   border: 2px solid var(--bench-graphite);
   font-family: var(--font-display-family);
-  font-size: 1.25rem;
+  font-size: max(1.05rem, calc(1.45 * var(--pt-unit)));
   font-variation-settings: "wdth" 88, "wght" 700;
+  letter-spacing: 0.02em;
   line-height: 1;
   text-align: center;
+  text-transform: uppercase;
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.34) inset,
     0 10px 24px rgba(58, 19, 10, 0.2);
@@ -3566,6 +3598,7 @@ html[data-hero-motion="prepare"]
 
   .plain-talk-zoom {
     height: 100%;
+    width: 100%;
   }
 
   .plain-talk-copy {
@@ -3607,6 +3640,7 @@ html[data-hero-motion="prepare"]
     top: clamp(5.8rem, 15svh, 8.5rem);
     right: calc(var(--page-pad) * -1);
     left: calc(var(--page-pad) * -1);
+    width: auto;
     height: clamp(7rem, 18svh, 9.5rem);
   }
 
@@ -4296,6 +4330,7 @@ html[data-hero-motion="prepare"]
     top: clamp(5.25rem, 14svh, 7.2rem);
     right: calc(var(--page-pad) * -1);
     left: calc(var(--page-pad) * -1);
+    width: auto;
     height: clamp(6.5rem, 17svh, 8.5rem);
   }
 
