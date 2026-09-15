@@ -122,7 +122,8 @@
 }
 
 .column,
-.visuals {
+.visuals,
+.frames {
   display: contents;
 }
 
@@ -284,29 +285,67 @@
   transform: translate(2px, -2px);
 }
 
-/* Escenario: animado. Sólo lo activa el componente cuando hay ancho de sobra
-   y el usuario no ha pedido menos movimiento; si no, manda el bloque de
-   arriba y no queda nada apilado fuera de la vista. */
+/* Escenario: animado. Lo activa el componente cuando el usuario no ha pedido
+   menos movimiento; si no, manda el bloque de arriba y no queda nada apilado
+   fuera de la vista. Dos repartos con la misma mecánica: `side` pone el marco
+   al lado del texto (pantalla ancha) y `stack` lo pega arriba con el texto
+   pasando por debajo (móvil). */
 
-.stage[data-motion="on"] {
+.stage[data-motion] .column {
+  display: flex;
+  flex-direction: column;
+}
+
+.stage[data-motion] .visuals {
+  display: block;
+  position: sticky;
+  top: var(--header-height);
+  align-self: flex-start;
+  /* Posicionado y por encima: el texto que ya pasó su turno se va por detrás
+     del marco en lugar de cruzarlo. */
+  z-index: 2;
+}
+
+.stage[data-motion] .frames {
+  display: block;
+  position: relative;
+}
+
+.stage[data-motion] .info {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  padding-left: 0;
+  border-left: 0;
+}
+
+.stage[data-motion] .frame {
+  position: absolute;
+  margin: 0;
+  box-shadow: none;
+}
+
+/* Las capas ocupan el mismo rectángulo: con una sola sombra, la de la capa de
+   abajo, basta para todo el bloque y no se suman unas sobre otras. */
+.stage[data-motion] .frame:last-child {
+  box-shadow: 0 1.6rem 3.4rem rgba(23, 27, 24, 0.2);
+}
+
+/* Reparto lateral: marco a la derecha, texto pasando a la izquierda. */
+
+.stage[data-motion="side"] {
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
   gap: clamp(2.5rem, 6vw, 5rem);
 }
 
-.stage[data-motion="on"] .column {
-  display: flex;
-  flex-direction: column;
+.stage[data-motion="side"] .column {
   flex: 1 1 22rem;
   min-width: 18rem;
 }
 
-.stage[data-motion="on"] .visuals {
-  display: block;
-  position: sticky;
-  top: var(--header-height);
-  align-self: flex-start;
+.stage[data-motion="side"] .visuals {
   flex: 1 1 34rem;
   max-width: 38rem;
   /* Igual de alto que cada bloque de texto: de ahí sale el reparto exacto de
@@ -314,29 +353,52 @@
   height: calc(100svh - var(--header-height));
 }
 
-.stage[data-motion="on"] .info {
-  height: calc(100svh - var(--header-height));
-  padding-left: 0;
-  border-left: 0;
-  display: grid;
-  align-content: center;
-  justify-items: start;
+.stage[data-motion="side"] .frames {
+  height: 100%;
 }
 
-.stage[data-motion="on"] .frame {
-  position: absolute;
+.stage[data-motion="side"] .info {
+  height: calc(100svh - var(--header-height));
+}
+
+.stage[data-motion="side"] .frame {
   top: 50%;
   left: 0;
   right: 0;
-  margin: 0;
   transform: translateY(-50%);
-  box-shadow: none;
 }
 
-/* Las capas ocupan el mismo rectángulo: con una sola sombra, la de la capa de
-   abajo, basta para todo el bloque y no se suman unas sobre otras. */
-.stage[data-motion="on"] .frame:last-child {
-  box-shadow: 0 1.6rem 3.4rem rgba(23, 27, 24, 0.2);
+/* Reparto apilado (móvil): el marco se queda pegado bajo la cabecera y el
+   texto va rotando por debajo, un proyecto por pantalla. */
+
+.stage[data-motion="stack"] {
+  flex-direction: column;
+  gap: 0;
+}
+
+.stage[data-motion="stack"] .visuals {
+  order: -1;
+  /* Se sale del margen de página y lleva su propio fondo (el mismo que viaja
+     en la sección) para que el texto que pasa por detrás no asome por las
+     esquinas redondeadas ni por los lados del marco. */
+  width: calc(100% + var(--page-pad) * 2);
+  margin-inline: calc(var(--page-pad) * -1);
+  padding: 0 var(--page-pad) clamp(0.9rem, 3vw, 1.4rem);
+}
+
+.stage[data-motion="stack"] .frames {
+  aspect-ratio: 16 / 9;
+}
+
+.stage[data-motion="stack"] .frame {
+  inset: 0;
+}
+
+.stage[data-motion="stack"] .info {
+  /* Más alto que el hueco de lectura que queda bajo el marco: así el primer
+     relevo no arranca hasta que el marco ya está pegado arriba, y el último
+     termina antes de que se despegue. */
+  height: max(70svh, 26rem);
 }
 
 @media (max-width: 860px) {

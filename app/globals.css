@@ -11,11 +11,12 @@
 }
 
 :root {
-  /* Cola de scroll al final de cada seccion: el margen que la seccion se queda
-     para si antes de que quede armada la frontera del relevo. Sin ella, una
-     seccion que mide justo una pantalla arma la frontera en su primer pixel y
-     la siguiente entra en cuanto rozas la rueda. */
-  --curtain-tail: clamp(5rem, 16svh, 12rem);
+  /* Aire al final de cada seccion: hueco vacio, del color de la propia
+     seccion, que se recorre antes de que quede armada la frontera del relevo.
+     Hace dos cosas a la vez: da scroll de margen para que la siguiente no entre
+     encima del contenido, y deja ver que la seccion se ha acabado antes de que
+     entre la siguiente. */
+  --curtain-tail: clamp(6rem, 18svh, 13rem);
   --tool-blue: #2948c7;
   --tool-blue-dark: #20389a;
   --action-orange: #e56748;
@@ -209,18 +210,26 @@ html[data-lenis="on"].lenis-stopped {
 }
 
 
-/* Una pantalla de contenido MAS la cola. Sube el suelo, no el techo: las
-   secciones con recorrido propio —las que ya miden dos o tres pantallas— no se
-   enteran, y las que median justo una pasan a tener `--curtain-tail` de scroll
-   propio antes de que el relevo pueda dispararse. */
 .section-gently-enabled .section-gently-panel {
-  min-height: calc(100svh + var(--curtain-tail));
+  min-height: 100svh;
 }
 
-/* El ultimo panel no releva con nadie: darle cola solo seria hueco muerto
-   antes del pie. */
-.section-gently-enabled .section-gently-panel:last-child {
-  min-height: 100svh;
+/* El aire del final. Va como `padding-bottom` de la superficie y no como
+   `min-height` del panel, y la diferencia es todo el asunto: `min-height` solo
+   sube el suelo, asi que las secciones con recorrido propio —proceso,
+   plain-talk, business-bottleneck— ya median de sobra y se quedaban sin una
+   gota de aire. Era justo donde se notaba que todo iba con prisa: el contenido
+   terminaba y la frontera ya estaba armada en ese mismo pixel.
+   Como hueco es espacio de verdad para todas, y lo pinta la superficie con el
+   fondo de su propia seccion (`--curtain-panel-background`, que
+   `lockSurfaceBackground` copia del color real), asi que se lee como "esto se
+   ha acabado" y no como una franja de otro sitio.
+   Primera y ultima fuera, a proposito: el hero abre a pantalla completa y el
+   contacto cierra contra el pie. */
+.section-gently-enabled
+  .section-gently-panel:not(:first-child):not(:last-child)
+  > .section-curtain-surface {
+  padding-bottom: var(--curtain-tail);
 }
 
 .section-gently-enabled
@@ -822,11 +831,11 @@ html[data-hero-motion="prepare"]
      tipografías tocan su techo.
 
      Se calibra contra la escena de referencia (1440x900): allí 1 unidad = 1vw
-     y el bloque de texto mide 40 unidades de alto. El segundo término descuenta
-     cabecera y paddings (~9rem) y reparte el alto restante entre 42 (esas 40
+     y el bloque de texto mide 34.5 unidades de alto. El segundo término descuenta
+     cabecera y paddings (~9rem) y reparte el alto restante entre 36 (esas 34.5
      unidades más un margen de respiro), de modo que en pantallas anchas y bajas
      manda la altura y nada se sale de la escena. */
-  --pt-unit: min(1vw, calc((100svh - 9rem) / 42));
+  --pt-unit: min(1vw, calc((100svh - 9rem) / 36));
 }
 
 /* El ancho útil de la referencia son 92 unidades (100vw menos los dos
@@ -871,13 +880,22 @@ html[data-hero-motion="prepare"]
   font-size: calc(3.65 * var(--pt-unit));
   line-height: 0.88;
   white-space: nowrap;
+  will-change: transform, opacity;
 }
 
-/* Las 10 unidades de hueco son las que ocupa la banda del boceto. */
+/* Las 10 unidades de hueco son las que ocupa la banda del boceto.
+
+   El cuerpo (7 unidades) deja sitio para que el remate crezca en el zoom hasta
+   llenar el ancho sin salirse: ver `PUNCH_ZOOM` en `components/plain-talk.tsx`,
+   que es quien pone el tope. El origen del transform es su borde izquierdo a
+   media altura, así que crece hacia la derecha y hacia fuera desde donde está
+   en vez de irse de la pantalla. */
 .plain-talk-punch {
   margin-top: calc(10 * var(--pt-unit));
-  font-size: calc(10.8 * var(--pt-unit));
+  font-size: calc(7 * var(--pt-unit));
   line-height: 0.72;
+  transform-origin: 0% 50%;
+  will-change: transform, opacity;
 }
 
 .plain-talk-copy p {
@@ -914,10 +932,11 @@ html[data-hero-motion="prepare"]
 }
 
 /* La banda ocupa el hueco entre las dos líneas del titular. El bloque de texto
-   está centrado y mide 40 unidades, así que arranca en `50% - 20u`; el enunciado
-   se lleva las primeras 6.4 y el hueco las 10 siguientes. Como el trazo no llena
-   la banda entera (el viewBox reserva aire arriba y abajo), `50% - 13.35u` es lo
-   que deja la curva centrada en ese hueco en vez de cruzando el enunciado.
+   está centrado y mide 34.5 unidades, así que arranca en `50% - 17.25u`; el
+   enunciado se lleva las primeras 6.4 y el hueco las 10 siguientes. Como el trazo
+   no llena la banda entera (el viewBox reserva aire arriba y abajo),
+   `50% - 10.6u` es lo que deja la curva centrada en ese hueco en vez de cruzando
+   el enunciado.
 
    Se sangra a todo el viewport aunque la escena esté limitada a su ancho de
    diseño, para que la línea siga saliendo por los dos lados. Sin `transform`:
@@ -925,7 +944,7 @@ html[data-hero-motion="prepare"]
 .route-sketch {
   position: absolute;
   z-index: 1;
-  top: calc(50% - 13.35 * var(--pt-unit));
+  top: calc(50% - 10.6 * var(--pt-unit));
   left: calc((100% - 100vw) / 2);
   width: 100vw;
   height: calc(12.35 * var(--pt-unit));
