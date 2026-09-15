@@ -267,6 +267,10 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
         <div className={styles.column}>
           {items.map((project, index) => {
             const kind = KIND_COPY[project.kind];
+            const external = project.href.startsWith("https://");
+            const linkLabel = external
+              ? project.kind === "app" ? "Visitar la aplicación" : "Visitar la web"
+              : kind.link;
             const familyIndex = project.kind === "app" ? ++appSeen : ++webSeen;
 
             return (
@@ -323,10 +327,17 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                     ))}
                   </div>
                 )}
-                <Link href={project.href} className={styles.link}>
-                  {kind.link}
-                  <ArrowUpRight aria-hidden="true" size={19} />
-                </Link>
+                {external ? (
+                  <a href={project.href} className={styles.link}>
+                    {linkLabel}
+                    <ArrowUpRight aria-hidden="true" size={19} />
+                  </a>
+                ) : (
+                  <Link href={project.href} className={styles.link}>
+                    {linkLabel}
+                    <ArrowUpRight aria-hidden="true" size={19} />
+                  </Link>
+                )}
               </article>
             );
           })}
