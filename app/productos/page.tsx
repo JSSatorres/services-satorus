@@ -8,6 +8,18 @@ import { SiteHeader } from "@/components/site-header";
 import { appProjects, webProjects } from "@/lib/project-catalog";
 import styles from "./catalogo.module.css";
 
+const projectDestinations: Record<string, string> = {
+  pidoteca: "https://pidoteca.com/",
+  sportapp: "https://manage-sport-app.vercel.app/",
+  "angel-mendoza": "https://angelmendoza.es/",
+  enrolla2: "https://enrolla2.com/",
+};
+
+const showcasedProjects = [...appProjects, ...webProjects].map((project) => ({
+  ...project,
+  href: projectDestinations[project.slug] ?? project.href,
+}));
+
 export const metadata: Metadata = {
   title: "Proyectos: apps y webs",
   description: "Conoce las aplicaciones y páginas web que diseñamos y desarrollamos en Satorus.",
@@ -53,8 +65,8 @@ export default function ProjectsPage() {
           id="proyectos"
           eyebrow="Un vistazo por dentro"
           title="La decisión detrás de cada proyecto"
-          lead="Tres preguntas en cada proyecto: cuál era el reto, qué queríamos mejorar y por qué elegimos ese camino. Desliza para recorrerlos; los detalles están dentro de cada caso."
-          items={[...appProjects, ...webProjects]}
+          lead="Tres preguntas en cada proyecto: cuál era el reto, qué queríamos mejorar y por qué elegimos ese camino. Desliza para recorrerlos y abre cada proyecto desde su enlace."
+          items={showcasedProjects}
         />
 
         <section className={styles.finalCta} aria-labelledby="projects-cta-title">
