@@ -661,15 +661,21 @@ export function SectionCurtainStack({ children }: SectionCurtainStackProps) {
       const onTouchMove = (event: TouchEvent) => {
         if (isEditableTarget(event.target)) return;
 
+        // Con el relevo en marcha el documento tiene que estar quieto, y ahora
+        // el táctil lo atiende Lenis: un arrastre por debajo del umbral se
+        // colaría hasta él y movería el documento bajo la animación. Se traga
+        // todo, sin mirar cuánto se ha movido el dedo.
+        if (takeover.active) {
+          swallow(event);
+          return;
+        }
+
         const current = event.touches[0]?.clientY ?? touchStartY;
         const delta = touchStartY - current;
         if (Math.abs(delta) < TOUCH_THRESHOLD) return;
 
         // Un deslizamiento = una sección: el resto del mismo dedo se traga.
-        if (touchConsumed) {
-          if (takeover.active) swallow(event);
-          return;
-        }
+        if (touchConsumed) return;
 
         const direction: 1 | -1 = delta > 0 ? 1 : -1;
         if (!takeover.active && !findPair(direction)) return;

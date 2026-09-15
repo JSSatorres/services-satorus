@@ -11,6 +11,10 @@ export type ProjectCatalogItem = {
   image: string;
   imageAlt: string;
   accent: "blue" | "orange" | "lime" | "cyan" | "rose";
+  /** La captura es vertical (móvil): se muestra entera sobre su color, sin recortar. */
+  portrait?: boolean;
+  /** Rótulo de la barra de navegador con la que se enseñan las webs. */
+  domain?: string;
 };
 
 export const appProjects: ProjectCatalogItem[] = [
@@ -39,6 +43,7 @@ export const appProjects: ProjectCatalogItem[] = [
     image: "/products/lector-bilingue/05-traduccion-bilingue.png",
     imageAlt: "Pantalla de lectura y traducción de Lector Bilingüe",
     accent: "lime",
+    portrait: true,
   },
   {
     slug: "sportapp",
@@ -68,6 +73,7 @@ export const webProjects: ProjectCatalogItem[] = [
     image: "/projects/angel-mendoza/site-desktop.png",
     imageAlt: "Página web de Ángel Mendoza vista en escritorio",
     accent: "cyan",
+    domain: "angelmendoza.es",
   },
   {
     slug: "enrolla2",
@@ -81,6 +87,7 @@ export const webProjects: ProjectCatalogItem[] = [
     image: "/projects/enrolla2/hero-desktop.png",
     imageAlt: "Portada de la página web de Enrolla2",
     accent: "rose",
+    domain: "enrolla2.es · Valencia",
   },
 ];
 
