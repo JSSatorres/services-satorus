@@ -20,6 +20,17 @@ type ProjectShowcaseProps = {
 
 /** Recorrido vertical de la imagen dentro de su marco, en % de su propio alto. */
 const DRIFT = 3;
+/** Tramo entre un texto y el siguiente, normalizado. */
+const STEP = 1;
+/**
+ * Cuánto aguanta el marco en el proyecto que se está leyendo antes de soltar el
+ * relevo. Sin esta espera el barrido se reparte por todo el hueco y a mitad de
+ * camino la imagen ya va por la mitad, cuando el texto de ese proyecto todavía
+ * se lee entero: la foto parecía ir por delante.
+ */
+const HOLD = 0.34;
+/** Ventana en la que ocurre el relevo, dentro del tramo. */
+const SWAP = 0.44;
 /** Holgura para que ese recorrido nunca descubra un borde del marco. */
 const MEDIA_SCALE = 1 + (DRIFT * 2) / 100 + 0.04;
 
@@ -147,8 +158,11 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
             },
           });
 
-          // Un relevo por pantalla de scroll: cada bloque de texto mide lo que
-          // mide el marco, así que el reparto sale solo.
+          // Un relevo por bloque de texto. Cada tramo dura `STEP`, que es lo que
+          // mide el hueco entre un texto y el siguiente: el barrido espera
+          // `HOLD` y se resuelve en `SWAP`, así que la imagen aguanta mientras
+          // su texto se lee y ya está puesta cuando llega el siguiente. La
+          // deriva sí recorre el tramo entero: es un movimiento de fondo.
           clips.forEach((clip, index) => {
             const next = clips[index + 1];
             if (!next) return;
@@ -156,14 +170,26 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
             timeline.add(
               gsap
                 .timeline()
-                .to(tinted, {
-                  backgroundColor: stageColors[index + 1],
-                  duration: 1.5,
-                  ease: "power2.inOut",
-                })
-                .to(clip, { clipPath: "inset(0px 0px 100%)", duration: 1.5 }, 0)
-                .to(images[index], { yPercent: -driftOf(index), duration: 1.5 }, 0)
-                .to(images[index + 1], { yPercent: 0, duration: 1.5 }, 0),
+                .to(
+                  tinted,
+                  {
+                    backgroundColor: stageColors[index + 1],
+                    duration: SWAP + 0.12,
+                    ease: "power2.inOut",
+                  },
+                  HOLD - 0.06,
+                )
+                .to(
+                  clip,
+                  {
+                    clipPath: "inset(0px 0px 100%)",
+                    duration: SWAP,
+                    ease: "power2.inOut",
+                  },
+                  HOLD,
+                )
+                .to(images[index], { yPercent: -driftOf(index), duration: STEP }, 0)
+                .to(images[index + 1], { yPercent: 0, duration: STEP }, 0),
             );
           });
 
@@ -237,6 +263,16 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 <p className={styles.eyebrow}>{project.eyebrow}</p>
                 <h3>{project.name}</h3>
                 <p className={styles.summary}>{project.summary}</p>
+                <dl className={styles.story}>
+                  <div>
+                    <dt>Qué mejoramos</dt>
+                    <dd>{project.improvement}</dd>
+                  </div>
+                  <div>
+                    <dt>Por qué así</dt>
+                    <dd>{project.reason}</dd>
+                  </div>
+                </dl>
                 <Link href={project.href} className={styles.link}>
                   {kind.link}
                   <ArrowUpRight aria-hidden="true" size={19} />

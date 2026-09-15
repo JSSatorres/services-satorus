@@ -37,8 +37,12 @@
 
 **Steps:** Ejecutar lint/build, recorrer cinco proyectos y comprobar enlaces, cortes de texto y desbordamiento; guardar tres capturas de la nueva página.
 
+**Resultado:** lint y build pasan. Las capturas de portada, Ángel Mendoza y Enrolla2 se guardan en la raíz del proyecto; móvil no tiene desbordamiento horizontal y con movimiento reducido los cinco casos se muestran sin escenario apilado.
+
 ### Task 4 (final): Actualizar documentación
 
 **Files:** Modify `DESIGN.md`, `docs/plans/2026-09-15-productos-relato-scroll.md`.
 
 **Steps:** Registrar el patrón de relato breve y evidencia real; dejar el plan alineado con la entrega.
+
+**Resultado:** regla documentada en `DESIGN.md`; no se añadieron cifras ni casos ficticios.

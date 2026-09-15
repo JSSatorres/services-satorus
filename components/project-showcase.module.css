@@ -37,12 +37,12 @@
 }
 .section [data-accent="cyan"] {
   --accent: #29a8cd;
-  --accent-ink: #f2f1ea;
+  --accent-ink: #171b18;
   --stage-bg: #e6f4fa;
 }
 .section [data-accent="rose"] {
   --accent: #e0466b;
-  --accent-ink: #f2f1ea;
+  --accent-ink: #101411;
   --stage-bg: #fbe9ee;
 }
 
@@ -66,7 +66,7 @@
 .heading h2 {
   margin: 0.25rem 0 0;
   font-family: var(--font-display-family);
-  font-size: clamp(3.6rem, 7.5vw, 7rem);
+  font-size: clamp(3.1rem, 6.8vw, 6rem);
   line-height: 0.78;
   letter-spacing: -0.065em;
 }
@@ -133,7 +133,7 @@
   /* Sin el tinte de fondo (que sólo existe durante el relevo) el color del
      proyecto necesita otro sitio donde identificarse. */
   padding-left: clamp(0.9rem, 3vw, 1.2rem);
-  border-left: 3px solid var(--accent);
+  border-left: 1px solid var(--accent);
 }
 
 .frame {
@@ -252,9 +252,37 @@
 }
 
 .summary {
-  margin: 0 0 1.9rem;
+  margin: 0 0 1.25rem;
   max-width: 32rem;
   font-size: clamp(1.02rem, 1.2vw, 1.14rem);
+}
+
+.story {
+  display: grid;
+  gap: 0;
+  width: min(100%, 32rem);
+  margin: 0 0 1.45rem;
+  border-top: 1px solid currentColor;
+}
+
+.story > div {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 0.42fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.story dt {
+  color: var(--graphite-soft);
+  font-size: 0.78rem;
+  font-weight: 770;
+}
+
+.story dd {
+  margin: 0;
+  font-size: clamp(0.91rem, 1.08vw, 1.02rem);
+  line-height: 1.37;
 }
 
 .link {
@@ -292,8 +320,12 @@
    pasando por debajo (móvil). */
 
 .stage[data-motion] .column {
-  display: flex;
-  flex-direction: column;
+  /* Rejilla de filas iguales en vez de columna flex: el reparto del relevo da
+     por hecho que todos los bloques miden lo mismo, y con `1fr` en una rejilla
+     de alto indefinido todas las filas se igualan a la más alta. Así un texto
+     más largo que los demás no descuadra los tiempos. */
+  display: grid;
+  grid-auto-rows: 1fr;
 }
 
 .stage[data-motion] .visuals {
@@ -358,7 +390,7 @@
 }
 
 .stage[data-motion="side"] .info {
-  height: calc(100svh - var(--header-height));
+  min-height: calc(100svh - var(--header-height));
 }
 
 .stage[data-motion="side"] .frame {
@@ -398,7 +430,7 @@
   /* Más alto que el hueco de lectura que queda bajo el marco: así el primer
      relevo no arranca hasta que el marco ya está pegado arriba, y el último
      termina antes de que se despegue. */
-  height: max(70svh, 26rem);
+  min-height: max(77svh, 32rem);
 }
 
 @media (max-width: 860px) {
@@ -429,7 +461,13 @@
   }
 
   .info h3 {
-    font-size: 3rem;
+    font-size: 2.75rem;
+  }
+
+  .story > div {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding: 0.6rem 0;
   }
 }
 

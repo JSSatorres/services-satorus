@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { ProjectShowcase } from "@/components/project-showcase";
@@ -25,25 +26,38 @@ export default function ProjectsPage() {
       <SiteHeader />
       <main id="contenido" className={styles.page}>
         <section className={styles.hero} aria-labelledby="projects-title">
-          <p className={styles.kicker}>Trabajo seleccionado · Satorus</p>
-          <h1 id="projects-title">Lo que hacemos<span>se puede abrir.</span></h1>
-          <div className={styles.heroBottom}>
-            <p>Diseñamos productos propios y webs para negocios. Aquí enseñamos el resultado, pero también las decisiones que hay detrás.</p>
+          <h1 id="projects-title">Mira la pantalla.<span>Entiende la decisión.</span></h1>
+          <div className={styles.heroProof} aria-label="Tres capturas reales de proyectos">
+            <figure className={styles.proofPidoteca}>
+              <div><Image src="/projects/pidoteca/overview.png" alt="Vista de Pidoteca, con carta y gestión conectadas" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
+              <figcaption>Pidoteca <span>Una sala mejor conectada</span></figcaption>
+            </figure>
+            <figure className={styles.proofAngel}>
+              <div><Image src="/projects/angel-mendoza/site-desktop.png" alt="Portada de la web de Ángel Mendoza" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
+              <figcaption>Ángel Mendoza <span>Experiencia que se entiende</span></figcaption>
+            </figure>
+            <figure className={styles.proofEnrolla2}>
+              <div><Image src="/projects/enrolla2/hero-desktop.png" alt="Portada de Enrolla2 con sus cinnamon rolls" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
+              <figcaption>Enrolla2 <span>Antojo con camino al encargo</span></figcaption>
+            </figure>
           </div>
-          <ArrowDown className={styles.heroArrow} aria-hidden="true" size={32} />
+          <div className={styles.heroBottom}>
+            <p>Hacemos apps y webs para quitar fricción y contar mejor lo que hace especial a cada negocio. Aquí ves el resultado, qué queríamos mejorar y por qué elegimos ese camino. El resto está dentro de cada caso.</p>
+            <a href="#proyectos" className={styles.heroLink}>Descubre los proyectos <ArrowDown aria-hidden="true" size={20} /></a>
+          </div>
         </section>
 
         <ProjectShowcase
           id="proyectos"
           eyebrow="Apps propias y webs para negocios"
-          title="Proyectos"
-          lead="Unos nacen en casa cuando un problema cotidiano pide una herramienta; otros parten de un negocio que ya tiene algo que decir. Todos se pueden abrir."
+          title="Historias y decisiones"
+          lead="Desliza para ver qué cambió y por qué. Cada captura es real; cada caso completo cuenta los detalles que aquí solo asomamos."
           items={[...appProjects, ...webProjects]}
         />
 
         <div className={styles.nextSlot}>
-          <span>Siguiente caso</span>
-          <p>Esta colección seguirá creciendo.</p>
+          <span>La próxima historia</span>
+          <p>Esta colección seguirá creciendo. Quizá con tu proyecto.</p>
         </div>
 
         <section className={styles.finalCta} aria-labelledby="projects-cta-title">
