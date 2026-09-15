@@ -48,6 +48,9 @@ function headerOffset() {
  * entra. Lo que separa una app de una web es la etiqueta de categoría y el
  * marco: las webs se enseñan dentro de una ventana de navegador.
  *
+ * En móvil la misma mecánica se reparte en vertical: el marco se queda pegado
+ * bajo la cabecera y el texto va rotando por debajo, un proyecto por pantalla.
+ *
  * Quedarse quieto es cosa de `position: sticky` (ver el módulo CSS), no del
  * `pin` de ScrollTrigger: aquí sólo se scrubea la máscara y el color.
  *
@@ -73,23 +76,28 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
 
       media.add(
         {
-          desktop: "(min-width: 861px)",
+          // `stack` es el complemento de `side` y tiene que estar escrito: si
+          // ninguna condición encaja, gsap.matchMedia no llega a llamar.
+          side: "(min-width: 861px)",
+          stack: "(max-width: 860px)",
           reduceMotion: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          const { desktop, reduceMotion } = context.conditions ?? {};
-          if (!desktop || reduceMotion || items.length < 2) return;
+          const { side, reduceMotion } = context.conditions ?? {};
+          if (reduceMotion || items.length < 2) return;
 
           const section = sectionRef.current;
           const stage = section?.querySelector<HTMLElement>(`.${styles.stage}`);
-          if (!section || !stage) return;
+          const visuals = stage?.querySelector<HTMLElement>(`.${styles.visuals}`);
+          const frames = stage?.querySelector<HTMLElement>(`.${styles.frames}`);
+          if (!section || !stage || !visuals || !frames) return;
 
-          // El reparto en dos columnas con las imágenes apiladas sólo se monta
-          // aquí: en reposo el marcado se lee intercalado y completo.
-          stage.dataset.motion = "on";
+          // El reparto con las imágenes apiladas sólo se monta aquí: en reposo
+          // el marcado se lee intercalado y completo.
+          stage.dataset.motion = side ? "side" : "stack";
 
           const select = gsap.utils.selector(stage);
-          const frames = select<HTMLElement>(`.${styles.frame}`);
+          const frameBoxes = select<HTMLElement>(`.${styles.frame}`);
           const clips = select<HTMLElement>(`.${styles.frameClip}`);
           const images = select<HTMLElement>(`.${styles.frameMedia} img`);
           const infos = select<HTMLElement>(`.${styles.info}`);
@@ -98,24 +106,42 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
             getComputedStyle(info).getPropertyValue("--stage-bg").trim(),
           );
 
-          // Una captura que se muestra entera sobre su color no tiene recorte de
-          // sobra: ampliarla para moverla le comería los bordes al móvil.
+          // Sin deriva en dos casos. Una captura que se muestra entera sobre su
+          // color no tiene recorte de sobra, y ampliarla le comería los bordes.
+          // Y en apilado el marco es pequeño: el 10% de zoom que pide la deriva
+          // se lleva por delante el titular de la captura, que es justo lo que
+          // hay que leer. El relevo por máscara ya carga con el efecto.
           const driftOf = (index: number) =>
-            frames[index]?.dataset.fit === "contain" ? 0 : DRIFT;
+            side && frameBoxes[index]?.dataset.fit !== "contain" ? DRIFT : 0;
 
           gsap.set(clips, { clipPath: "inset(0px)" });
           gsap.set(images, {
             scale: (index: number) => (driftOf(index) ? MEDIA_SCALE : 1),
             yPercent: (index: number) => driftOf(index),
           });
-          gsap.set(section, { backgroundColor: stageColors[0] });
+          // El marco apilado lleva su propio fondo a juego, porque se sale del
+          // margen de página para tapar el texto que pasa por detrás.
+          const tinted = [section, visuals];
+          gsap.set(tinted, { backgroundColor: stageColors[0] });
+
+          // Donde descansa el texto: en lateral es el centro de la ventana; en
+          // apilado, el centro del hueco que queda bajo el marco.
+          const restCenter = () => {
+            const header = headerOffset();
+            const top = side ? header : header + visuals.getBoundingClientRect().height;
+            return top + (window.innerHeight - top) / 2;
+          };
 
           const timeline = gsap.timeline({
             defaults: { ease: "none" },
             scrollTrigger: {
-              trigger: stage,
-              start: () => `top top+=${headerOffset()}`,
-              end: "bottom bottom",
+              // Anclado a los propios bloques de texto: cada relevo cae justo
+              // cuando el siguiente proyecto llega a su sitio de lectura, sin
+              // depender de cuánto mida el marco en cada reparto.
+              trigger: infos[0],
+              start: () => `center top+=${restCenter()}`,
+              endTrigger: infos[infos.length - 1],
+              end: () => `center top+=${restCenter()}`,
               scrub: true,
               invalidateOnRefresh: true,
             },
@@ -130,7 +156,7 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
             timeline.add(
               gsap
                 .timeline()
-                .to(section, {
+                .to(tinted, {
                   backgroundColor: stageColors[index + 1],
                   duration: 1.5,
                   ease: "power2.inOut",
@@ -143,7 +169,7 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
 
           return () => {
             delete stage.dataset.motion;
-            gsap.set(section, { clearProps: "backgroundColor" });
+            gsap.set(tinted, { clearProps: "backgroundColor" });
           };
         },
       );
@@ -221,34 +247,36 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
         </div>
 
         <div className={styles.visuals}>
-          {items.map((project, index) => (
-            <div
-              key={project.slug}
-              className={styles.frame}
-              data-accent={project.accent}
-              data-fit={project.portrait ? "contain" : undefined}
-              style={{ "--order": index, zIndex: items.length - index } as CSSProperties}
-            >
-              <div className={styles.frameClip}>
-                {project.kind === "web" && (
-                  <div className={styles.browserBar} aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
-                    <span>{project.domain}</span>
+          <div className={styles.frames}>
+            {items.map((project, index) => (
+              <div
+                key={project.slug}
+                className={styles.frame}
+                data-accent={project.accent}
+                data-fit={project.portrait ? "contain" : undefined}
+                style={{ "--order": index, zIndex: items.length - index } as CSSProperties}
+              >
+                <div className={styles.frameClip}>
+                  {project.kind === "web" && (
+                    <div className={styles.browserBar} aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                      <span>{project.domain}</span>
+                    </div>
+                  )}
+                  <div className={styles.frameMedia}>
+                    <Image
+                      src={project.image}
+                      alt={project.imageAlt}
+                      fill
+                      sizes="(max-width: 860px) 100vw, 38rem"
+                    />
                   </div>
-                )}
-                <div className={styles.frameMedia}>
-                  <Image
-                    src={project.image}
-                    alt={project.imageAlt}
-                    fill
-                    sizes="(max-width: 860px) 92vw, 38rem"
-                  />
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
