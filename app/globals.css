@@ -232,6 +232,26 @@ html[data-lenis="on"].lenis-stopped {
   padding-bottom: var(--curtain-tail);
 }
 
+/* El primer panel tiene que medir MÁS que la pantalla, no exactamente una
+   pantalla. En móvil `100svh` es el viewport con la barra de URL desplegada,
+   pero `innerHeight` crece cuando la barra se esconde: el panel se queda más
+   corto que la pantalla y `relay.start` se vuelve NEGATIVO. Con eso el scroll 0
+   ya cae DENTRO de la zona de relevo —que sólo se arma en el borde—, así que la
+   frontera no se reconoce y el rescate devuelve el documento arriba una y otra
+   vez: la página se queda clavada en el hero y no avanza.
+   Medido: con el hero 40px más corto que el viewport, `relay0 = [-40, 710]` y
+   un deslizamiento hacia abajo no movía nada.
+   Esto le devuelve la holgura que tenía. Va como altura y no como
+   `padding-bottom`: aquí no es aire al final —el hero abre a pantalla completa
+   y no lleva—, es sólo margen para que la frontera caiga por debajo del inicio.
+   En escritorio no hace falta: no hay barra que aparezca y desaparezca, así que
+   `100svh` y `innerHeight` son lo mismo. */
+@media (max-width: 900px) {
+  .section-gently-enabled .section-gently-panel:first-child {
+    min-height: calc(100svh + var(--curtain-tail));
+  }
+}
+
 .section-gently-enabled
   .section-gently-panel
   > .section-curtain-surface,

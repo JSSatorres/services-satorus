@@ -13,18 +13,18 @@ Ruta pública `/productos` en modo Persuade. Extiende el mundo visual de Satorus
 
 ## Audience, job and action
 
-Una pyme, restaurante o club que llega desde Satorus debe entender qué problema cotidiano resuelve cada producto. Pidoteca conduce a su landing pública; SportApp conduce a la lista de espera para las primeras pruebas.
+Una persona que llega desde Satorus debe entender qué mejoró en cada app o web y por qué se diseñó así, sin leer aún la ficha extensa. Cada captura abre el caso completo; Pidoteca, Lector Bilingüe, SportApp, Ángel Mendoza y Enrolla2 conservan sus propios recorridos.
 
 ## Proof and constraints
 
-- Pidoteca usa capturas reales del tablero y el plano de mesas, además de capacidades verificadas en su landing.
-- SportApp usa una fotografía de entrenamiento y una captura real del dashboard, además de prestaciones verificadas en su landing.
+- El catálogo y la portada usan capturas reales de los cinco proyectos, con tres muestras en el primer viewport.
+- El texto de mejora y motivo describe decisiones comprobables, no un antes/después ni un impacto cuantificado.
 - No se inventan fechas, métricas, clientes ni disponibilidad comercial.
 - SportApp se presenta explícitamente como producto aún no disponible para venta.
 
 ## Direction and memorable moment
 
-Un dossier en dos actos sale del mismo taller Satorus. Las capturas aparecen como hojas físicas y una ruta naranja conecta productos, recorridos y acciones. El momento memorable es la ruta que atraviesa las dos capturas del primer viewport y desemboca en Pidoteca disponible y SportApp en acceso anticipado.
+Una portada de tres pruebas reales abre la pregunta «Mira la pantalla. Entiende la decisión». El escenario sticky conserva el relevo de capturas por máscara durante el scroll, mientras cada caso aporta una mejora y el motivo de su dirección en dos líneas editoriales. El detalle queda en la ficha propia; con menos movimiento, texto e imagen se intercalan sin apilarse.
 
 ## Unresolved decisions
 

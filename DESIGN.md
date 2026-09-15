@@ -242,6 +242,7 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 - **Escalable sin huecos falsos:** los proyectos se renderizan desde `lib/project-catalog.ts`. Añadir un caso amplía su lista sin exigir tarjetas vacías ni una retícula cerrada.
 - **La captura es evidencia:** las fichas usan pantallas y fotografías reales de cada proyecto. El texto explica problema, dirección y decisiones sin atribuir métricas o resultados no medidos.
 - **Profundidad progresiva:** `/productos` sirve como índice breve. Cada elemento abre una ficha larga; Lector Bilingüe conserva su página propia y Pidoteca, SportApp, Ángel Mendoza y Enrolla2 cuentan ahora con una ruta dedicada.
+- **Relato antes del detalle:** la portada muestra tres capturas reales y explica la regla del recorrido. En cada relevo de scroll, la imagen va acompañada por «Qué mejoramos» y «Por qué así»; son pistas breves, no resultados medidos ni una sustitución de la ficha larga. El cambio de imagen por máscara y la alternativa sin movimiento permanecen intactos.
 
 ### Route & Process Markers
 
