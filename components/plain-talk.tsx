@@ -70,14 +70,33 @@ export function PlainTalk() {
       });
 
       if (mobile) {
+        /* Misma coreografía que en escritorio —el párrafo, el CTA y el boceto se
+           retiran, el enunciado se va por arriba y quien crece es sólo el
+           remate—, pero movida con variables sobre el titular en vez de con
+           tweens sobre sus dos mitades.
+
+           El motivo es que `SectionCurtainStack` trocea este titular con
+           SplitText en cuanto cargan las fuentes, y al hacerlo rehace los `span`
+           de dentro: `intro` y `punch` se quedan apuntando a nodos que ya no
+           están en el documento y la animación no se ve. El `h2` sí sobrevive al
+           troceado, así que lo que se anima es él, y las reglas de
+           `@media (max-width: 900px)` convierten esas variables en opacidad y
+           transform sobre los `span` que haya en ese momento. En escritorio no
+           hace falta: allí el troceado llega antes de que se monte la línea de
+           tiempo y las referencias siguen siendo buenas.
+
+           Antes esto no se notaba porque el móvil escalaba el titular entero
+           —el `h2`, que nunca se reemplaza—, y era justo eso lo que subía el
+           enunciado por detrás de la cabecera y desbordaba el remate. */
         timeline
           .to(
             [lead, cta, sketch].filter(Boolean),
             { autoAlpha: 0, yPercent: 10, duration: 0.24, stagger: 0.035 },
             0,
           )
-          .to(title, { scale: 1.8, transformOrigin: "0% 38%", duration: 1 }, 0)
-          .to(title, { autoAlpha: 0, duration: 0.22 }, 0.78);
+          .to(title, { "--pt-punch-grow": 1, duration: 1 }, 0)
+          .to(title, { "--pt-intro-out": 1, duration: 0.28 }, 0.04)
+          .to(title, { "--pt-punch-out": 1, duration: 0.2 }, 0.84);
       } else {
         timeline
           .to(
@@ -120,7 +139,13 @@ export function PlainTalk() {
                   no va a esperarte.
                 </span>
                 <span className="plain-talk-punch">
-                  Tu competencia
+                  Tu{" "}
+                  {/* Sólo en móvil: allí "TU COMPETENCIA" no cabe de una línea y
+                      el navegador partía la palabra por la mitad. El salto va en
+                      el marcado y se anula con `display: none` en escritorio, que
+                      sigue leyendo "TU COMPETENCIA / TAMPOCO.". */}
+                  <br className="plain-talk-punch-break" />
+                  competencia
                   <br />
                   tampoco.
                 </span>
