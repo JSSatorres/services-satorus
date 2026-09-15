@@ -44,6 +44,10 @@ const MOBILE_DRAW_DURATION = 1.2
 // un pelo para que el color no vaya por detrás del trazo.
 const REACH_LEAD = 0.12
 
+// A partir de aquí la escena se recorre en horizontal; por debajo, los pasos se
+// apilan y el cable baja.
+const HORIZONTAL_QUERY = "(min-width: 901px)"
+
 /**
  * Recorrido de los pasos, replicando la sección `rethink` de lenis.dev: en
  * escritorio la escena se queda quieta con `sticky` y la pista se desplaza en X
@@ -60,6 +64,11 @@ export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [motionEnabled, setMotionEnabled] = useState(false)
   const [progress, setProgress] = useState(1)
+  // Dónde cae el cartel de cada paso DENTRO de su tramo de cable: 0 es su propio
+  // pin, 1 el pin siguiente. Solo se mide en móvil —ver `measureAnswers`—; vacío
+  // significa «sin medida» y entonces el cartel se enciende con su pin, que es
+  // lo que hace escritorio.
+  const [answerReach, setAnswerReach] = useState<Array<number | null>>([])
 
   useGSAP(
     () => {
@@ -73,7 +82,7 @@ export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
       const rail = root?.querySelector<HTMLElement>(".process-steps")
       if (!root || !track || !stage || !rail) return
 
-      const horizontal = window.matchMedia("(min-width: 901px)").matches
+      const horizontal = window.matchMedia(HORIZONTAL_QUERY).matches
 
       setProgress(0)
       setMotionEnabled(true)
@@ -81,6 +90,65 @@ export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
       if (!horizontal) {
         let trigger: ScrollTrigger | null = null
         let drawing: gsap.core.Tween | null = null
+
+        // En móvil el cartel de respuesta y su titular no están a la altura de
+        // su pin: cuelgan bajo la foto del paso, a media distancia del pin
+        // siguiente. Encenderlos con el pin —como hace escritorio, donde sí
+        // comparten altura— los ponía en azul mientras el cable naranja seguía
+        // muy por encima. Esto mide a qué altura de su tramo cae cada cartel,
+        // así el color espera al trazo. El último paso no tiene tramo debajo:
+        // se queda con la regla del pin, que es donde termina la ruta.
+        const measureAnswers = () => {
+          if (!rail.isConnected) return
+
+          // Un giro de pantalla puede llevar la escena al recorrido horizontal:
+          // allí el cartel vuelve a estar a la altura del pin y la medida sobra.
+          if (window.matchMedia(HORIZONTAL_QUERY).matches) {
+            setAnswerReach((current) => (current.length ? [] : current))
+            return
+          }
+
+          const items = Array.from(
+            rail.querySelectorAll<HTMLElement>(":scope > li"),
+          )
+
+          // Distancias dentro de la misma caja de scroll, así que basta con las
+          // coordenadas de viewport: lo que valga el scroll se va en la resta.
+          const pinCenters = items.map((item) => {
+            const pin = item.querySelector<HTMLElement>(".step-pin")
+            if (!pin) return null
+
+            const rect = pin.getBoundingClientRect()
+            return rect.top + rect.height / 2
+          })
+
+          const next = items.map((item, index) => {
+            const from = pinCenters[index]
+            const to = pinCenters[index + 1]
+            const answer =
+              item.querySelector<HTMLElement>(".process-step-answer")
+            if (!answer || from == null || to == null || to <= from) return null
+
+            const rect = answer.getBoundingClientRect()
+            const center = rect.top + rect.height / 2
+            return Math.min(1, Math.max(0, (center - from) / (to - from)))
+          })
+
+          setAnswerReach((current) =>
+            current.length === next.length &&
+            current.every((value, index) => value === next[index])
+              ? current
+              : next,
+          )
+        }
+
+        // Se mide ya —la caja de cada paso no depende del sobrante del panel, y
+        // la foto reserva su hueco con `aspect-ratio` aunque no haya cargado—, y
+        // se vuelve a medir en cada refresh y cuando las fuentes están listas:
+        // las métricas del texto mueven el cartel dentro de su tramo.
+        measureAnswers()
+        ScrollTrigger.addEventListener("refresh", measureAnswers)
+        document.fonts?.ready.then(measureAnswers)
 
         // La pista de scroll de móvil la abre `SectionCurtainStack` al montarse
         // y su efecto corre DESPUÉS que el de este componente —los hijos van
@@ -140,6 +208,7 @@ export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
 
         return () => {
           window.cancelAnimationFrame(frame)
+          ScrollTrigger.removeEventListener("refresh", measureAnswers)
           trigger?.kill()
           drawing?.kill()
         }
@@ -218,11 +287,19 @@ export function ProcessRoute({ heading, intro, steps }: ProcessRouteProps) {
             >
               {steps.map((step, index) => {
                 const fill = Math.min(1, Math.max(0, drawn - index))
+                const reached = drawn + REACH_LEAD >= index
+                // El pin se enciende cuando el cable llega a él; el cartel y el
+                // titular esperan a que llegue a SU altura. Sin medida —todo
+                // escritorio— las dos cosas son lo mismo.
+                const answerAt = answerReach[index]
+                const answerReached =
+                  answerAt == null ? reached : drawn >= index + answerAt
 
                 return (
                   <li
                     key={step.title}
-                    data-reached={drawn + REACH_LEAD >= index || undefined}
+                    data-reached={reached || undefined}
+                    data-answer-reached={answerReached || undefined}
                     style={{ "--step-fill": fill } as React.CSSProperties}
                   >
                     <span className="step-pin" aria-hidden="true">

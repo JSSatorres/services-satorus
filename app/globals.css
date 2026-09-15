@@ -247,8 +247,24 @@ html[data-lenis="on"].lenis-stopped {
    En escritorio no hace falta: no hay barra que aparezca y desaparezca, así que
    `100svh` y `innerHeight` son lo mismo. */
 @media (max-width: 900px) {
+  :root {
+    /* Un solo mando para dos cosas que tienen que ir a la par: lo que el primer
+       panel mide de mas —el recorrido que se puede bajar dentro del hero antes
+       de que la frontera quede armada— y lo que el hero se descuenta para no
+       empujar su contenido fuera de la pantalla.
+       Mas que `--curtain-tail` (18svh) a proposito: con la holgura justa el
+       relevo saltaba al primer gesto y no daba sensacion de poder recorrer el
+       hero. Aqui son ~32svh: un tercio de pantalla de margen, y como el video
+       del hero cubre todo el panel, lo que se recorre sigue siendo la foto. */
+    --hero-scroll-room: clamp(9rem, 32svh, 18rem);
+  }
+
   .section-gently-enabled .section-gently-panel:first-child {
-    min-height: calc(100svh + var(--curtain-tail));
+    min-height: calc(100svh + var(--hero-scroll-room));
+  }
+
+  .section-gently-enabled .section-gently-panel:first-child .hero {
+    --hero-tail: var(--hero-scroll-room);
   }
 }
 
@@ -482,6 +498,11 @@ summary {
 
 /* Hero */
 .hero {
+  /* Cuanto mide el hero DE MAS por debajo de la primera pantalla. En escritorio
+     no hay holgura y vale cero; en movil lo fija el primer panel del relevo.
+     Todo lo que va anclado abajo —el CTA— y el aire inferior lo suman, asi que
+     el contenido sigue cayendo dentro de la pantalla aunque la caja crezca. */
+  --hero-tail: 0px;
   position: relative;
   display: grid;
   place-items: center;
@@ -613,6 +634,12 @@ html[data-hero-motion="prepare"]
 
 .hero-kinetic-description-line + .hero-kinetic-description-line {
   margin-top: 0.22rem;
+}
+
+/* Los tramos de cada linea solo existen para el corte de movil: aqui van en
+   linea y la frase se lee igual que si fuese un unico span. */
+.hero-kinetic-description-part {
+  display: inline;
 }
 
 .hero-kinetic-word,
@@ -893,6 +920,12 @@ html[data-hero-motion="prepare"]
   display: block;
   font-variation-settings: "wdth" 66, "wght" 820;
   letter-spacing: -0.055em;
+}
+
+/* El salto extra del remate existe sólo para el apilado de tres líneas del
+   móvil; aquí se anula y la línea vuelve a leerse "TU COMPETENCIA". */
+.plain-talk-punch-break {
+  display: none;
 }
 
 .plain-talk-intro {
@@ -2470,7 +2503,14 @@ html[data-hero-motion="prepare"]
     transform 180ms ease;
 }
 
-.process-steps li[data-reached="true"] .process-step-answer {
+/* El cartel y el titular no se encienden con el pin del paso, sino con
+   `data-answer-reached`. En escritorio da igual —cartel y pin están a la misma
+   altura y el componente lo calcula igual que `data-reached`—, pero en móvil el
+   cartel cuelga bajo la foto, a medio camino del pin siguiente: encendiéndolo
+   con el pin se ponía azul mientras el cable naranja seguía arriba. El
+   componente mide a qué altura del tramo cae cada cartel y el color llega
+   cuando llega el trazo. */
+.process-steps li[data-answer-reached="true"] .process-step-answer {
   background: var(--tool-blue);
   box-shadow: 0 8px 14px rgba(16, 20, 17, 0.2);
   color: white;
@@ -2488,7 +2528,7 @@ html[data-hero-motion="prepare"]
   transition: color 180ms ease;
 }
 
-.process-steps li[data-reached="true"] h3 {
+.process-steps li[data-answer-reached="true"] h3 {
   color: var(--tool-blue-dark);
 }
 
@@ -3257,7 +3297,8 @@ html[data-hero-motion="prepare"]
 
   .hero {
     min-height: 100svh;
-    padding: calc(var(--header-height) + 1rem) var(--page-pad) 7rem;
+    padding: calc(var(--header-height) + 1rem) var(--page-pad)
+      calc(7rem + var(--hero-tail));
     overflow: hidden;
   }
 
@@ -3339,7 +3380,9 @@ html[data-hero-motion="prepare"]
     justify-self: center;
     width: max-content;
     max-width: none;
-    font-size: clamp(0.72rem, 2.25vw, 1rem);
+    /* Aqui la linea aun se lee entera (~29.7em) y el ancho da de sobra: el
+       cuerpo sube hasta donde ese renglon sigue cabiendo. */
+    font-size: clamp(0.8rem, 2.6vw, 1.1rem);
     line-height: 1.3;
     text-align: center;
   }
@@ -3348,7 +3391,7 @@ html[data-hero-motion="prepare"]
     position: absolute;
     top: auto;
     right: 0;
-    bottom: 1.65rem;
+    bottom: calc(1.65rem + var(--hero-tail));
     left: 0;
     justify-content: space-between;
     width: min(calc(100% - (2 * var(--page-pad))), 30rem);
@@ -3630,7 +3673,16 @@ html[data-hero-motion="prepare"]
     height: 195svh;
   }
 
+  /* En móvil la escena no se mide contra el alto —no da de sí— sino contra el
+     ancho útil, que es el que decide si el titular cabe. `--pt-line` es ese
+     ancho: exactamente lo que ocupa `.plain-talk-zoom`. Los dos cuerpos del
+     titular se expresan como una fracción suya, así que ninguna línea se parte
+     por muy estrecho que sea el teléfono. */
   .plain-talk-stage {
+    --pt-line: calc(100vw - 2 * var(--page-pad));
+    --pt-band: clamp(6.5rem, 16svh, 8.5rem);
+    --pt-punch-lift: -5rem;
+
     height: 100svh;
     padding: var(--m-stage-top) var(--page-pad) var(--m-stage-bottom);
   }
@@ -3640,25 +3692,68 @@ html[data-hero-motion="prepare"]
     width: 100%;
   }
 
+  /* Centrado como en escritorio. Anclado arriba, el bloque se apelotonaba bajo
+     la cabecera y dejaba media pantalla de naranja vacía debajo. */
   .plain-talk-copy {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
+  /* Los tres mandos del zoom, todos de 0 a 1. Quien los mueve es la línea de
+     tiempo de components/plain-talk.tsx, y los mueve AQUÍ, sobre el `h2`, no
+     sobre los `span` de dentro: SplitText rehace esos `span` al trocear el
+     titular y GSAP se quedaría agarrado a nodos que ya no están en el
+     documento. Al heredarse, el `span` que haya en cada momento recoge el valor
+     bueno. */
   .plain-talk-copy h2 {
+    --pt-intro-out: 0;
+    --pt-punch-grow: 0;
+    --pt-punch-out: 0;
+
     max-width: none;
     margin: 0;
   }
 
+  /* "LA INTELIGENCIA ARTIFICIAL" mide 12.62 veces su cuerpo: con `--pt-line`
+     entre 15.6 ocupa el 81% del ancho y le queda aire hasta el borde. La
+     proporción con el remate (1.6) es la misma que guarda el escritorio. */
   .plain-talk-intro {
     max-width: none;
-    font-size: clamp(1.5rem, 6.5vw, 2.8rem);
-    line-height: 0.9;
+    font-size: calc(var(--pt-line) / 15.6);
+    line-height: 0.92;
+    opacity: calc(1 - var(--pt-intro-out));
+    transform: translateY(calc(var(--pt-intro-out) * -24%));
   }
 
+  /* El remate se apila en tres líneas ("TU / COMPETENCIA / TAMPOCO.") gracias al
+     salto de `.plain-talk-punch-break`, y cada una va en `nowrap`: el corte lo
+     decide el marcado y no el ancho de la pantalla, que es lo que partía
+     "COMPETENCIA" por la mitad. El cuerpo sale de la línea más larga
+     —"COMPETENCIA", que medida en pantalla ocupa 6.9 veces su cuerpo—:
+     `--pt-line` entre 10.1 la deja al 68% del ancho en reposo.
+
+     De ahí sale el 0.42 del zoom: 0.68 x 1.42 ≈ 97% del ancho, o sea que acaba
+     llenando la pantalla justo antes del borde, igual que hace `PUNCH_ZOOM` en
+     escritorio.
+
+     `--pt-punch-lift` es lo que sube mientras crece. En reposo el remate cae por
+     debajo del centro de la escena —el enunciado y la banda del boceto le
+     empujan— y esto le devuelve al centro justo cuando se queda solo. Va en
+     píxeles y no en porcentaje de su propio alto porque esa caída es una
+     distancia, y se mueve mucho menos que el bloque: en teléfonos son unos 52 px
+     tanto a 360 como a 430 de ancho, mientras que el remate crece un 8%. */
   .plain-talk-punch {
-    margin-top: clamp(8.5rem, 23svh, 12rem);
-    font-size: clamp(3.25rem, 14.2vw, 6rem);
-    line-height: 0.76;
+    margin-top: clamp(6rem, 17svh, 8.5rem);
+    font-size: calc(var(--pt-line) / 10.1);
+    line-height: 0.78;
+    white-space: nowrap;
+    opacity: calc(1 - var(--pt-punch-out));
+    transform: translateY(calc(var(--pt-punch-grow) * var(--pt-punch-lift)))
+      scale(calc(1 + var(--pt-punch-grow) * 0.42));
+    transform-origin: 0% 50%;
+  }
+
+  .plain-talk-punch-break {
+    display: initial;
   }
 
   .plain-talk-copy p {
@@ -3675,12 +3770,18 @@ html[data-hero-motion="prepare"]
     font-size: 0.82rem;
   }
 
+  /* La banda se ancla al centro y no al borde superior, porque el bloque de
+     texto ahora va centrado. El hueco entre enunciado y remate cae siempre a la
+     misma distancia del centro, y esa distancia no depende de lo ancho que sea
+     el hueco: es la mitad de lo que el remate, el párrafo y el CTA bajan el
+     bloque menos lo que el enunciado lo sube. Medido en este tramo son 6.5rem;
+     la mitad de la banda es lo que queda para pasar de su centro a su borde. */
   .route-sketch {
-    top: clamp(5.8rem, 15svh, 8.5rem);
+    top: calc(50% - 6.5rem - var(--pt-band) / 2);
     right: calc(var(--page-pad) * -1);
     left: calc(var(--page-pad) * -1);
     width: auto;
-    height: clamp(7rem, 18svh, 9.5rem);
+    height: var(--pt-band);
   }
 
   .route-sketch span {
@@ -4001,7 +4102,7 @@ html[data-hero-motion="prepare"]
     transform: rotate(-1deg);
   }
 
-  .process-steps li[data-reached="true"] .process-step-answer {
+  .process-steps li[data-answer-reached="true"] .process-step-answer {
     /* Sin el `translateY` de escritorio: aqui ese levantamiento es lo que
        hacia que el cartel del paso alcanzado invadiera el texto del paso
        anterior. */
@@ -4288,7 +4389,8 @@ html[data-hero-motion="prepare"]
 
   .hero {
     min-height: 100svh;
-    padding: calc(var(--header-height) + 0.75rem) 1rem 6.6rem;
+    padding: calc(var(--header-height) + 0.75rem) 1rem
+      calc(6.6rem + var(--hero-tail));
   }
 
   .hero-kinetic-scene {
@@ -4314,7 +4416,27 @@ html[data-hero-motion="prepare"]
   .hero-kinetic-copy--right {
     width: max-content;
     max-width: none;
-    font-size: clamp(0.56rem, 2.85vw, 0.88rem);
+    /* El renglon mas largo mide ~21.3em, asi que a 360px caben ~15.4px: este
+       clamp se queda algo por debajo de ese techo en todo el rango. */
+    font-size: clamp(0.82rem, 4.05vw, 1.15rem);
+  }
+
+  /* Cada tramo pasa a su propio renglon: es lo que acorta la linea mas larga y
+     deja subir el cuerpo de letra. El espacio que los unia sobra aqui. */
+  .hero-kinetic-description-part {
+    display: block;
+  }
+
+  .hero-kinetic-description-part + .hero-kinetic-description-part {
+    margin-top: 0.22rem;
+  }
+
+  .hero-kinetic-description-gap {
+    display: none;
+  }
+
+  .hero-support {
+    font-size: clamp(1rem, 4.2vw, 1.15rem);
   }
 
   .hero-media {
@@ -4330,7 +4452,7 @@ html[data-hero-motion="prepare"]
   .hero-cta {
     top: auto;
     right: 0;
-    bottom: 1.15rem;
+    bottom: calc(1.15rem + var(--hero-tail));
     left: 0;
     justify-content: space-between;
     gap: 0.75rem;
@@ -4351,13 +4473,11 @@ html[data-hero-motion="prepare"]
     max-width: none;
   }
 
-  .plain-talk-intro {
-    font-size: clamp(1.4rem, 6.25vw, 2.4rem);
-  }
-
+  /* Los cuerpos del titular no se retocan aquí: ya salen del ancho útil de la
+     escena (`--pt-line`), así que bajan solos con la pantalla. Lo único que se
+     aprieta es el hueco de la banda, que es alto fijo y aquí sobra. */
   .plain-talk-punch {
-    margin-top: clamp(7.8rem, 21svh, 10.5rem);
-    font-size: clamp(3rem, 14.5vw, 5.3rem);
+    margin-top: clamp(5.25rem, 15svh, 7.5rem);
   }
 
   .plain-talk-copy p {
@@ -4365,12 +4485,16 @@ html[data-hero-motion="prepare"]
     font-size: clamp(0.86rem, 3.7vw, 1rem);
   }
 
+  /* Mismo reparto que en el tramo ancho, con el bloque de texto más corto: aquí
+     el hueco cae a 4.8rem del centro de la escena y el remate a 3.3rem. */
+  .plain-talk-stage {
+    --pt-punch-lift: -3.3rem;
+  }
+
   .route-sketch {
-    top: clamp(5.25rem, 14svh, 7.2rem);
-    right: calc(var(--page-pad) * -1);
-    left: calc(var(--page-pad) * -1);
-    width: auto;
-    height: clamp(6.5rem, 17svh, 8.5rem);
+    --pt-band: clamp(5.75rem, 14svh, 7.5rem);
+
+    top: calc(50% - 4.8rem - var(--pt-band) / 2);
   }
 
   .route-sketch span {
@@ -4540,7 +4664,7 @@ html[data-hero-motion="prepare"]
 
   .hero-support {
     margin-top: 0.5rem;
-    font-size: min(0.85rem, 3.4vw);
+    font-size: min(0.95rem, 3.9vw);
   }
 
   .services-heading,

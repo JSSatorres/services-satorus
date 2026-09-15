@@ -8,12 +8,16 @@ import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-moti
 /* Cada línea se compone con `white-space: nowrap`, así que el corte es parte del
    texto: se reparte para que el titular quepa también a 360px de ancho. */
 const taglineLines = ["Tu negocio puede", "llegar más lejos."];
+/* Cada línea se parte en tramos. En escritorio los tramos van en línea y se lee
+   igual que antes; en móvil cada tramo baja a su propio renglón. Así el renglón
+   más largo se acorta lo suficiente para subir el cuerpo de letra sin desbordar
+   los 360px: con la línea entera el techo eran ~11px, ilegible. */
 const descriptionLines = [
-  "Webs, herramientas e IA para pequeñas y medianas empresas.",
-  "Te ayudamos a aprovechar la tecnología para captar clientes,",
-  "atender mejor y reducir el trabajo manual.",
-  "Diseñamos y ponemos en marcha la solución",
-  "que encaja con tu negocio.",
+  ["Webs, herramientas e IA", "para pequeñas y medianas empresas."],
+  ["Te ayudamos a aprovechar", "la tecnología para captar clientes,"],
+  ["atender mejor y reducir el trabajo manual."],
+  ["Diseñamos y ponemos en marcha la solución"],
+  ["que encaja con tu negocio."],
 ];
 
 const characterOffsets = [-520, 470, -390, 560, -450, 410, -580, 360];
@@ -312,9 +316,21 @@ export function HeroKineticLockup() {
           data-kinetic-copy="right"
           aria-hidden="true"
         >
-          {descriptionLines.map((line) => (
-            <span className="hero-kinetic-description-line" key={line}>
-              <KineticWords text={line} />
+          {descriptionLines.map((parts) => (
+            <span
+              className="hero-kinetic-description-line"
+              key={parts.join(" ")}
+            >
+              {parts.map((part, partIndex) => (
+                <span className="hero-kinetic-description-part" key={part}>
+                  <KineticWords text={part} />
+                  {partIndex < parts.length - 1 ? (
+                    <span className="hero-kinetic-description-gap">
+                      {"\u00a0"}
+                    </span>
+                  ) : null}
+                </span>
+              ))}
             </span>
           ))}
         </div>
