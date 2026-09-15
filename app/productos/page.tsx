@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowDown, MoveUpRight } from "lucide-react";
 import { ProjectShowcase } from "@/components/project-showcase";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -26,44 +26,49 @@ export default function ProjectsPage() {
       <SiteHeader />
       <main id="contenido" className={styles.page}>
         <section className={styles.hero} aria-labelledby="projects-title">
-          <h1 id="projects-title">Mira la pantalla.<span>Entiende la decisión.</span></h1>
+          <div className={styles.heroCopy}>
+            <p className={styles.heroLabel}>Proyectos reales. Decisiones visibles.</p>
+            <h1 id="projects-title">No es solo<br />una pantalla.<br /><span>Es una decisión.</span></h1>
+            <p className={styles.heroLead}>Hacemos apps y webs para quitar fricción y contar mejor lo que hace especial a cada negocio. Aquí puedes ver la solución y entender por qué tomó esa forma.</p>
+            <a href="#proyectos" className={styles.heroLink}>Explorar proyectos <ArrowDown aria-hidden="true" size={19} /></a>
+          </div>
           <div className={styles.heroProof} aria-label="Tres capturas reales de proyectos">
             <figure className={styles.proofPidoteca}>
-              <div><Image src="/projects/pidoteca/overview.png" alt="Vista de Pidoteca, con carta y gestión conectadas" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
-              <figcaption>Pidoteca <span>Una sala mejor conectada</span></figcaption>
+              <div><Image src="/projects/pidoteca/customer-ordering-journey-wide.png" alt="Recorrido visual de Pidoteca desde la carta hasta el pedido" fill priority sizes="(max-width: 800px) 72vw, 23vw" /></div>
+              <figcaption>Pidoteca <span>App · Restauración</span></figcaption>
             </figure>
             <figure className={styles.proofAngel}>
-              <div><Image src="/projects/angel-mendoza/site-desktop.png" alt="Portada de la web de Ángel Mendoza" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
-              <figcaption>Ángel Mendoza <span>Experiencia que se entiende</span></figcaption>
+              <div><Image src="/projects/angel-mendoza/site-desktop.png" alt="Portada de la web de Ángel Mendoza" fill priority sizes="(max-width: 800px) 86vw, 29vw" /></div>
+              <figcaption>Ángel Mendoza <span>Web · Marca personal</span></figcaption>
             </figure>
             <figure className={styles.proofEnrolla2}>
-              <div><Image src="/projects/enrolla2/hero-desktop.png" alt="Portada de Enrolla2 con sus cinnamon rolls" fill priority sizes="(max-width: 800px) 65vw, 25vw" /></div>
-              <figcaption>Enrolla2 <span>Antojo con camino al encargo</span></figcaption>
+              <div><Image src="/projects/enrolla2/hero-desktop.png" alt="Portada de Enrolla2 con sus cinnamon rolls" fill priority sizes="(max-width: 800px) 70vw, 21vw" /></div>
+              <figcaption>Enrolla2 <span>Web · Restauración</span></figcaption>
             </figure>
-          </div>
-          <div className={styles.heroBottom}>
-            <p>Hacemos apps y webs para quitar fricción y contar mejor lo que hace especial a cada negocio. Aquí ves el resultado, qué queríamos mejorar y por qué elegimos ese camino. El resto está dentro de cada caso.</p>
-            <a href="#proyectos" className={styles.heroLink}>Descubre los proyectos <ArrowDown aria-hidden="true" size={20} /></a>
+            <p className={styles.proofNote}>Tres formas distintas.<br />La misma pregunta: ¿qué necesita quien llega?</p>
           </div>
         </section>
 
         <ProjectShowcase
           id="proyectos"
-          eyebrow="Apps propias y webs para negocios"
-          title="Historias y decisiones"
-          lead="Desliza para ver qué cambió y por qué. Cada captura es real; cada caso completo cuenta los detalles que aquí solo asomamos."
+          eyebrow="Un vistazo por dentro"
+          title="La decisión detrás de cada proyecto"
+          lead="Tres preguntas en cada proyecto: cuál era el reto, qué queríamos mejorar y por qué elegimos ese camino. Desliza para recorrerlos; los detalles están dentro de cada caso."
           items={[...appProjects, ...webProjects]}
         />
 
-        <div className={styles.nextSlot}>
-          <span>La próxima historia</span>
-          <p>Esta colección seguirá creciendo. Quizá con tu proyecto.</p>
-        </div>
-
         <section className={styles.finalCta} aria-labelledby="projects-cta-title">
-          <p>¿Tu proyecto podría estar aquí?</p>
-          <h2 id="projects-cta-title">Vamos a construir algo que merezca ser enseñado.</h2>
-          <Link href="/#contacto">Cuéntanos qué necesitas <ArrowUpRight aria-hidden="true" size={24} /></Link>
+          <div className={styles.finalCopy}>
+            <p className={styles.finalLabel}>De pantallas a personas</p>
+            <h2 id="projects-cta-title">Tu negocio también tiene una <span>mejor versión.</span></h2>
+            <p>Detrás de cada proyecto hay una conversación, muchas preguntas y una decisión: apostar por una web o una herramienta que ayude a avanzar de verdad. Hablemos de la tuya.</p>
+            <Link href="/#contacto">Hablemos de tu proyecto <MoveUpRight aria-hidden="true" size={20} /></Link>
+          </div>
+          <div className={styles.finalSteps} aria-label="Nuestra forma de trabajar">
+            <div><span>01</span><div><h3>Escuchamos tu contexto</h3><p>Cada negocio es distinto. Empezamos por entender el tuyo.</p></div></div>
+            <div><span>02</span><div><h3>Diseñamos una solución a medida</h3><p>Sin plantillas por inercia: una web o app que encaje contigo.</p></div></div>
+            <div><span>03</span><div><h3>Te acompañamos en el camino</h3><p>De la idea al lanzamiento, con pasos claros.</p></div></div>
+          </div>
         </section>
       </main>
       <SiteFooter />

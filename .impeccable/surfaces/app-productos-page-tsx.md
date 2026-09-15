@@ -17,14 +17,14 @@ Una persona que llega desde Satorus debe entender qué mejoró en cada app o web
 
 ## Proof and constraints
 
-- El catálogo y la portada usan capturas reales de los cinco proyectos, con tres muestras en el primer viewport.
+- El catálogo y la portada usan capturas reales de los cinco proyectos, con tres muestras en el primer viewport y hasta tres detalles existentes por caso en escritorio.
 - El texto de mejora y motivo describe decisiones comprobables, no un antes/después ni un impacto cuantificado.
 - No se inventan fechas, métricas, clientes ni disponibilidad comercial.
 - SportApp se presenta explícitamente como producto aún no disponible para venta.
 
 ## Direction and memorable moment
 
-Una portada de tres pruebas reales abre la pregunta «Mira la pantalla. Entiende la decisión». El escenario sticky conserva el relevo de capturas por máscara durante el scroll, mientras cada caso aporta una mejora y el motivo de su dirección en dos líneas editoriales. El detalle queda en la ficha propia; con menos movimiento, texto e imagen se intercalan sin apilarse.
+Una portada blanca con un campo azul cielo y tres pruebas reales abre la tesis «No es solo una pantalla. Es una decisión». El escenario sticky conserva el relevo por máscara y agrupa la captura principal con hasta tres detalles reales; cada caso explica reto, mejora y motivo en tres pasos breves. En móvil el sticky conserva una sola captura y los detalles contextuales viajan con el texto; cuando son tres, el último completa una fila entera. Un cierre editorial tras el último caso conduce a contacto; con menos movimiento, texto e imagen se intercalan sin apilarse.
 
 ## Unresolved decisions
 

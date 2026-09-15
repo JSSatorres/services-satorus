@@ -8,6 +8,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import type { ProjectCatalogItem } from "@/lib/project-catalog";
+import { PidotecaJourneyScene } from "@/components/pidoteca-journey-scene";
 import styles from "./project-showcase.module.css";
 
 type ProjectShowcaseProps = {
@@ -44,6 +45,42 @@ function KindIcon({ kind }: { kind: ProjectCatalogItem["kind"] }) {
   return <Icon aria-hidden="true" />;
 }
 
+function LectorScreenCollage() {
+  const screens = [
+    { src: "/products/lector-bilingue/08-biblioteca-con-libro.png", alt: "Biblioteca con un libro emparejado" },
+    { src: "/products/lector-bilingue/04-lectura-y-navegacion.png", alt: "Pantalla de lectura" },
+    { src: "/products/lector-bilingue/05-traduccion-bilingue.png", alt: "Consulta bilingüe de un fragmento" },
+  ];
+
+  return (
+    <div className={styles.lectorScreens}>
+      {screens.map((screen) => (
+        <div className={styles.lectorPhone} key={screen.src}>
+          <Image src={screen.src} alt={screen.alt} fill sizes="(max-width: 860px) 28vw, 8rem" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LectorLanguagePairs() {
+  return (
+    <div className={styles.lectorLanguages} aria-label="Dos ejemplos de parejas de libros en inglés y español">
+      <span className={styles.lectorLanguagesHeading}><Globe2 aria-hidden="true" /> Elige una pareja de EPUB</span>
+      <div className={styles.languagePair}>
+        <span className={styles.languageChoice}><i className={styles.flagUk} aria-hidden="true" /><span><strong>Inglés</strong><small>Reino Unido</small></span></span>
+        <span className={styles.languagePlus} aria-hidden="true">+</span>
+        <span className={styles.languageChoice}><i className={styles.flagSpain} aria-hidden="true" /><span><strong>Español</strong><small>España</small></span></span>
+      </div>
+      <div className={styles.languagePair}>
+        <span className={styles.languageChoice}><i className={styles.flagUs} aria-hidden="true" /><span><strong>Inglés</strong><small>EE. UU.</small></span></span>
+        <span className={styles.languagePlus} aria-hidden="true">+</span>
+        <span className={styles.languageChoice}><i className={styles.flagMexico} aria-hidden="true" /><span><strong>Español</strong><small>México</small></span></span>
+      </div>
+    </div>
+  );
+}
+
 function headerOffset() {
   const raw = getComputedStyle(document.documentElement).getPropertyValue("--header-height");
   return Number.parseFloat(raw) || 0;
@@ -74,9 +111,6 @@ function headerOffset() {
  */
 export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShowcaseProps) {
   const sectionRef = useRef<HTMLElement>(null);
-
-  const appCount = items.filter((item) => item.kind === "app").length;
-  const webCount = items.length - appCount;
 
   useGSAP(
     () => {
@@ -110,7 +144,10 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
           const select = gsap.utils.selector(stage);
           const frameBoxes = select<HTMLElement>(`.${styles.frame}`);
           const clips = select<HTMLElement>(`.${styles.frameClip}`);
-          const images = select<HTMLElement>(`.${styles.frameMedia} img`);
+          const images = frameBoxes.map((frame) =>
+            Array.from(frame.querySelectorAll<HTMLImageElement>(`.${styles.frameMedia} img`))
+              .find((image) => getComputedStyle(image).display !== "none"),
+          );
           const infos = select<HTMLElement>(`.${styles.info}`);
 
           const stageColors = infos.map((info) =>
@@ -123,12 +160,14 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
           // se lleva por delante el titular de la captura, que es justo lo que
           // hay que leer. El relevo por máscara ya carga con el efecto.
           const driftOf = (index: number) =>
-            side && frameBoxes[index]?.dataset.fit !== "contain" ? DRIFT : 0;
+            side && frameBoxes[index]?.dataset.fit !== "contain" && frameBoxes[index]?.dataset.imageFit !== "contain" ? DRIFT : 0;
 
           gsap.set(clips, { clipPath: "inset(0px)" });
-          gsap.set(images, {
-            scale: (index: number) => (driftOf(index) ? MEDIA_SCALE : 1),
-            yPercent: (index: number) => driftOf(index),
+          images.forEach((image, index) => {
+            if (image) gsap.set(image, {
+              scale: driftOf(index) ? MEDIA_SCALE : 1,
+              yPercent: driftOf(index),
+            });
           });
           // El marco apilado lleva su propio fondo a juego, porque se sale del
           // margen de página para tapar el texto que pasa por detrás.
@@ -167,8 +206,7 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
             const next = clips[index + 1];
             if (!next) return;
 
-            timeline.add(
-              gsap
+            const swap = gsap
                 .timeline()
                 .to(
                   tinted,
@@ -187,10 +225,12 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                     ease: "power2.inOut",
                   },
                   HOLD,
-                )
-                .to(images[index], { yPercent: -driftOf(index), duration: STEP }, 0)
-                .to(images[index + 1], { yPercent: 0, duration: STEP }, 0),
-            );
+                );
+            const currentImage = images[index];
+            const nextImage = images[index + 1];
+            if (currentImage) swap.to(currentImage, { yPercent: -driftOf(index), duration: STEP }, 0);
+            if (nextImage) swap.to(nextImage, { yPercent: 0, duration: STEP }, 0);
+            timeline.add(swap);
           });
 
           return () => {
@@ -216,19 +256,9 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
       aria-labelledby={`${id}-title`}
     >
       <header className={styles.heading}>
-        <div className={styles.headingMain}>
-          <div className={styles.legend}>
-            <span>
-              <Boxes aria-hidden="true" /> Apps <b>{appCount}</b>
-            </span>
-            <span>
-              <Globe2 aria-hidden="true" /> Webs <b>{webCount}</b>
-            </span>
-          </div>
-          <div>
-            <p className={styles.eyebrow}>{eyebrow}</p>
-            <h2 id={`${id}-title`}>{title}</h2>
-          </div>
+        <div>
+          <p className={styles.eyebrow}>{eyebrow}</p>
+          <h2 id={`${id}-title`}>{title}</h2>
         </div>
         <p>{lead}</p>
       </header>
@@ -238,7 +268,6 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
           {items.map((project, index) => {
             const kind = KIND_COPY[project.kind];
             const familyIndex = project.kind === "app" ? ++appSeen : ++webSeen;
-            const familyTotal = project.kind === "app" ? appCount : webCount;
 
             return (
               <article
@@ -254,9 +283,6 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                   <span className={styles.kind}>
                     <KindIcon kind={project.kind} />
                     {kind.label}
-                    <b>
-                      {String(familyIndex).padStart(2, "0")}/{String(familyTotal).padStart(2, "0")}
-                    </b>
                   </span>
                   <span className={styles.status}>{project.status}</span>
                 </p>
@@ -265,14 +291,38 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 <p className={styles.summary}>{project.summary}</p>
                 <dl className={styles.story}>
                   <div>
-                    <dt>Qué mejoramos</dt>
+                    <dt><span className={styles.stepNumber}>01</span> El reto</dt>
+                    <dd>{project.challenge}</dd>
+                  </div>
+                  <div>
+                    <dt><span className={styles.stepNumber}>02</span> Qué mejoramos</dt>
                     <dd>{project.improvement}</dd>
                   </div>
                   <div>
-                    <dt>Por qué así</dt>
+                    <dt><span className={styles.stepNumber}>03</span> Por qué así</dt>
                     <dd>{project.reason}</dd>
                   </div>
                 </dl>
+                {project.details.length > 0 && (
+                  <div
+                    className={styles.mobileDetails}
+                    aria-label={`Detalles visuales de ${project.name}`}
+                  >
+                    {project.details.slice(0, 2).map((detail) => (
+                      <figure className={styles.mobileDetail} key={detail.image}>
+                        <div className={styles.mobileDetailMedia} data-fit={detail.portrait ? "contain" : undefined} data-focus={detail.focus}>
+                          <Image
+                            src={detail.image}
+                            alt={detail.alt}
+                            fill
+                            sizes="(max-width: 860px) 44vw, 16rem"
+                          />
+                        </div>
+                        <figcaption>{detail.label}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
                 <Link href={project.href} className={styles.link}>
                   {kind.link}
                   <ArrowUpRight aria-hidden="true" size={19} />
@@ -289,25 +339,71 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 key={project.slug}
                 className={styles.frame}
                 data-accent={project.accent}
+                data-project={project.slug}
                 data-fit={project.portrait ? "contain" : undefined}
+                data-image-fit={project.imageFit}
                 style={{ "--order": index, zIndex: items.length - index } as CSSProperties}
               >
                 <div className={styles.frameClip}>
-                  {project.kind === "web" && (
-                    <div className={styles.browserBar} aria-hidden="true">
-                      <i />
-                      <i />
-                      <i />
-                      <span>{project.domain}</span>
+                  <div className={styles.visualEnsemble}>
+                    <div className={styles.primaryVisual}>
+                      {project.kind === "web" && (
+                        <div className={styles.browserBar} aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                          <span>{project.domain}</span>
+                        </div>
+                      )}
+                      {project.slug === "pidoteca" ? (
+                        <PidotecaJourneyScene compact />
+                      ) : (
+                        <div className={styles.frameMedia}>
+                          <Image
+                            src={project.image}
+                            alt={project.imageAlt}
+                            fill
+                            sizes="(max-width: 860px) 100vw, 42rem"
+                            className={project.mobileImage ? styles.desktopImage : undefined}
+                          />
+                          {project.mobileImage && (
+                            <Image
+                              src={project.mobileImage}
+                              alt={project.imageAlt}
+                              fill
+                              sizes="(max-width: 860px) 100vw, 42rem"
+                              className={styles.mobileImage}
+                            />
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div className={styles.frameMedia}>
-                    <Image
-                      src={project.image}
-                      alt={project.imageAlt}
-                      fill
-                      sizes="(max-width: 860px) 100vw, 38rem"
-                    />
+                    <div className={styles.detailRow} data-count={project.details.length}>
+                      {project.slug === "lector-bilingue" ? (
+                        <>
+                          <div className={styles.detailShot}>
+                            <LectorScreenCollage />
+                            <span className={styles.detailCaption}>Biblioteca · Lectura · Traducción</span>
+                          </div>
+                          <div className={styles.detailShot}>
+                            <LectorLanguagePairs />
+                            <span className={styles.detailCaption}>Idiomas en pareja</span>
+                          </div>
+                        </>
+                      ) : project.details.map((detail) => (
+                        <div className={styles.detailShot} key={detail.image}>
+                          <div className={styles.detailMedia} data-fit={detail.portrait ? "contain" : undefined} data-focus={detail.focus}>
+                            <Image
+                              src={detail.image}
+                              alt={detail.alt}
+                              fill
+                              sizes="(max-width: 860px) 80vw, 19rem"
+                            />
+                          </div>
+                          <span className={styles.detailCaption}>{detail.label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

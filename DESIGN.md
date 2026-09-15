@@ -238,11 +238,15 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 
 ### Catálogo de proyectos
 
+- **Portada y cierre editoriales:** `/productos` abre en papel claro (`#fffefa`) con un campo azul cielo (`#dff0fb`), tres capturas reales superpuestas y el naranja reservado para la tesis y la acción. El cierre vuelve al papel, resume cómo trabajamos y lleva a la conversación. Esta variación pertenece solo al catálogo, no sustituye la paleta global.
 - **Dos familias, dos atmósferas:** Apps conserva el papel frío y presenta cada producto como una hoja de trabajo; Webs cambia a grafito y usa ventanas de navegador como piezas de exposición.
 - **Escalable sin huecos falsos:** los proyectos se renderizan desde `lib/project-catalog.ts`. Añadir un caso amplía su lista sin exigir tarjetas vacías ni una retícula cerrada.
 - **La captura es evidencia:** las fichas usan pantallas y fotografías reales de cada proyecto. El texto explica problema, dirección y decisiones sin atribuir métricas o resultados no medidos.
 - **Profundidad progresiva:** `/productos` sirve como índice breve. Cada elemento abre una ficha larga; Lector Bilingüe conserva su página propia y Pidoteca, SportApp, Ángel Mendoza y Enrolla2 cuentan ahora con una ruta dedicada.
-- **Relato antes del detalle:** la portada muestra tres capturas reales y explica la regla del recorrido. En cada relevo de scroll, la imagen va acompañada por «Qué mejoramos» y «Por qué así»; son pistas breves, no resultados medidos ni una sustitución de la ficha larga. El cambio de imagen por máscara y la alternativa sin movimiento permanecen intactos.
+- **Relato antes del detalle:** cada caso plantea «El reto», «Qué mejoramos» y «Por qué así» en tres pasos breves; son decisiones y objetivos, no resultados medidos ni una sustitución de la ficha larga.
+- **Pruebas agrupadas:** en escritorio la captura principal y hasta tres vistas de contexto viven dentro del mismo `frameClip`; la máscara y el color existentes relevan el conjunto entero a la vez. Solo se muestran imágenes reales disponibles; SportApp tiene una segunda vista distinta y no se duplica.
+- **Móvil sin sobrecargar el sticky:** la captura principal sigue fija bajo la cabecera en 16/9 y el texto pasa por debajo. Una imagen contextual por caso se intercala en el relato, no en el sticky. Con movimiento reducido, texto e imagen vuelven a intercalarse sin capas apiladas.
+- **Enrolla2, evidencia de producto:** el caso muestra capturas de la propia web —galería, carta y opiniones— en vez de fotografías aisladas. Si hay tres detalles, el último completa una fila de ancho total en móvil; las capturas verticales se contienen sin recorte.
 
 ### Route & Process Markers
 

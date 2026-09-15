@@ -199,7 +199,7 @@ function JourneyScene({
         <div className={`${styles.stage} ${compact ? styles.stageCompact : ""}`.trim()}>
           <motion.div
             className={styles.stageImage}
-            animate={{ scale: activeStep === 0 ? 1.035 : 1 }}
+            animate={{ scale: !compact && activeStep === 0 ? 1.035 : 1 }}
             transition={{ duration: 0.38, ease: SCENE_EASE }}
           >
             <Image
@@ -233,12 +233,14 @@ function JourneyScene({
 
           <motion.div
             className={styles.phone}
-            animate={{
-              x: activeStep === 0 ? 38 : activeStep === 1 ? 8 : -10,
-              y: activeStep === 0 ? 54 : activeStep === 1 ? 22 : 4,
-              rotate: activeStep === 0 ? 10 : activeStep === 1 ? 4 : 0,
-              scale: activeStep < 2 ? 0.82 : 1,
-            }}
+            animate={compact
+              ? { x: 0, y: 0, rotate: 0, scale: 1 }
+              : {
+                x: activeStep === 0 ? 38 : activeStep === 1 ? 8 : -10,
+                y: activeStep === 0 ? 54 : activeStep === 1 ? 22 : 4,
+                rotate: activeStep === 0 ? 10 : activeStep === 1 ? 4 : 0,
+                scale: activeStep < 2 ? 0.82 : 1,
+              }}
             transition={{ duration: 0.38, ease: SCENE_EASE }}
           >
             <span aria-hidden="true" />
