@@ -6,6 +6,7 @@ import {
   suspendCurtainTakeover,
 } from "@/lib/curtain-nav"
 import { jumpToScrollTop } from "@/lib/lenis"
+import { SPATIAL_ACTIVE_EVENT } from "@/lib/spatial-nav"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ArrowUpRight, Menu, X } from "lucide-react"
 import Link from "next/link"
@@ -267,6 +268,13 @@ export function SiteHeader() {
     event: MouseEvent<HTMLAnchorElement>,
     href: string,
   ) {
+    // La mesa del home atiende los enlaces en captura: si ya ha mandado la
+    // cámara a la sección, aquí sólo queda cerrar el menú.
+    if (event.defaultPrevented) {
+      setOpen(false)
+      return
+    }
+
     const sectionId = getSectionId(href)
     if (!sectionId || pathname !== "/" || !canHandleSectionLink(event)) return
 
@@ -291,6 +299,17 @@ export function SiteHeader() {
     jumpToScrollTop(getSectionScrollTop(visible))
   }, [pathname])
 
+  // En la mesa las secciones no pasan por el viewport al hacer scroll: la
+  // cámara avisa de dónde se ha posado.
+  useEffect(() => {
+    const onStation = (event: Event) => {
+      setActiveSection((event as CustomEvent<string>).detail)
+    }
+
+    window.addEventListener(SPATIAL_ACTIVE_EVENT, onStation)
+    return () => window.removeEventListener(SPATIAL_ACTIVE_EVENT, onStation)
+  }, [])
+
   useEffect(() => {
     const sections = links
       .map((link) => getSectionId(link.href))
@@ -301,6 +320,9 @@ export function SiteHeader() {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        // En la mesa quien sabe la sección activa es la cámara.
+        if (document.documentElement.dataset.spatial === "on") return
+
         const visibleSection = entries
           .filter((entry) => entry.isIntersecting)
           .sort(
