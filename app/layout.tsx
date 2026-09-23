@@ -85,7 +85,10 @@ export default function RootLayout({
           {`var root = document.documentElement;
           if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
             delete root.dataset.heroMotion;
-          } else if (window.location.pathname === "/") {
+          } else if (
+            window.location.pathname === "/" &&
+            window.matchMedia("(min-width: 901px)").matches
+          ) {
             root.dataset.spatial = "on";
             if (!window.location.hash) root.dataset.spatialIntro = "on";
           }`}
