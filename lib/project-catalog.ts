@@ -24,7 +24,9 @@ export type ProjectCatalogItem = {
   imageAlt: string;
   imageFit?: "contain";
   details: ProjectVisualDetail[];
-  accent: "blue" | "orange" | "lime" | "cyan" | "rose";
+  accent: "blue" | "orange" | "lime" | "cyan" | "rose" | "green";
+  /** Módulos que se enseñan como chips bajo el relato: marcan un proyecto destacado. */
+  highlights?: string[];
   /** La captura es vertical (móvil): se muestra entera sobre su color, sin recortar. */
   portrait?: boolean;
   /** Rótulo de la barra de navegador con la que se enseñan las webs. */
@@ -32,6 +34,28 @@ export type ProjectCatalogItem = {
 };
 
 export const appProjects: ProjectCatalogItem[] = [
+  {
+    slug: "goblintrader",
+    kind: "app",
+    name: "GoblinTrader",
+    eyebrow: "Desarrollo a medida · Comercio",
+    status: "Proyecto destacado",
+    summary:
+      "La aplicación con la que una tienda lleva su día a día entero: caja y tickets con Verifactu, compras, stock, empleados, fichaje y accesos en un mismo sistema.",
+    challenge: "Unir caja, compras, almacén y equipo en una sola herramienta hecha para su forma de trabajar.",
+    improvement: "Cada venta, pedido y fichaje queda registrado en el mismo sitio, y los tickets salen listos para Verifactu.",
+    reason: "Un desarrollo a medida evita encajar el negocio en cinco programas distintos que no se hablan entre sí.",
+    href: "/proyectos/goblintrader",
+    image: "/projects/goblintrader/overview-desktop.webp",
+    mobileImage: "/projects/goblintrader/overview-mobile.webp",
+    imageAlt: "Panel de GoblinTrader con la caja del día, un móvil con el control horario y un ticket con código Verifactu",
+    details: [
+      { image: "/projects/goblintrader/historico-material.webp", alt: "Histórico de material de GoblinTrader con los datos ocultos por ser información reservada", label: "Histórico de material · datos reservados" },
+      { image: "/projects/goblintrader/panel-inicio.webp", alt: "Panel de inicio de GoblinTrader con los avisos internos ocultos por ser información reservada", label: "Panel del empleado · datos reservados" },
+    ],
+    accent: "green",
+    highlights: ["Caja y tickets", "Verifactu", "Compras", "Stock y almacén", "Empleados", "Fichaje", "Control de accesos"],
+  },
   {
     slug: "pidoteca",
     kind: "app",

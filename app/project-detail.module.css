@@ -3,6 +3,7 @@
 .orange { --case-accent:var(--action-orange); }
 .cyan { --case-accent:#00a7d7; }
 .rose { --case-accent:#ff6688; }
+.green { --case-accent:#2fb34d; }
 .backRow { padding:1.15rem var(--page-pad); border-bottom:1px solid var(--line); }
 .backRow a { display:inline-flex; align-items:center; gap:.5rem; color:inherit; font-weight:720; text-decoration:none; }
 .hero { min-height:calc(100svh - var(--header-height) - 3.6rem); padding:clamp(4rem,8vw,8rem) var(--page-pad); display:grid; grid-template-columns:minmax(18rem,.9fr) minmax(25rem,1.1fr); gap:clamp(2rem,5vw,6rem); align-items:center; }
