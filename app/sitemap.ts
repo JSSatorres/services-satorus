@@ -7,6 +7,7 @@ const publicRoutes = [
   "/productos/pidoteca",
   "/productos/sportapp",
   "/lector-bilingue",
+  "/proyectos/goblintrader",
   "/proyectos/angel-mendoza",
   "/proyectos/enrolla2",
   "/aviso-legal",

@@ -40,6 +40,11 @@
   --accent-ink: #171b18;
   --stage-bg: #e6f4fa;
 }
+.section [data-accent="green"] {
+  --accent: #2fb34d;
+  --accent-ink: #0f2016;
+  --stage-bg: #e4f3e6;
+}
 .section [data-accent="rose"] {
   --accent: #e0466b;
   --accent-ink: #101411;
@@ -614,3 +619,7 @@
     transition: none;
   }
 }
+
+/* Proyecto destacado: los módulos que abarca, a la vista antes del enlace. */
+.highlights { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
+.highlights li { padding: .38rem .7rem; border: 1px solid var(--accent); border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, #fffefa); color: var(--bench-graphite); font-size: .8rem; font-weight: 720; }
