@@ -1,0 +1,820 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Mesa espacial del home (v3)
+
+   Sin `html[data-spatial="on"]` todo esto es un documento vertical normal:
+   es lo que ven el movimiento reducido y quien no tiene JavaScript. Con el
+   atributo —lo pone `layout.tsx` antes de pintar— las secciones pasan a ser
+   estaciones sobre una mesa azul y la pantalla, una cámara que vuela entre
+   ellas (`components/spatial/spatial-home.tsx`).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.spatial-mat,
+.spatial-decor,
+.spatial-vignette {
+  display: none;
+}
+
+/* ── Estación "Cómo trabajamos" ─────────────────────────────────────── */
+.sp-process {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-areas:
+    "head steps"
+    "prints steps";
+  align-content: center;
+  gap: clamp(1.5rem, 4vh, 3rem) clamp(2.5rem, 6vw, 6.5rem);
+  padding: calc(var(--header-height) + clamp(1.5rem, 5vh, 4rem)) var(--page-pad)
+    clamp(3rem, 7vh, 5rem);
+  background: var(--cool-paper);
+}
+
+.sp-kicker {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  background: var(--label-lime);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.sp-process-head {
+  grid-area: head;
+  align-self: end;
+}
+
+.sp-process-head h2 {
+  max-width: 12ch;
+  margin: 1rem 0 0.9rem;
+  font-family: var(--font-display-family);
+  font-size: clamp(2.6rem, 4.4vw, 5.2rem);
+  font-variation-settings: "wdth" 78, "wght" 790;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.sp-process-head p {
+  max-width: 42ch;
+  margin: 0;
+  font-size: clamp(1rem, 1.2vw, 1.15rem);
+}
+
+.sp-process-prints {
+  grid-area: prints;
+  position: relative;
+  width: min(100%, 34rem);
+  aspect-ratio: 4 / 3;
+  margin-top: 0.5rem;
+}
+
+.sp-print {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  background: #fbfaf5;
+  border: 10px solid #fbfaf5;
+  border-bottom-width: 44px;
+  box-shadow: 0 26px 50px -22px rgba(10, 20, 50, 0.55);
+  transform: translate(calc(var(--offset) * 4.5%), calc(var(--offset) * -3.5%))
+    rotate(calc(var(--offset) * 2.6deg)) scale(calc(1 - var(--offset) * 0.045));
+  transition:
+    transform 850ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 500ms ease;
+}
+
+.sp-print[data-state="past"] {
+  opacity: 0;
+  transform: translate(-62%, 10%) rotate(-15deg) scale(0.9);
+}
+
+.sp-print img {
+  object-fit: cover;
+}
+
+.sp-print figcaption {
+  position: absolute;
+  right: 0;
+  bottom: -36px;
+  left: 0;
+  overflow: hidden;
+  font-family: var(--font-display-family);
+  font-size: 0.95rem;
+  font-variation-settings: "wdth" 84, "wght" 720;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sp-process-steps {
+  --pin: 2.8rem;
+  --step-gap: clamp(1rem, 2.6vh, 1.9rem);
+
+  grid-area: steps;
+  align-self: center;
+  display: grid;
+  gap: var(--step-gap);
+  margin: 0;
+  padding: 0 0 0 calc(var(--pin) + 1.1rem);
+  list-style: none;
+}
+
+.sp-process-steps > li {
+  position: relative;
+}
+
+/* Tramo de cable hasta el pin siguiente: gris por debajo y naranja por encima,
+   que se estira cuando el recorrido llega a ese tramo. */
+.sp-process-steps > li:not(:last-child)::before,
+.sp-process-steps > li:not(:last-child)::after {
+  position: absolute;
+  top: calc(var(--pin) / 2);
+  left: calc(-1.1rem - var(--pin) / 2 - 3px);
+  width: 6px;
+  height: calc(100% + var(--step-gap));
+  content: "";
+  border-radius: 6px;
+}
+
+.sp-process-steps > li:not(:last-child)::before {
+  background: var(--paper-muted);
+}
+
+.sp-process-steps > li:not(:last-child)::after {
+  background: var(--action-orange);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.sp-process-steps > li[data-filled]::after {
+  transform: scaleY(1);
+}
+
+.sp-step-pin {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: calc(-1.1rem - var(--pin));
+  display: grid;
+  width: var(--pin);
+  height: var(--pin);
+  padding: 0;
+  place-items: center;
+  color: var(--bench-graphite);
+  background: var(--cool-paper);
+  border: 3px solid var(--bench-graphite);
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: var(--font-display-family);
+  font-size: 1.15rem;
+  font-variation-settings: "wdth" 84, "wght" 780;
+  transition:
+    background 400ms ease,
+    border-color 400ms ease,
+    color 400ms ease,
+    box-shadow 400ms ease;
+}
+
+.sp-process-steps > li[data-reached] .sp-step-pin {
+  color: white;
+  background: var(--action-orange);
+  border-color: var(--action-orange);
+}
+
+.sp-process-steps > li[data-current] .sp-step-pin {
+  color: white;
+  background: var(--tool-blue);
+  border-color: var(--tool-blue);
+  box-shadow: 0 0 0 6px rgba(41, 72, 199, 0.2);
+}
+
+.sp-step-pin:focus-visible {
+  outline: 3px solid var(--tool-blue);
+  outline-offset: 4px;
+}
+
+.sp-process-steps > li > div {
+  transition: opacity 500ms ease;
+}
+
+.sp-process-steps > li:not([data-reached]) > div {
+  opacity: 0.45;
+}
+
+.sp-step-answer {
+  display: inline-block;
+  margin: 0 0 0.4rem;
+  padding: 0.2rem 0.55rem;
+  background: var(--label-lime);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.sp-process-steps h3 {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-display-family);
+  font-size: clamp(1.3rem, 1.8vw, 1.95rem);
+  font-variation-settings: "wdth" 83, "wght" 720;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.sp-process-steps li[data-current] h3 {
+  color: var(--tool-blue);
+}
+
+.sp-process-steps p:last-child {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--graphite-soft);
+  font-size: 0.98rem;
+}
+
+@media (max-width: 900px) {
+  .sp-process {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "prints"
+      "steps";
+    align-content: start;
+    gap: 2rem;
+  }
+
+  .sp-process-prints {
+    width: min(100% - 1rem, 30rem);
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ── Estación "Tu competencia tampoco" ─────────────────────────────── */
+/* La versión de scroll vive en una pista de 235svh con la escena en sticky;
+   como estación, la escena mide lo que la pantalla. */
+.sp-plain .plain-talk-stage {
+  position: relative;
+  height: var(--sh, 100svh);
+}
+
+/* ═══ Modo mesa ═════════════════════════════════════════════════════════ */
+html[data-spatial="on"] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html[data-spatial="on"] .scroll-rail {
+  display: none;
+}
+
+html[data-spatial="on"] .spatial-viewport {
+  --sw: 100vw;
+  --sh: 100svh;
+  --gap-x: 1.36;
+  --gap-y: 1.34;
+  --decor-scale: 1;
+
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  background: var(--tool-blue);
+  perspective: 1500px;
+  perspective-origin: 50% 42%;
+}
+
+html[data-spatial="on"] .spatial-camera {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+/* Estado previo a la intro: se pinta así desde el primer fotograma para que
+   la bajada de la cámara no empiece con un salto. */
+html[data-spatial-intro="on"] .spatial-camera {
+  transform: scale(0.4) rotateX(26deg);
+}
+
+/* Alfombrilla de corte: rejilla fina cada 48px y gruesa cada 240px. Mide cuatro
+   pantallas y se desplaza sólo el resto de una baldosa gruesa (ver `syncMat`). */
+html[data-spatial="on"] .spatial-mat {
+  position: absolute;
+  display: block;
+  inset: -150%;
+  background-color: var(--tool-blue);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.17) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.17) 2px, transparent 2px),
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size:
+    240px 240px,
+    240px 240px,
+    48px 48px,
+    48px 48px;
+  transform: translateZ(-2px);
+}
+
+html[data-spatial="on"] .spatial-world {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+html[data-spatial="on"] .spatial-station {
+  position: absolute;
+  /* Redondeado igual que el desplazamiento de la cámara (`offsetOf`): si no,
+     la estación queda a medio píxel y asoma una línea de mesa. */
+  top: calc(round(var(--row) * var(--gap-y) * var(--sh), 1px) - var(--sh) / 2);
+  left: calc(round(var(--col) * var(--gap-x) * var(--sw), 1px) - var(--sw) / 2);
+  width: var(--sw);
+  height: var(--sh);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--cool-paper);
+  outline: none;
+  scrollbar-color: var(--tool-blue) transparent;
+  scrollbar-width: thin;
+  transition:
+    border-radius 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 450ms ease;
+}
+
+html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-station {
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 60px 90px -30px rgba(4, 10, 40, 0.6);
+}
+
+html[data-spatial="on"] .spatial-station > :first-child {
+  min-height: 100%;
+}
+
+html[data-spatial="on"] .spatial-station .hero {
+  min-height: max(100%, clamp(640px, 88svh, 900px));
+}
+
+/* Secciones pensadas para el flujo del documento: en una estación de una
+   pantalla su contenido quedaba arriba y todo el aire, debajo. */
+html[data-spatial="on"] .spatial-station > :is(.projects-section, .business-bottleneck) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: calc(var(--header-height) + clamp(1.5rem, 4vh, 3.5rem));
+}
+
+html[data-spatial="on"] .spatial-station > .contact-section {
+  min-height: calc(100% - 8rem);
+}
+
+/* ── Paralaje con el puntero ─────────────────────────────────────────
+   `translate` y no `transform`: así se suma a los transform propios de cada
+   pieza (animaciones, giros de las ventanas) en vez de pisarlos. */
+html[data-spatial="on"] .spatial-station [data-depth] {
+  translate: calc(var(--px, 0) * var(--depth, 10) * -1px)
+    calc(var(--py, 0) * var(--depth, 10) * -1px);
+}
+
+html[data-spatial="on"] .spatial-station .hero-media {
+  scale: 1.06;
+  translate: calc(var(--px, 0) * 16px) calc(var(--py, 0) * 12px);
+}
+
+/* ── Enfoque al posarse ──────────────────────────────────────────────
+   Mientras la cámara vuela, el contenido de las estaciones está un poco
+   hundido y desvaído; al posarse sube a su sitio, escalonado. */
+html[data-spatial="on"]
+  .spatial-station
+  :is(
+    .sp-rise,
+    .projects-heading,
+    .project-card,
+    .faq-heading,
+    .faq-list details,
+    .contact-copy,
+    .bottleneck-heading,
+    .bottleneck-panel,
+    .bottleneck-footer
+  ) {
+  transition:
+    opacity 600ms ease,
+    translate 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--rise-i, 0) * 60ms + 80ms);
+}
+
+html[data-spatial="on"]
+  .spatial-station:not([data-arrived])
+  :is(
+    .sp-rise,
+    .projects-heading,
+    .project-card,
+    .faq-heading,
+    .faq-list details,
+    .contact-copy,
+    .bottleneck-heading,
+    .bottleneck-panel,
+    .bottleneck-footer
+  ) {
+  opacity: 0.55;
+  translate: 0 32px;
+  transition-duration: 250ms;
+  transition-delay: 0s;
+}
+
+/* ── Objetos sobre la mesa ─────────────────────────────────────────── */
+html[data-spatial="on"] .spatial-decor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+html[data-spatial="on"] .spatial-decor > * {
+  position: absolute;
+  top: calc(var(--y) * var(--sh));
+  left: calc(var(--x) * var(--sw));
+  margin: 0;
+  transform: translate(-50%, -50%) translateZ(var(--z, 0px)) rotate(var(--r, 0deg));
+}
+
+html[data-spatial="on"] .spatial-cable {
+  width: calc(var(--w) * var(--sw));
+  height: calc(var(--h) * var(--sh));
+  overflow: visible;
+  transform: none;
+}
+
+.spatial-cable path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.spatial-cable-line {
+  stroke: var(--action-orange);
+  stroke-width: 16px;
+}
+
+/* La sombra va desplazada en unidades del viewBox (1 = 1% de pantalla). */
+.spatial-cable-shadow {
+  stroke: rgba(4, 10, 40, 0.34);
+  stroke-width: 18px;
+  transform: translate(0.5px, 1.3px);
+}
+
+html[data-spatial="on"] .spatial-print {
+  width: calc(var(--w) * var(--sw) * var(--decor-scale));
+  aspect-ratio: 4 / 3;
+  background: #fbfaf5;
+  border: 8px solid #fbfaf5;
+  border-bottom-width: 30px;
+  box-shadow: 0 34px 50px -20px rgba(4, 10, 40, 0.6);
+}
+
+.spatial-print img {
+  object-fit: cover;
+}
+
+.spatial-print > span {
+  position: absolute;
+  z-index: 1;
+  top: -22px;
+  left: 50%;
+  padding: 0.3rem 0.7rem;
+  background: var(--label-lime);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+.spatial-tag,
+.spatial-exit,
+.spatial-station-tag {
+  padding: 0.5em 0.9em;
+  color: var(--bench-graphite);
+  background: var(--cool-paper);
+  border: 2px solid var(--bench-graphite);
+  box-shadow: 0 18px 30px -14px rgba(4, 10, 40, 0.55);
+  font-family: var(--font-display-family);
+  font-size: clamp(0.85rem, 1.25vw, 1.35rem);
+  font-variation-settings: "wdth" 84, "wght" 740;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.spatial-tag[data-tone="lime"],
+.spatial-exit {
+  background: var(--label-lime);
+}
+
+html[data-spatial="on"] .spatial-decor > .spatial-station-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  border-color: var(--bench-graphite);
+  transform: translate(0, calc(-100% - 18px)) translateZ(var(--z)) rotate(var(--r));
+}
+
+.spatial-station-tag b {
+  color: var(--label-lime);
+  font-weight: inherit;
+}
+
+.spatial-sticker {
+  padding: 0.05em 0.3em 0.12em;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  border-radius: 0.18em;
+  box-shadow: 0 30px 40px -20px rgba(4, 10, 40, 0.6);
+  font-family: var(--font-display-family);
+  font-size: calc(var(--sw) * 0.085);
+  font-variation-settings: "wdth" 70, "wght" 820;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+html[data-spatial="on"] .spatial-vignette {
+  position: absolute;
+  display: block;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    transparent 52%,
+    rgba(4, 10, 40, 0.42) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-vignette {
+  opacity: 1;
+}
+
+/* ── Brújula ───────────────────────────────────────────────────────── */
+.spatial-compass {
+  position: fixed;
+  z-index: 90;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.55rem;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px -16px rgba(4, 10, 40, 0.7);
+}
+
+.spatial-compass-step {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  color: inherit;
+  background: transparent;
+  border: 1.5px solid rgba(242, 241, 234, 0.45);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.spatial-compass-step:hover:not(:disabled),
+.spatial-compass-step:focus-visible {
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border-color: var(--label-lime);
+}
+
+.spatial-compass-step:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.spatial-compass-map {
+  position: relative;
+  width: calc(var(--cols) * 26px);
+  height: calc(var(--rows) * 20px);
+}
+
+.spatial-compass-map svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.spatial-compass-map polyline {
+  fill: none;
+  stroke: var(--action-orange);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.spatial-compass-map ol {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spatial-compass-map li {
+  display: grid;
+}
+
+.spatial-compass-map button {
+  display: grid;
+  padding: 0;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.spatial-compass-map button span {
+  width: 13px;
+  height: 10px;
+  overflow: hidden;
+  background: var(--bench-graphite);
+  border: 1.5px solid rgba(242, 241, 234, 0.7);
+  border-radius: 3px;
+  color: transparent;
+  font-size: 0;
+  transition:
+    background 250ms ease,
+    transform 250ms ease;
+}
+
+.spatial-compass-map button[data-visited] span {
+  background: var(--action-orange);
+  border-color: var(--action-orange);
+}
+
+.spatial-compass-map button[aria-current] span {
+  background: var(--label-lime);
+  border-color: var(--label-lime);
+  transform: scale(1.35);
+}
+
+.spatial-compass-map button:hover span,
+.spatial-compass-map button:focus-visible span {
+  transform: scale(1.35);
+}
+
+.spatial-compass-map button:focus-visible {
+  outline: 2px solid var(--label-lime);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.spatial-compass-label {
+  min-width: 8.5rem;
+  margin: 0;
+  font-family: var(--font-display-family);
+  font-size: 1rem;
+  font-variation-settings: "wdth" 84, "wght" 720;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.spatial-compass-label span {
+  display: block;
+  color: var(--label-lime);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.spatial-hint {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  left: 0;
+  max-width: min(22rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border-radius: 8px;
+  box-shadow: 0 12px 26px -12px rgba(4, 10, 40, 0.6);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+  transition:
+    opacity 400ms ease,
+    translate 400ms ease;
+}
+
+.spatial-hint[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 8px;
+}
+
+/* ── Móvil ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html[data-spatial="on"] .spatial-viewport {
+    --decor-scale: 1.6;
+
+    perspective: 1100px;
+  }
+
+  html[data-spatial-intro="on"] .spatial-camera {
+    transform: scale(0.52) rotateX(16deg);
+  }
+
+  html[data-spatial="on"] .spatial-station {
+    scrollbar-width: none;
+  }
+
+  html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-station {
+    border-radius: 16px;
+  }
+
+  .spatial-tag,
+  .spatial-exit,
+  .spatial-station-tag {
+    font-size: 0.72rem;
+  }
+
+  .spatial-print > span {
+    font-size: 0.62rem;
+  }
+
+  /* En móvil abajo no cabe: el hero y el formulario tienen allí su botón
+     principal. Sube a la cabecera, al lado del menú, donde hay hueco. */
+  .spatial-compass {
+    z-index: 110;
+    top: calc((var(--header-height) - 44px) / 2);
+    right: calc(max(var(--page-pad), env(safe-area-inset-right)) + 3.4rem);
+    bottom: auto;
+    left: auto;
+    gap: 0.3rem;
+    padding: 0.2rem;
+    border-radius: 999px;
+    box-shadow: none;
+  }
+
+  .spatial-compass-map {
+    display: none;
+  }
+
+  .spatial-compass-label {
+    min-width: 0;
+    font-size: 0;
+  }
+
+  .spatial-compass-label span {
+    font-size: 0.72rem;
+  }
+
+  .spatial-compass-step {
+    width: 36px;
+    height: 36px;
+  }
+
+  body.menu-open .spatial-compass {
+    visibility: hidden;
+  }
+
+  .spatial-hint {
+    top: calc(100% + 0.6rem);
+    right: 0;
+    bottom: auto;
+    left: auto;
+    width: max-content;
+    max-width: min(16rem, calc(100vw - 2rem));
+  }
+
+  .spatial-hint[data-hidden] {
+    translate: 0 -8px;
+  }
+}

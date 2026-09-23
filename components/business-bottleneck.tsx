@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react"
 import { ArrowRight, Check, Clock3, FileText, MessageCircleMore } from "lucide-react"
 
 const inboxItems = [
@@ -27,7 +28,7 @@ function WindowBar({ title }: { title: string }) {
 function CurrentWorkScene() {
   return (
     <div className="bottleneck-chaos-scene" aria-hidden="true">
-      <div className="bottleneck-window bottleneck-inbox">
+      <div className="bottleneck-window bottleneck-inbox" data-depth="" style={{ "--depth": 18 } as CSSProperties}>
         <WindowBar title="Entrada (124)" />
         <div className="bottleneck-window-content">
           {inboxItems.map(([label, time]) => (
@@ -40,7 +41,7 @@ function CurrentWorkScene() {
         </div>
       </div>
 
-      <div className="bottleneck-window bottleneck-sheet">
+      <div className="bottleneck-window bottleneck-sheet" data-depth="" style={{ "--depth": -12 } as CSSProperties}>
         <WindowBar title="Clientes.xlsx" />
         <div className="bottleneck-sheet-grid" aria-hidden="true">
           <span>Acme</span><span>Propuesta</span><span>Duplicado</span>
@@ -49,7 +50,7 @@ function CurrentWorkScene() {
         </div>
       </div>
 
-      <div className="bottleneck-window bottleneck-messages">
+      <div className="bottleneck-window bottleneck-messages" data-depth="" style={{ "--depth": 26 } as CSSProperties}>
         <WindowBar title="Mensajes" />
         <div className="bottleneck-message-list">
           <span><b>Cliente</b> ¿Hay novedades?<i>3</i></span>
@@ -73,7 +74,7 @@ function CurrentWorkScene() {
 function OrganizedWorkScene() {
   return (
     <div className="bottleneck-order-scene" aria-hidden="true">
-      <div className="bottleneck-dashboard">
+      <div className="bottleneck-dashboard" data-depth="" style={{ "--depth": 10 } as CSSProperties}>
         <WindowBar title="Tu espacio de trabajo" />
         <div className="bottleneck-dashboard-body">
           <div className="bottleneck-dashboard-nav">
