@@ -307,6 +307,11 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                     <dd>{project.reason}</dd>
                   </div>
                 </dl>
+                {project.highlights && (
+                  <ul className={styles.highlights} aria-label={`Módulos de ${project.name}`}>
+                    {project.highlights.map((module) => <li key={module}>{module}</li>)}
+                  </ul>
+                )}
                 {project.details.length > 0 && (
                   <div
                     className={styles.mobileDetails}
