@@ -3,7 +3,9 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import {
+  Fragment,
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -28,6 +30,7 @@ import {
   type StationId,
 } from "@/components/spatial/table-layout"
 import { faqs, processSteps, projectDoors } from "@/lib/home-content"
+import { jumpToScrollTop } from "@/lib/lenis"
 import {
   SPATIAL_DIVE_KEY,
   SPATIAL_RETURN_KEY,
@@ -44,28 +47,22 @@ const GESTURE_GAP_MS = 90
 const MIN_WHEEL_DELTA = 4
 
 /**
- * Resistencia del borde. Llegar al final de una estación no la cambia: hay que
- * insistir. Cada evento de rueda suma como mucho `PULL_STEP_MAX` px, así que
- * una rueda de ratón necesita unas tres muescas seguidas; si pasa
- * `PULL_DECAY_MS` sin insistir, la cuenta vuelve a cero.
+ * Pausa tras aterrizar: la inercia del trackpad que queda del gesto que lanzó
+ * el vuelo no puede lanzar otro. El tiempo para ver que la sección se acaba lo
+ * dan los márgenes vacíos de cada hoja (`--sheet-rest` en `app/spatial.css`).
  */
-const PULL_THRESHOLD = 280
-const PULL_STEP_MAX = 110
-const PULL_DECAY_MS = 650
-/** Arrastre táctil, más allá del borde, que hace falta para cambiar. */
-const TOUCH_PULL = 150
-/** Cuánto cede la hoja al tirar de ella, en px. */
-const PULL_GIVE = 26
-/**
- * Pausas de lectura: tras tocar el final del texto y tras aterrizar, la mesa
- * no escucha el borde. Así la inercia del trackpad no encadena saltos y la
- * última línea se puede leer.
- */
-const EDGE_DWELL_MS = 500
 const ARRIVAL_COOLDOWN_MS = 700
+const SWIPE_THRESHOLD = 60
 /** Paso de la rejilla mayor de la alfombrilla de corte: ver `.spatial-mat`. */
 const MAT_TILE = 240
 const MOBILE_QUERY = "(max-width: 900px)"
+/**
+ * La mesa es sólo para escritorio. En móvil la cámara peleaba con el scroll
+ * nativo —inercia, barra de direcciones— y la capa 3D de siete pantallas no
+ * llegaba a pintarse a tiempo; allí el home es el documento vertical, con las
+ * secciones como hojas sobre la mesa (ver `app/spatial.css`).
+ */
+const DESKTOP_QUERY = "(min-width: 901px)"
 
 type Direction = 1 | -1
 
@@ -174,9 +171,6 @@ const stationContent: Record<StationId, ReactNode> = {
   ),
 }
 
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-}
 
 function isEditable(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false
@@ -218,6 +212,26 @@ function canScrollWithin(
 }
 
 /**
+ * Tramo de mesa entre dos hojas del documento plano (móvil y movimiento
+ * reducido): el cable baja hasta la hoja siguiente, que ya asoma con su
+ * etiqueta. Es el aire que avisa de que la sección se acaba antes de que se
+ * acabe. En la mesa de escritorio no se muestra.
+ */
+function SheetGap({ index, label }: { index: number; label: string }) {
+  return (
+    <div className="spatial-gap" aria-hidden="true">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M22 0 C22 30 44 34 40 52 S18 78 22 100" />
+      </svg>
+      <span className="spatial-gap-tag">
+        <b>{String(index + 1).padStart(2, "0")}</b>
+        {label}
+      </span>
+    </div>
+  )
+}
+
+/**
  * Home como mesa de trabajo.
  *
  * Las secciones son estaciones repartidas sobre una mesa azul y unidas por el
@@ -237,9 +251,6 @@ export function SpatialHome() {
   const cameraRef = useRef<HTMLDivElement>(null)
   const matRef = useRef<HTMLDivElement>(null)
   const worldRef = useRef<HTMLDivElement>(null)
-  const pullRef = useRef<HTMLDivElement>(null)
-  const pullLabelRef = useRef<HTMLSpanElement>(null)
-  const pullBarRef = useRef<HTMLSpanElement>(null)
   const stationRefs = useRef<Array<HTMLDivElement | null>>([])
 
   const activeRef = useRef(0)
@@ -276,22 +287,72 @@ export function SpatialHome() {
       window.sessionStorage.removeItem(SPATIAL_RETURN_KEY)
     }
 
-    if (prefersReducedMotion()) {
-      delete root.dataset.spatial
-      delete root.dataset.spatialIntro
-      return
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const desktop = window.matchMedia(DESKTOP_QUERY)
+
+    // El modo depende del navegador y tiene que fijarse antes de pintar. Se
+    // vuelve a decidir si la ventana cruza el corte o cambia la preferencia.
+    const sync = () => {
+      const on = !reduced.matches && desktop.matches
+      if (on) {
+        root.dataset.spatial = "on"
+      } else {
+        delete root.dataset.spatial
+        delete root.dataset.spatialIntro
+      }
+      setSpatial(on)
     }
 
-    root.dataset.spatial = "on"
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- el modo depende del navegador y tiene que fijarse antes de pintar
-    setSpatial(true)
+    sync()
+    reduced.addEventListener("change", sync)
+    desktop.addEventListener("change", sync)
 
     // `data-spatial-intro` no se toca aquí: lo retira la propia intro al
     // acabar, y borrarlo en el doble montaje de desarrollo la cortaría.
     return () => {
+      reduced.removeEventListener("change", sync)
+      desktop.removeEventListener("change", sync)
       delete document.documentElement.dataset.spatial
     }
   }, [])
+
+  // Documento plano (móvil): los enlaces a secciones —menú, CTAs `#contacto`—
+  // dejan la sección arriba del todo, justo donde empieza su contenido y sin
+  // enseñar el margen vacío de encima. La posición sale de `offsetTop`, que no
+  // cuenta los transform: las hojas que aún no han entrado están encogidas
+  // por su animación de scroll y `getBoundingClientRect` daría una posición
+  // falsa. En captura, para adelantarse a la navegación propia del header.
+  useEffect(() => {
+    if (spatial) return
+
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+      const anchor = (event.target as Element | null)?.closest?.("a[href]")
+      const href = anchor?.getAttribute("href") ?? ""
+      if (!href.startsWith("#") && !href.startsWith("/#")) return
+
+      const id = decodeURIComponent(href.slice(href.indexOf("#") + 1))
+      const target = document.getElementById(id)
+      if (!target?.closest(".spatial-station")) return
+
+      event.preventDefault()
+      let top = 0
+      for (
+        let node: HTMLElement | null = target;
+        node;
+        node = node.offsetParent as HTMLElement | null
+      ) {
+        top += node.offsetTop
+      }
+      jumpToScrollTop(top)
+      window.history.pushState(null, "", `/#${id}`)
+    }
+
+    document.addEventListener("click", onClick, true)
+    return () => document.removeEventListener("click", onClick, true)
+  }, [spatial])
 
   useLayoutEffect(() => {
     if (!spatial) return
@@ -309,7 +370,6 @@ export function SpatialHome() {
     let lastWheelAt = 0
     let scrollGesture = false
     let arrivedAt = 0
-    let lastContentScrollAt = 0
     let cancelled = false
 
     const size = () => ({
@@ -377,6 +437,21 @@ export function SpatialHome() {
       }
     }
 
+    // Límites del contenido de una estación, sin sus márgenes vacíos
+    // (`::before` y `::after`). La estación es `position: absolute`, así que es
+    // el `offsetParent` de sus hijos y `offsetTop` ya se mide desde ella.
+    function contentStartTop(station: HTMLElement) {
+      const first = station.firstElementChild as HTMLElement | null
+      return first ? first.offsetTop : 0
+    }
+
+    function contentEndTop(station: HTMLElement) {
+      const last = station.lastElementChild as HTMLElement | null
+      if (!last) return station.scrollHeight
+      const end = last.offsetTop + last.offsetHeight
+      return Math.max(contentStartTop(station), end - station.clientHeight)
+    }
+
     flyRef.current = (index, direction) => {
       if (index < 0 || index >= STATION_SPOTS.length) return
       if (index === activeRef.current && !flyingRef.current) return
@@ -386,13 +461,14 @@ export function SpatialHome() {
       const target = offsetOf(index)
       const station = stations[index]
 
-      // Volver atrás es volver a donde se dejó de leer: al final de la
-      // estación anterior, como en un documento continuo.
+      // Se llega al contenido, nunca al margen vacío: bajando o por
+      // navegación, a donde empieza; subiendo, a donde acaba, como en un
+      // documento continuo. El margen sólo se ve al seguir hacia la vecina.
       if (station) {
-        station.scrollTop = direction === -1 ? station.scrollHeight : 0
+        station.scrollTop =
+          direction === -1 ? contentEndTop(station) : contentStartTop(station)
       }
 
-      resetPull()
       activeRef.current = index
       flyingRef.current = true
       setActive(index)
@@ -449,90 +525,6 @@ export function SpatialHome() {
       flyRef.current(activeRef.current + direction, direction)
     }
 
-    const hasNeighbour = (direction: Direction) => {
-      const next = activeRef.current + direction
-      return next >= 0 && next < STATION_SPOTS.length
-    }
-
-    // ── Resistencia del borde ───────────────────────────────────────────
-    const pull: { direction: 0 | Direction; amount: number; lastAt: number } = {
-      direction: 0,
-      amount: 0,
-      lastAt: 0,
-    }
-    let pullTimer = 0
-
-    const renderPull = (direction: Direction, progress: number) => {
-      const indicator = pullRef.current
-      const station = stations[activeRef.current]
-      if (!indicator || !station) return
-
-      if (progress <= 0) {
-        delete indicator.dataset.visible
-        gsap.to(station, { y: 0, duration: 0.45, ease: "power3.out", overwrite: true })
-        return
-      }
-
-      const next = STATION_SPOTS[activeRef.current + direction]
-      indicator.dataset.visible = "true"
-      indicator.dataset.direction = direction > 0 ? "down" : "up"
-      if (pullLabelRef.current && next) {
-        pullLabelRef.current.textContent = `${direction > 0 ? "Sigue bajando" : "Sigue subiendo"} · ${next.label}`
-      }
-      pullBarRef.current?.style.setProperty("transform", `scaleX(${progress.toFixed(3)})`)
-      gsap.to(station, {
-        y: -direction * progress * PULL_GIVE,
-        duration: 0.3,
-        ease: "power2.out",
-        overwrite: true,
-      })
-    }
-
-    function resetPull() {
-      window.clearTimeout(pullTimer)
-      const direction = pull.direction
-      pull.amount = 0
-      pull.direction = 0
-      if (direction !== 0) renderPull(direction, 0)
-    }
-
-    /** Suma insistencia hacia `direction`; cambia de estación al completarla. */
-    const addPull = (direction: Direction, amount: number) => {
-      if (!hasNeighbour(direction)) return
-
-      const now = performance.now()
-      if (pull.direction !== direction || now - pull.lastAt > PULL_DECAY_MS) {
-        pull.amount = 0
-      }
-      pull.direction = direction
-      pull.lastAt = now
-      pull.amount += amount
-
-      window.clearTimeout(pullTimer)
-      const progress = Math.min(1, pull.amount / PULL_THRESHOLD)
-      if (progress >= 1) {
-        step(direction)
-        return
-      }
-
-      renderPull(direction, progress)
-      pullTimer = window.setTimeout(resetPull, PULL_DECAY_MS)
-    }
-
-    /** ¿Escucha la mesa el borde ahora mismo, o es tiempo de lectura? */
-    const edgeListening = () => {
-      const now = performance.now()
-      return (
-        now - arrivedAt > ARRIVAL_COOLDOWN_MS &&
-        now - lastContentScrollAt > EDGE_DWELL_MS
-      )
-    }
-
-    const onStationScroll = () => {
-      lastContentScrollAt = performance.now()
-      if (pull.direction !== 0) resetPull()
-    }
-
     // ── Punto de partida ────────────────────────────────────────────────
     // Ni un `gsap.set` sobre la cámara aquí: GSAP leería su transform a mitad
     // de la intro CSS y lo dejaría fijado en línea al acabar.
@@ -549,6 +541,8 @@ export function SpatialHome() {
     setActive(startIndex)
     gsap.set(world, offsetOf(startIndex))
     syncMat()
+    const startStation = stations[startIndex]
+    if (startStation) startStation.scrollTop = contentStartTop(startStation)
 
     flyingRef.current = true
     setArrived(false)
@@ -636,77 +630,55 @@ export function SpatialHome() {
       // El gesto que ha llevado el texto hasta el borde no cuenta: hace falta
       // soltar y volver a empezar.
       if (continues && scrollGesture) return
-      if (!edgeListening()) return
-      addPull(direction, Math.min(PULL_STEP_MAX, Math.abs(pixels)))
+      if (performance.now() - arrivedAt < ARRIVAL_COOLDOWN_MS) return
+      step(direction)
     }
 
     // ── Táctil ──────────────────────────────────────────────────────────
-    // Tirar de la hoja: en el borde, arrastrar más allá llena el indicador y
-    // al soltar con él lleno se cambia de estación. Soltar antes devuelve la
-    // hoja a su sitio.
-    let touch: {
+    // Sólo cuenta si la estación ya estaba en el borde al empezar a deslizar:
+    // el deslizamiento que lleva el texto hasta el final no cambia de estación.
+    let touchStart: {
       x: number
       y: number
       target: EventTarget | null
       canDown: boolean
       canUp: boolean
-      listening: boolean
-      progress: number
-      direction: Direction
     } | null = null
 
     const onTouchStart = (event: TouchEvent) => {
       if (skipIntro()) return
       if (event.touches.length !== 1) {
-        touch = null
+        touchStart = null
         return
       }
       const point = event.touches[0]
       const station = stations[activeRef.current]
-      touch = {
+      touchStart = {
         x: point.clientX,
         y: point.clientY,
         target: event.target,
         canDown: station ? canScrollWithin(event.target, station, 1) : true,
         canUp: station ? canScrollWithin(event.target, station, -1) : true,
-        listening: edgeListening(),
-        progress: 0,
-        direction: 1,
       }
     }
 
-    const onTouchMove = (event: TouchEvent) => {
-      const current = touch
-      if (!current || !current.listening || flyingRef.current) return
+    const onTouchEnd = (event: TouchEvent) => {
+      const start = touchStart
+      touchStart = null
+      if (!start || flyingRef.current) return
       if (document.body.classList.contains("menu-open")) return
-      if (isEditable(current.target)) return
+      if (isEditable(start.target)) return
+      if (performance.now() - arrivedAt < ARRIVAL_COOLDOWN_MS) return
 
-      const point = event.touches[0]
-      const dx = current.x - point.clientX
-      const dy = current.y - point.clientY
-      if (Math.abs(dx) > Math.abs(dy)) return
+      const point = event.changedTouches[0]
+      const dx = start.x - point.clientX
+      const dy = start.y - point.clientY
+      if (Math.abs(dy) < Math.abs(dx) || Math.abs(dy) < SWIPE_THRESHOLD) return
 
       const direction: Direction = dy > 0 ? 1 : -1
-      const blocked =
-        (direction === 1 && current.canDown) || (direction === -1 && current.canUp)
-      if (blocked || !hasNeighbour(direction)) return
-
-      current.direction = direction
-      current.progress = Math.min(1, Math.max(0, (Math.abs(dy) - 12) / TOUCH_PULL))
-      pull.direction = direction
-      renderPull(direction, current.progress)
-    }
-
-    const onTouchEnd = () => {
-      const current = touch
-      touch = null
-      if (!current || current.progress <= 0) return
-
-      if (current.progress >= 1 && !flyingRef.current) {
-        step(current.direction)
-        return
-      }
-      resetPull()
+      if (direction === 1 && start.canDown) return
+      if (direction === -1 && start.canUp) return
+      step(direction)
     }
 
     // ── Teclado ─────────────────────────────────────────────────────────
@@ -874,12 +846,7 @@ export function SpatialHome() {
 
     window.addEventListener("wheel", onWheel, { passive: false })
     window.addEventListener("touchstart", onTouchStart, { passive: true })
-    window.addEventListener("touchmove", onTouchMove, { passive: true })
     window.addEventListener("touchend", onTouchEnd, { passive: true })
-    window.addEventListener("touchcancel", onTouchEnd, { passive: true })
-    stations.forEach((station) =>
-      station?.addEventListener("scroll", onStationScroll, { passive: true }),
-    )
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("resize", onResize)
     window.addEventListener("pointermove", onPointerMove, { passive: true })
@@ -890,13 +857,7 @@ export function SpatialHome() {
       window.removeEventListener("wheel", onWheel)
       window.removeEventListener("touchstart", onTouchStart)
       cancelled = true
-      window.clearTimeout(pullTimer)
-      window.removeEventListener("touchmove", onTouchMove)
       window.removeEventListener("touchend", onTouchEnd)
-      window.removeEventListener("touchcancel", onTouchEnd)
-      stations.forEach((station) =>
-        station?.removeEventListener("scroll", onStationScroll),
-      )
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("pointermove", onPointerMove)
@@ -904,6 +865,11 @@ export function SpatialHome() {
       entrance?.kill()
       flightRef.current?.kill()
       gsap.killTweensOf(pointer)
+      // Si se sale de la mesa (la ventana cruza a móvil), el documento plano
+      // no puede heredar la cámara ni los desplazamientos del vuelo.
+      gsap.set([world, mat, ...stations.filter(Boolean)], { clearProps: "transform" })
+      gsap.set(camera, { clearProps: "transform,transformOrigin,opacity,visibility" })
+      gsap.set(viewport, { clearProps: "opacity,visibility" })
     }
   }, [spatial, router])
 
@@ -919,14 +885,19 @@ export function SpatialHome() {
 
             {STATION_SPOTS.map((spot, index) => {
               const isActive = index === active
+              const next = STATION_SPOTS[index + 1]
               return (
+                <Fragment key={spot.id}>
                 <div
                   className="spatial-station"
-                  key={spot.id}
                   ref={(element) => {
                     stationRefs.current[index] = element
                   }}
                   data-station={spot.id}
+                  // Qué márgenes vacíos lleva la hoja: arriba si hay una
+                  // anterior, abajo si hay una siguiente.
+                  data-prev={index > 0 || undefined}
+                  data-next={Boolean(next) || undefined}
                   data-active={(spatial && isActive) || undefined}
                   data-arrived={(spatial && isActive && arrived) || undefined}
                   inert={spatial && !isActive ? true : undefined}
@@ -939,18 +910,13 @@ export function SpatialHome() {
                     {stationContent[spot.id]}
                   </StationContext.Provider>
                 </div>
+                {next ? <SheetGap index={index + 1} label={next.label} /> : null}
+                </Fragment>
               )
             })}
           </div>
         </div>
         <div className="spatial-vignette" aria-hidden="true" />
-      </div>
-
-      <div className="spatial-pull" ref={pullRef} aria-hidden="true">
-        <span className="spatial-pull-label" ref={pullLabelRef} />
-        <span className="spatial-pull-bar">
-          <span ref={pullBarRef} />
-        </span>
       </div>
 
       {spatial ? (
