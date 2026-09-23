@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import {
+  Fragment,
   useCallback,
   useLayoutEffect,
   useRef,
@@ -66,6 +67,13 @@ const ARRIVAL_COOLDOWN_MS = 700
 /** Paso de la rejilla mayor de la alfombrilla de corte: ver `.spatial-mat`. */
 const MAT_TILE = 240
 const MOBILE_QUERY = "(max-width: 900px)"
+/**
+ * La mesa es sólo para escritorio. En móvil la cámara peleaba con el scroll
+ * nativo —inercia, barra de direcciones— y la capa 3D de siete pantallas no
+ * llegaba a pintarse a tiempo; allí el home es el documento vertical, con las
+ * secciones como hojas sobre la mesa (ver `app/spatial.css`).
+ */
+const DESKTOP_QUERY = "(min-width: 901px)"
 
 type Direction = 1 | -1
 
@@ -174,9 +182,6 @@ const stationContent: Record<StationId, ReactNode> = {
   ),
 }
 
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-}
 
 function isEditable(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false
@@ -215,6 +220,26 @@ function canScrollWithin(
   }
 
   return false
+}
+
+/**
+ * Tramo de mesa entre dos hojas del documento plano (móvil y movimiento
+ * reducido): el cable baja hasta la hoja siguiente, que ya asoma con su
+ * etiqueta. Es el aire que avisa de que la sección se acaba antes de que se
+ * acabe. En la mesa de escritorio no se muestra.
+ */
+function SheetGap({ index, label }: { index: number; label: string }) {
+  return (
+    <div className="spatial-gap" aria-hidden="true">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M22 0 C22 30 44 34 40 52 S18 78 22 100" />
+      </svg>
+      <span className="spatial-gap-tag">
+        <b>{String(index + 1).padStart(2, "0")}</b>
+        {label}
+      </span>
+    </div>
+  )
 }
 
 /**
@@ -276,19 +301,31 @@ export function SpatialHome() {
       window.sessionStorage.removeItem(SPATIAL_RETURN_KEY)
     }
 
-    if (prefersReducedMotion()) {
-      delete root.dataset.spatial
-      delete root.dataset.spatialIntro
-      return
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const desktop = window.matchMedia(DESKTOP_QUERY)
+
+    // El modo depende del navegador y tiene que fijarse antes de pintar. Se
+    // vuelve a decidir si la ventana cruza el corte o cambia la preferencia.
+    const sync = () => {
+      const on = !reduced.matches && desktop.matches
+      if (on) {
+        root.dataset.spatial = "on"
+      } else {
+        delete root.dataset.spatial
+        delete root.dataset.spatialIntro
+      }
+      setSpatial(on)
     }
 
-    root.dataset.spatial = "on"
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- el modo depende del navegador y tiene que fijarse antes de pintar
-    setSpatial(true)
+    sync()
+    reduced.addEventListener("change", sync)
+    desktop.addEventListener("change", sync)
 
     // `data-spatial-intro` no se toca aquí: lo retira la propia intro al
     // acabar, y borrarlo en el doble montaje de desarrollo la cortaría.
     return () => {
+      reduced.removeEventListener("change", sync)
+      desktop.removeEventListener("change", sync)
       delete document.documentElement.dataset.spatial
     }
   }, [])
@@ -904,6 +941,11 @@ export function SpatialHome() {
       entrance?.kill()
       flightRef.current?.kill()
       gsap.killTweensOf(pointer)
+      // Si se sale de la mesa (la ventana cruza a móvil), el documento plano
+      // no puede heredar la cámara ni los desplazamientos del vuelo.
+      gsap.set([world, mat, ...stations.filter(Boolean)], { clearProps: "transform" })
+      gsap.set(camera, { clearProps: "transform,transformOrigin,opacity,visibility" })
+      gsap.set(viewport, { clearProps: "opacity,visibility" })
     }
   }, [spatial, router])
 
@@ -919,14 +961,16 @@ export function SpatialHome() {
 
             {STATION_SPOTS.map((spot, index) => {
               const isActive = index === active
+              const next = STATION_SPOTS[index + 1]
               return (
+                <Fragment key={spot.id}>
                 <div
                   className="spatial-station"
-                  key={spot.id}
                   ref={(element) => {
                     stationRefs.current[index] = element
                   }}
                   data-station={spot.id}
+                  data-next={next ? `↓ Sigue: ${next.label}` : undefined}
                   data-active={(spatial && isActive) || undefined}
                   data-arrived={(spatial && isActive && arrived) || undefined}
                   inert={spatial && !isActive ? true : undefined}
@@ -939,6 +983,8 @@ export function SpatialHome() {
                     {stationContent[spot.id]}
                   </StationContext.Provider>
                 </div>
+                {next ? <SheetGap index={index + 1} label={next.label} /> : null}
+                </Fragment>
               )
             })}
           </div>

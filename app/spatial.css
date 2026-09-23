@@ -262,6 +262,186 @@
   height: var(--sh, 100svh);
 }
 
+/* ═══ Documento plano: hojas sobre la mesa ═══════════════════════════════
+   Móvil y movimiento reducido. Scroll nativo de arriba abajo; cada sección es
+   una hoja de papel y entre hoja y hoja asoma un tramo de mesa con el cable y
+   la etiqueta de la siguiente. Ese tramo es el aire que avisa, con tiempo, de
+   que la sección se acaba. En móvil es más largo que en escritorio. */
+html:not([data-spatial="on"]) .spatial-viewport {
+  --sheet-gap: clamp(5rem, 14vh, 8.5rem);
+
+  background-color: var(--tool-blue);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.17) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.17) 2px, transparent 2px),
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size:
+    240px 240px,
+    240px 240px,
+    48px 48px,
+    48px 48px;
+}
+
+html:not([data-spatial="on"]) .spatial-station {
+  position: relative;
+  /* `clip` y no `hidden`: recorta las esquinas sin crear un contenedor de
+     scroll, así los `sticky` de dentro siguen pegándose al documento. */
+  overflow: clip;
+  background: var(--cool-paper);
+  border-radius: 22px;
+  box-shadow: 0 30px 60px -30px rgba(4, 10, 40, 0.6);
+}
+
+html:not([data-spatial="on"]) .spatial-station:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.spatial-gap {
+  position: relative;
+  height: var(--sheet-gap, 6rem);
+}
+
+html[data-spatial="on"] .spatial-gap {
+  display: none;
+}
+
+.spatial-gap svg {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 24px);
+  overflow: visible;
+}
+
+.spatial-gap path {
+  fill: none;
+  stroke: var(--action-orange);
+  stroke-linecap: round;
+  stroke-width: 14px;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(4px 8px 0 rgba(4, 10, 40, 0.3));
+}
+
+.spatial-gap-tag {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.55em 0.95em;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  box-shadow: 0 18px 30px -14px rgba(4, 10, 40, 0.6);
+  font-family: var(--font-display-family);
+  font-size: 0.95rem;
+  font-variation-settings: "wdth" 84, "wght" 740;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translate(-30%, -50%) rotate(-2deg);
+}
+
+.spatial-gap-tag b {
+  color: var(--label-lime);
+  font-weight: inherit;
+}
+
+@media (max-width: 900px) {
+  html:not([data-spatial="on"]) .spatial-viewport {
+    --sheet-gap: clamp(9rem, 30svh, 15rem);
+  }
+
+  html:not([data-spatial="on"]) .spatial-station {
+    border-radius: 18px;
+  }
+
+  /* Dentro de cada hoja, más aire arriba y abajo que en el documento de
+     antes: el final de la sección se ve venir. */
+  html:not([data-spatial="on"]) .spatial-station > section:not(.hero, .sp-plain) {
+    padding-top: calc(var(--header-height) + 2.5rem);
+    padding-bottom: 4.5rem;
+  }
+
+  /* La escena del remate mide una pantalla entera en la mesa; como hoja de
+     móvil mide lo que su texto, o deja media pantalla de naranja vacía. */
+  html:not([data-spatial="on"]) .sp-plain .plain-talk-stage {
+    height: auto;
+    padding-top: calc(var(--header-height) + 2.5rem);
+    padding-bottom: 5rem;
+  }
+
+  html:not([data-spatial="on"]) .sp-plain :is(.plain-talk-zoom, .plain-talk-copy) {
+    height: auto;
+  }
+}
+
+/* Entrada de las hojas, animada por el propio scroll: la siguiente llega
+   desde la mesa, un poco inclinada, y se asienta al subir. La lleva el
+   compositor del navegador —sin JavaScript por fotograma—, que es lo que la
+   mantiene fluida en móvil. Donde no hay `animation-timeline`, las hojas
+   simplemente están. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    html:not([data-spatial="on"]) .spatial-station:not(:first-child) {
+      transform-origin: 50% 0%;
+      animation: spatial-sheet-land linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    html:not([data-spatial="on"]) .spatial-station [data-depth] {
+      animation: spatial-depth-drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+
+    html:not([data-spatial="on"]) .spatial-gap-tag {
+      animation: spatial-tag-drop linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+}
+
+@keyframes spatial-sheet-land {
+  from {
+    opacity: 0.9;
+    transform: perspective(1100px) rotateX(9deg) scale(0.93);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes spatial-depth-drift {
+  from {
+    translate: 0 calc(var(--depth, 10) * 1.4px);
+  }
+
+  to {
+    translate: 0 calc(var(--depth, 10) * -1.4px);
+  }
+}
+
+@keyframes spatial-tag-drop {
+  from {
+    opacity: 0;
+    translate: 0 -18px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
 /* ═══ Modo mesa ═════════════════════════════════════════════════════════ */
 html[data-spatial="on"] body {
   overflow: hidden;
@@ -282,7 +462,10 @@ html[data-spatial="on"] .spatial-viewport {
   position: fixed;
   z-index: 1;
   inset: 0;
-  overflow: hidden;
+  /* `clip` y no `hidden`: con `hidden` sigue siendo desplazable por código, y
+     el navegador lo desplazaba para enseñar un ancla (`/#proyectos`) o un
+     elemento con foco, descuadrando la cámara. */
+  overflow: clip;
   background: var(--tool-blue);
   perspective: 1500px;
   perspective-origin: 50% 42%;
@@ -383,6 +566,22 @@ html[data-spatial="on"] .spatial-station > :is(.projects-section, .business-bott
   flex-direction: column;
   justify-content: center;
   padding-top: calc(var(--header-height) + clamp(1.5rem, 4vh, 3.5rem));
+}
+
+/* Final de hoja: aire extra y aviso de la estación siguiente antes del
+   borde, para que se vea venir el cambio. Es poco —en escritorio la mesa
+   ya obliga a insistir en el borde—; el móvil tiene su propio tramo de mesa. */
+html[data-spatial="on"] .spatial-station[data-next]::after {
+  display: block;
+  padding: clamp(2.5rem, 9vh, 5.5rem) var(--page-pad) clamp(1.5rem, 4vh, 2.5rem);
+  color: var(--graphite-soft);
+  content: attr(data-next);
+  font-family: var(--font-display-family);
+  font-size: 0.9rem;
+  font-variation-settings: "wdth" 84, "wght" 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 html[data-spatial="on"] .spatial-station > .contact-section {
