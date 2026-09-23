@@ -42,7 +42,27 @@ import {
  */
 const GESTURE_GAP_MS = 90
 const MIN_WHEEL_DELTA = 4
-const SWIPE_THRESHOLD = 56
+
+/**
+ * Resistencia del borde. Llegar al final de una estación no la cambia: hay que
+ * insistir. Cada evento de rueda suma como mucho `PULL_STEP_MAX` px, así que
+ * una rueda de ratón necesita unas tres muescas seguidas; si pasa
+ * `PULL_DECAY_MS` sin insistir, la cuenta vuelve a cero.
+ */
+const PULL_THRESHOLD = 280
+const PULL_STEP_MAX = 110
+const PULL_DECAY_MS = 650
+/** Arrastre táctil, más allá del borde, que hace falta para cambiar. */
+const TOUCH_PULL = 150
+/** Cuánto cede la hoja al tirar de ella, en px. */
+const PULL_GIVE = 26
+/**
+ * Pausas de lectura: tras tocar el final del texto y tras aterrizar, la mesa
+ * no escucha el borde. Así la inercia del trackpad no encadena saltos y la
+ * última línea se puede leer.
+ */
+const EDGE_DWELL_MS = 500
+const ARRIVAL_COOLDOWN_MS = 700
 /** Paso de la rejilla mayor de la alfombrilla de corte: ver `.spatial-mat`. */
 const MAT_TILE = 240
 const MOBILE_QUERY = "(max-width: 900px)"
@@ -217,6 +237,9 @@ export function SpatialHome() {
   const cameraRef = useRef<HTMLDivElement>(null)
   const matRef = useRef<HTMLDivElement>(null)
   const worldRef = useRef<HTMLDivElement>(null)
+  const pullRef = useRef<HTMLDivElement>(null)
+  const pullLabelRef = useRef<HTMLSpanElement>(null)
+  const pullBarRef = useRef<HTMLSpanElement>(null)
   const stationRefs = useRef<Array<HTMLDivElement | null>>([])
 
   const activeRef = useRef(0)
@@ -263,9 +286,10 @@ export function SpatialHome() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- el modo depende del navegador y tiene que fijarse antes de pintar
     setSpatial(true)
 
+    // `data-spatial-intro` no se toca aquí: lo retira la propia intro al
+    // acabar, y borrarlo en el doble montaje de desarrollo la cortaría.
     return () => {
       delete document.documentElement.dataset.spatial
-      delete document.documentElement.dataset.spatialIntro
     }
   }, [])
 
@@ -284,6 +308,9 @@ export function SpatialHome() {
 
     let lastWheelAt = 0
     let scrollGesture = false
+    let arrivedAt = 0
+    let lastContentScrollAt = 0
+    let cancelled = false
 
     const size = () => ({
       width: viewport.clientWidth,
@@ -326,6 +353,7 @@ export function SpatialHome() {
 
     const arrive = (index: number) => {
       flyingRef.current = false
+      arrivedAt = performance.now()
       delete viewport.dataset.flying
       setArrived(true)
 
@@ -364,6 +392,7 @@ export function SpatialHome() {
         station.scrollTop = direction === -1 ? station.scrollHeight : 0
       }
 
+      resetPull()
       activeRef.current = index
       flyingRef.current = true
       setActive(index)
@@ -375,26 +404,30 @@ export function SpatialHome() {
       const dx = (to.col - from.col) * GAP_X
       const dy = (to.row - from.row) * GAP_Y
       const distance = Math.hypot(dx, dy)
-      const duration = gsap.utils.clamp(1.15, 2.1, 0.95 + distance * 0.3)
+      // Vuelo corto y contenido: la cámara se aleja lo justo para ver la
+      // mesa alrededor, no para marear. Sólo los saltos largos (brújula,
+      // header) se alejan más.
+      const duration = gsap.utils.clamp(1.1, 1.75, 0.9 + distance * 0.26)
+      const baseLift = mobile() ? 0.8 : 0.74
       const lift = gsap.utils.clamp(
-        0.34,
-        mobile() ? 0.62 : 0.6,
-        (mobile() ? 0.62 : 0.6) - (distance - 1.4) * 0.1,
+        0.46,
+        baseLift,
+        baseLift - (distance - 1.4) * 0.12,
       )
-      const climb = duration * 0.44
+      const climb = duration * 0.45
 
       flightRef.current = gsap
         .timeline({ onUpdate: syncMat, onComplete: () => arrive(index) })
-        .to(world, { ...target, duration, ease: "power2.inOut" }, 0)
+        .to(world, { ...target, duration, ease: "power3.inOut" }, 0)
         .to(
           camera,
           {
             scale: lift,
-            rotationX: mobile() ? 12 : 20,
-            rotationY: Math.sign(dx) * (mobile() ? 4 : 9),
-            rotationZ: -Math.sign(dx) * 1.2 + Math.sign(dy) * 0.8,
+            rotationX: mobile() ? 7 : 12,
+            rotationY: Math.sign(dx) * (mobile() ? 2 : 4),
+            rotationZ: 0,
             duration: climb,
-            ease: "power2.out",
+            ease: "sine.out",
           },
           0,
         )
@@ -406,7 +439,7 @@ export function SpatialHome() {
             rotationY: 0,
             rotationZ: 0,
             duration: duration - climb,
-            ease: "power3.inOut",
+            ease: "power2.inOut",
           },
           climb,
         )
@@ -416,17 +449,100 @@ export function SpatialHome() {
       flyRef.current(activeRef.current + direction, direction)
     }
 
+    const hasNeighbour = (direction: Direction) => {
+      const next = activeRef.current + direction
+      return next >= 0 && next < STATION_SPOTS.length
+    }
+
+    // ── Resistencia del borde ───────────────────────────────────────────
+    const pull: { direction: 0 | Direction; amount: number; lastAt: number } = {
+      direction: 0,
+      amount: 0,
+      lastAt: 0,
+    }
+    let pullTimer = 0
+
+    const renderPull = (direction: Direction, progress: number) => {
+      const indicator = pullRef.current
+      const station = stations[activeRef.current]
+      if (!indicator || !station) return
+
+      if (progress <= 0) {
+        delete indicator.dataset.visible
+        gsap.to(station, { y: 0, duration: 0.45, ease: "power3.out", overwrite: true })
+        return
+      }
+
+      const next = STATION_SPOTS[activeRef.current + direction]
+      indicator.dataset.visible = "true"
+      indicator.dataset.direction = direction > 0 ? "down" : "up"
+      if (pullLabelRef.current && next) {
+        pullLabelRef.current.textContent = `${direction > 0 ? "Sigue bajando" : "Sigue subiendo"} · ${next.label}`
+      }
+      pullBarRef.current?.style.setProperty("transform", `scaleX(${progress.toFixed(3)})`)
+      gsap.to(station, {
+        y: -direction * progress * PULL_GIVE,
+        duration: 0.3,
+        ease: "power2.out",
+        overwrite: true,
+      })
+    }
+
+    function resetPull() {
+      window.clearTimeout(pullTimer)
+      const direction = pull.direction
+      pull.amount = 0
+      pull.direction = 0
+      if (direction !== 0) renderPull(direction, 0)
+    }
+
+    /** Suma insistencia hacia `direction`; cambia de estación al completarla. */
+    const addPull = (direction: Direction, amount: number) => {
+      if (!hasNeighbour(direction)) return
+
+      const now = performance.now()
+      if (pull.direction !== direction || now - pull.lastAt > PULL_DECAY_MS) {
+        pull.amount = 0
+      }
+      pull.direction = direction
+      pull.lastAt = now
+      pull.amount += amount
+
+      window.clearTimeout(pullTimer)
+      const progress = Math.min(1, pull.amount / PULL_THRESHOLD)
+      if (progress >= 1) {
+        step(direction)
+        return
+      }
+
+      renderPull(direction, progress)
+      pullTimer = window.setTimeout(resetPull, PULL_DECAY_MS)
+    }
+
+    /** ¿Escucha la mesa el borde ahora mismo, o es tiempo de lectura? */
+    const edgeListening = () => {
+      const now = performance.now()
+      return (
+        now - arrivedAt > ARRIVAL_COOLDOWN_MS &&
+        now - lastContentScrollAt > EDGE_DWELL_MS
+      )
+    }
+
+    const onStationScroll = () => {
+      lastContentScrollAt = performance.now()
+      if (pull.direction !== 0) resetPull()
+    }
+
     // ── Punto de partida ────────────────────────────────────────────────
+    // Ni un `gsap.set` sobre la cámara aquí: GSAP leería su transform a mitad
+    // de la intro CSS y lo dejaría fijado en línea al acabar.
     applySize()
-    gsap.set(camera, { transformOrigin: "50% 50%" })
 
     const hashId = decodeURIComponent(window.location.hash.slice(1))
     const { intro: introFromScript, returnId } = arrivalRef.current ?? {
       intro: false,
       returnId: null,
     }
-    delete root.dataset.spatialIntro
-
     const startId = hashId || returnId || ""
     const startIndex = startId ? Math.max(0, stationIndexOf(startId)) : 0
     activeRef.current = startIndex
@@ -434,28 +550,46 @@ export function SpatialHome() {
     gsap.set(world, offsetOf(startIndex))
     syncMat()
 
-    const entrance = gsap.timeline({
-      onComplete: () => arrive(startIndex),
-    })
     flyingRef.current = true
     setArrived(false)
     viewport.dataset.flying = "true"
 
+    let entrance: gsap.core.Timeline | null = null
+    // La intro de la primera visita es una animación CSS (`spatial-intro` en
+    // `app/spatial.css`): arranca con la primera pintura, sin esperar a que
+    // React hidrate. Aquí sólo se espera a que acabe para posar la cámara.
+    let introAnimations: Animation[] = introFromScript ? camera.getAnimations() : []
+
+    const finishIntro = () => {
+      introAnimations = []
+      delete root.dataset.spatialIntro
+      arrive(startIndex)
+    }
+
+    /** Cualquier gesto durante la intro la termina en el acto. */
+    const skipIntro = () => {
+      if (introAnimations.length === 0) return false
+      introAnimations.forEach((animation) => animation.finish())
+      return true
+    }
+
     if (introFromScript) {
-      // Primera visita: se ve la mesa entera desde arriba y la cámara baja
-      // hasta el inicio.
-      entrance.fromTo(
-        camera,
-        { scale: mobile() ? 0.52 : 0.4, rotationX: mobile() ? 16 : 26 },
-        { scale: 1, rotationX: 0, duration: 1.9, ease: "power3.inOut", delay: 0.25 },
-      )
+      if (introAnimations.length === 0) {
+        finishIntro()
+      } else {
+        Promise.all(introAnimations.map((animation) => animation.finished))
+          .catch(() => undefined)
+          .then(() => {
+            if (!cancelled) finishIntro()
+          })
+      }
     } else {
       // Vuelta desde otra página o entrada directa a una sección: la cámara
-      // sale del documento del que viene y se echa hacia atrás hasta posarse.
-      entrance.fromTo(
+      // se echa un poco hacia atrás y se posa.
+      entrance = gsap.timeline({ onComplete: () => arrive(startIndex) }).fromTo(
         camera,
-        { scale: 1.8, rotationX: -10, autoAlpha: 0 },
-        { scale: 1, rotationX: 0, autoAlpha: 1, duration: 1.1, ease: "expo.out" },
+        { scale: 1.12, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, duration: 0.8, ease: "power3.out" },
       )
     }
 
@@ -467,87 +601,112 @@ export function SpatialHome() {
       const continues = now - lastWheelAt < GESTURE_GAP_MS
       lastWheelAt = now
 
-      if (flyingRef.current) {
+      if (skipIntro() || flyingRef.current) {
         event.preventDefault()
         return
       }
 
-      const horizontal =
-        Math.abs(event.deltaX) > Math.abs(event.deltaY) * 1.5 &&
-        Math.abs(event.deltaX) > 20
-      const delta = horizontal ? event.deltaX : event.deltaY
-      if (Math.abs(delta) < MIN_WHEEL_DELTA && !continues) return
-      const direction: Direction = delta > 0 ? 1 : -1
+      // Sólo vertical: el desplazamiento lateral del trackpad se escapa sin
+      // querer y no puede cambiar de estación.
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return
+      const pixels =
+        event.deltaMode === 1
+          ? event.deltaY * 40
+          : event.deltaMode === 2
+            ? event.deltaY * window.innerHeight
+            : event.deltaY
+      if (Math.abs(pixels) < MIN_WHEEL_DELTA && !continues) return
+      const direction: Direction = pixels > 0 ? 1 : -1
       const station = stations[activeRef.current]
       if (!station) return
 
       if (!continues) scrollGesture = false
 
-      if (!horizontal && canScrollWithin(event.target, station, direction)) {
+      if (canScrollWithin(event.target, station, direction)) {
         scrollGesture = true
         // Sobre el header o la brújula la rueda no llega a la estación.
         if (!station.contains(event.target as Node)) {
           event.preventDefault()
-          station.scrollBy({ top: event.deltaY })
+          station.scrollBy({ top: pixels })
         }
         return
       }
 
       event.preventDefault()
-      // El gesto que ha llevado la estación hasta el borde no puede además
-      // lanzar el vuelo: hace falta soltar y volver a empezar.
-      if (continues) return
-      if (scrollGesture) return
-      step(direction)
+      // El gesto que ha llevado el texto hasta el borde no cuenta: hace falta
+      // soltar y volver a empezar.
+      if (continues && scrollGesture) return
+      if (!edgeListening()) return
+      addPull(direction, Math.min(PULL_STEP_MAX, Math.abs(pixels)))
     }
 
     // ── Táctil ──────────────────────────────────────────────────────────
-    let touchStart: {
+    // Tirar de la hoja: en el borde, arrastrar más allá llena el indicador y
+    // al soltar con él lleno se cambia de estación. Soltar antes devuelve la
+    // hoja a su sitio.
+    let touch: {
       x: number
       y: number
       target: EventTarget | null
       canDown: boolean
       canUp: boolean
+      listening: boolean
+      progress: number
+      direction: Direction
     } | null = null
 
     const onTouchStart = (event: TouchEvent) => {
+      if (skipIntro()) return
       if (event.touches.length !== 1) {
-        touchStart = null
+        touch = null
         return
       }
-      const touch = event.touches[0]
+      const point = event.touches[0]
       const station = stations[activeRef.current]
-      touchStart = {
-        x: touch.clientX,
-        y: touch.clientY,
+      touch = {
+        x: point.clientX,
+        y: point.clientY,
         target: event.target,
-        canDown: station ? canScrollWithin(event.target, station, 1) : false,
-        canUp: station ? canScrollWithin(event.target, station, -1) : false,
+        canDown: station ? canScrollWithin(event.target, station, 1) : true,
+        canUp: station ? canScrollWithin(event.target, station, -1) : true,
+        listening: edgeListening(),
+        progress: 0,
+        direction: 1,
       }
     }
 
-    const onTouchEnd = (event: TouchEvent) => {
-      const start = touchStart
-      touchStart = null
-      if (!start || flyingRef.current) return
+    const onTouchMove = (event: TouchEvent) => {
+      const current = touch
+      if (!current || !current.listening || flyingRef.current) return
       if (document.body.classList.contains("menu-open")) return
-      if (isEditable(start.target)) return
+      if (isEditable(current.target)) return
 
-      const touch = event.changedTouches[0]
-      const dx = start.x - touch.clientX
-      const dy = start.y - touch.clientY
+      const point = event.touches[0]
+      const dx = current.x - point.clientX
+      const dy = current.y - point.clientY
+      if (Math.abs(dx) > Math.abs(dy)) return
 
-      if (Math.abs(dy) >= Math.abs(dx)) {
-        if (Math.abs(dy) < SWIPE_THRESHOLD) return
-        const direction: Direction = dy > 0 ? 1 : -1
-        if (direction === 1 && start.canDown) return
-        if (direction === -1 && start.canUp) return
-        step(direction)
+      const direction: Direction = dy > 0 ? 1 : -1
+      const blocked =
+        (direction === 1 && current.canDown) || (direction === -1 && current.canUp)
+      if (blocked || !hasNeighbour(direction)) return
+
+      current.direction = direction
+      current.progress = Math.min(1, Math.max(0, (Math.abs(dy) - 12) / TOUCH_PULL))
+      pull.direction = direction
+      renderPull(direction, current.progress)
+    }
+
+    const onTouchEnd = () => {
+      const current = touch
+      touch = null
+      if (!current || current.progress <= 0) return
+
+      if (current.progress >= 1 && !flyingRef.current) {
+        step(current.direction)
         return
       }
-
-      if (Math.abs(dx) < SWIPE_THRESHOLD * 1.4) return
-      step(dx > 0 ? 1 : -1)
+      resetPull()
     }
 
     // ── Teclado ─────────────────────────────────────────────────────────
@@ -588,11 +747,11 @@ export function SpatialHome() {
           break
         case "ArrowRight":
           event.preventDefault()
-          if (!flyingRef.current) step(1)
+          if (!skipIntro() && !flyingRef.current) step(1)
           return
         case "ArrowLeft":
           event.preventDefault()
-          if (!flyingRef.current) step(-1)
+          if (!skipIntro() && !flyingRef.current) step(-1)
           return
         case "Home":
           event.preventDefault()
@@ -607,13 +766,15 @@ export function SpatialHome() {
       }
 
       event.preventDefault()
-      if (flyingRef.current) return
+      if (skipIntro() || flyingRef.current) return
 
       if (canScrollWithin(station, station, direction)) {
         station.scrollBy({ top: direction * amount, behavior: "smooth" })
         return
       }
 
+      // Una tecla es un gesto deliberado: basta con respetar el aterrizaje.
+      if (performance.now() - arrivedAt < ARRIVAL_COOLDOWN_MS / 2) return
       step(direction)
     }
 
@@ -713,7 +874,12 @@ export function SpatialHome() {
 
     window.addEventListener("wheel", onWheel, { passive: false })
     window.addEventListener("touchstart", onTouchStart, { passive: true })
+    window.addEventListener("touchmove", onTouchMove, { passive: true })
     window.addEventListener("touchend", onTouchEnd, { passive: true })
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true })
+    stations.forEach((station) =>
+      station?.addEventListener("scroll", onStationScroll, { passive: true }),
+    )
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("resize", onResize)
     window.addEventListener("pointermove", onPointerMove, { passive: true })
@@ -723,12 +889,19 @@ export function SpatialHome() {
       registerSpatialNavigator(null)
       window.removeEventListener("wheel", onWheel)
       window.removeEventListener("touchstart", onTouchStart)
+      cancelled = true
+      window.clearTimeout(pullTimer)
+      window.removeEventListener("touchmove", onTouchMove)
       window.removeEventListener("touchend", onTouchEnd)
+      window.removeEventListener("touchcancel", onTouchEnd)
+      stations.forEach((station) =>
+        station?.removeEventListener("scroll", onStationScroll),
+      )
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("pointermove", onPointerMove)
       document.removeEventListener("click", onClick, true)
-      entrance.kill()
+      entrance?.kill()
       flightRef.current?.kill()
       gsap.killTweensOf(pointer)
     }
@@ -771,6 +944,13 @@ export function SpatialHome() {
           </div>
         </div>
         <div className="spatial-vignette" aria-hidden="true" />
+      </div>
+
+      <div className="spatial-pull" ref={pullRef} aria-hidden="true">
+        <span className="spatial-pull-label" ref={pullLabelRef} />
+        <span className="spatial-pull-bar">
+          <span ref={pullBarRef} />
+        </span>
       </div>
 
       {spatial ? (

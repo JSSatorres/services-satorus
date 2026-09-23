@@ -294,10 +294,22 @@ html[data-spatial="on"] .spatial-camera {
   transform-style: preserve-3d;
 }
 
-/* Estado previo a la intro: se pinta así desde el primer fotograma para que
-   la bajada de la cámara no empiece con un salto. */
+/* Intro de la primera visita: la cámara baja sobre la mesa. Es CSS y no GSAP
+   para que empiece con la primera pintura, sin esperar a que React hidrate:
+   antes se quedaba alejada hasta que cargaba el JavaScript. `spatial-home.tsx`
+   espera a que termine (o la termina si el visitante ya está moviéndose). */
+@keyframes spatial-intro {
+  from {
+    transform: scale(0.66) rotateX(14deg);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
 html[data-spatial-intro="on"] .spatial-camera {
-  transform: scale(0.4) rotateX(26deg);
+  animation: spatial-intro 1.15s cubic-bezier(0.65, 0, 0.35, 1) 0.1s both;
 }
 
 /* Alfombrilla de corte: rejilla fina cada 48px y gruesa cada 240px. Mide cuatro
@@ -425,8 +437,8 @@ html[data-spatial="on"]
     .bottleneck-panel,
     .bottleneck-footer
   ) {
-  opacity: 0.55;
-  translate: 0 32px;
+  opacity: 0.8;
+  translate: 0 14px;
   transition-duration: 250ms;
   transition-delay: 0s;
 }
@@ -569,6 +581,72 @@ html[data-spatial="on"] .spatial-vignette {
 
 html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-vignette {
   opacity: 1;
+}
+
+/* ── Resistencia del borde ───────────────────────────────────────────
+   Aparece al insistir en el final (o el principio) de una estación y se
+   llena hasta cambiar. Soltar a medias la vacía. */
+.spatial-pull {
+  position: fixed;
+  z-index: 95;
+  bottom: clamp(1.25rem, 4vh, 2.25rem);
+  left: 50%;
+  display: grid;
+  gap: 0.45rem;
+  min-width: min(18rem, calc(100vw - 2rem));
+  padding: 0.7rem 0.95rem 0.8rem;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px -16px rgba(4, 10, 40, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  translate: -50% 12px;
+  transition:
+    opacity 220ms ease,
+    translate 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spatial-pull[data-direction="up"] {
+  top: calc(var(--header-height) + 1rem);
+  bottom: auto;
+  translate: -50% -12px;
+}
+
+.spatial-pull[data-visible] {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+.spatial-pull-label {
+  font-family: var(--font-display-family);
+  font-size: 0.95rem;
+  font-variation-settings: "wdth" 84, "wght" 720;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.spatial-pull-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  background: rgba(242, 241, 234, 0.2);
+  border-radius: 6px;
+}
+
+.spatial-pull-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--label-lime);
+  border-radius: inherit;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease-out;
+}
+
+html:not([data-spatial="on"]) .spatial-pull {
+  display: none;
 }
 
 /* ── Brújula ───────────────────────────────────────────────────────── */
@@ -747,8 +825,14 @@ html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-vignette {
     perspective: 1100px;
   }
 
-  html[data-spatial-intro="on"] .spatial-camera {
-    transform: scale(0.52) rotateX(16deg);
+  @keyframes spatial-intro {
+    from {
+      transform: scale(0.74) rotateX(9deg);
+    }
+
+    to {
+      transform: none;
+    }
   }
 
   html[data-spatial="on"] .spatial-station {

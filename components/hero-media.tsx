@@ -71,7 +71,9 @@ export function HeroMedia() {
           loop
           playsInline
           preload="metadata"
-          poster="/images/daily-tangle.png"
+          // La versión optimizada de next/image: el PNG original pesa 2 MB y
+          // era lo más pesado de la primera carga después del propio vídeo.
+          poster="/_next/image?url=%2Fimages%2Fdaily-tangle.png&w=1920&q=75"
           src="/videos/satorus-hero-loop.mp4"
           aria-hidden="true"
         />
