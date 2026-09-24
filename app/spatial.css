@@ -24,13 +24,34 @@
 }
 
 .spatial-station[data-prev]::before,
-.spatial-station[data-next]::after {
+.spatial-station[data-next]:not([data-station="inicio"])::after {
   display: block;
   height: var(--sheet-rest);
   content: "";
 }
 
+/* El hero no lleva un margen aparte: crece él mismo, así el margen es su
+   propia foto (o vídeo) y no una franja de papel. `--hero-tail` es lo que el
+   hero ya usa en móvil para mantener el CTA dentro de la primera pantalla. */
+.spatial-station[data-next] > .hero {
+  --hero-tail: var(--sheet-rest);
+}
+
+@media (min-width: 901px) {
+  .spatial-station[data-next] > .hero {
+    padding-bottom: calc(clamp(7rem, 12vh, 9rem) + var(--sheet-rest));
+  }
+
+  .spatial-station[data-next] > .hero .hero-cta {
+    bottom: calc(clamp(2rem, 5vh, 3.5rem) + var(--sheet-rest));
+  }
+}
+
 /* El margen tiene el color de su sección, así que la hoja lo lleva debajo. */
+:root .spatial-station[data-station="como-trabajamos"] {
+  background: var(--label-lime);
+}
+
 :root .spatial-station[data-station="hablamos-claro"] {
   background: var(--action-orange);
 }
@@ -53,6 +74,11 @@
 
 /* ── Estación "Cómo trabajamos" ─────────────────────────────────────── */
 .sp-process {
+  /* El lima de siempre de "Cómo trabajamos". */
+  background: var(--label-lime);
+}
+
+.sp-process-stage {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   grid-template-areas:
@@ -62,13 +88,28 @@
   gap: clamp(1.5rem, 4vh, 3rem) clamp(2.5rem, 6vw, 6.5rem);
   padding: calc(var(--header-height) + clamp(1.5rem, 5vh, 4rem)) var(--page-pad)
     clamp(3rem, 7vh, 5rem);
-  background: var(--cool-paper);
+}
+
+/* Escritorio: la escena se queda fija mientras la sección —dos pantallas y
+   media— pasa por debajo; ese recorrido es el que avanza los pasos
+   (`STEPS_TRAVEL` en spatial-process.tsx). */
+@media (min-width: 901px) {
+  .sp-process {
+    height: calc(var(--sh, 100svh) * 2.6);
+  }
+
+  .sp-process-stage {
+    position: sticky;
+    top: 0;
+    min-height: var(--sh, 100svh);
+  }
 }
 
 .sp-kicker {
   display: inline-block;
   padding: 0.35rem 0.7rem;
-  background: var(--label-lime);
+  color: var(--label-lime);
+  background: var(--bench-graphite);
   font-size: 0.8rem;
   font-weight: 760;
   letter-spacing: 0.06em;
@@ -177,7 +218,7 @@
 }
 
 .sp-process-steps > li:not(:last-child)::before {
-  background: var(--paper-muted);
+  background: rgba(23, 27, 24, 0.16);
 }
 
 .sp-process-steps > li:not(:last-child)::after {
@@ -239,14 +280,14 @@
 }
 
 .sp-process-steps > li:not([data-reached]) > div {
-  opacity: 0.45;
+  opacity: 0.55;
 }
 
 .sp-step-answer {
   display: inline-block;
   margin: 0 0 0.4rem;
   padding: 0.2rem 0.55rem;
-  background: var(--label-lime);
+  background: var(--cool-paper);
   font-size: 0.78rem;
   font-weight: 760;
   letter-spacing: 0.05em;
@@ -275,7 +316,7 @@
 }
 
 @media (max-width: 900px) {
-  .sp-process {
+  .sp-process-stage {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "head"
@@ -285,9 +326,42 @@
     gap: 2rem;
   }
 
+  /* La pila de fotos se queda fija bajo la cabecera, dentro de una franja
+     lima a todo lo ancho: los pasos pasan por debajo de la franja y se
+     esconden limpios, en vez de asomar medio tapados junto a la foto. Se
+     pega a quien hace scroll: la estación en la mesa, el documento en plano. */
   .sp-process-prints {
-    width: min(100% - 1rem, 30rem);
-    margin-bottom: 1.5rem;
+    position: sticky;
+    z-index: 2;
+    top: calc(var(--header-height) + 0.75rem);
+    justify-self: center;
+    width: min(62%, 17rem);
+    margin-bottom: 2.25rem;
+  }
+
+  .sp-process-prints::before {
+    position: absolute;
+    z-index: -1;
+    top: calc(-0.75rem - 2px);
+    right: -50vw;
+    bottom: -2rem;
+    left: -50vw;
+    content: "";
+    background: linear-gradient(
+      to bottom,
+      var(--label-lime) calc(100% - 1.5rem),
+      rgba(223, 233, 122, 0)
+    );
+  }
+
+  .sp-print figcaption {
+    font-size: 0.8rem;
+  }
+
+  /* Hueco al final para que el último paso llegue a la franja de lectura
+     con la foto todavía fija encima. */
+  .sp-process-steps {
+    padding-bottom: 30svh;
   }
 }
 
@@ -576,16 +650,18 @@ html[data-spatial="on"] .spatial-station {
   outline: none;
   scrollbar-color: var(--tool-blue) transparent;
   scrollbar-width: thin;
-  transition:
-    border-radius 450ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 450ms ease;
-}
-
-html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-station {
-  border-radius: 22px;
+  /* Sombra fija y sin transición: en reposo cae fuera de la pantalla y en el
+     vuelo ya está pintada. Animar sombra y esquinas de siete hojas enormes al
+     despegar era uno de los tirones del escritorio. */
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.25),
     0 60px 90px -30px rgba(4, 10, 40, 0.6);
+}
+
+/* Sólo se pinta lo que se ve: en reposo, la estación activa; en vuelo, la de
+   salida, la de llegada y sus vecinas (`data-near`). */
+html[data-spatial="on"] .spatial-station:not([data-active]):not([data-from]):not([data-near]) {
+  visibility: hidden;
 }
 
 html[data-spatial="on"] .spatial-station > :first-child {
@@ -593,7 +669,7 @@ html[data-spatial="on"] .spatial-station > :first-child {
 }
 
 html[data-spatial="on"] .spatial-station .hero {
-  min-height: max(100%, clamp(640px, 88svh, 900px));
+  min-height: calc(max(100%, clamp(640px, 88svh, 900px)) + var(--sheet-rest));
 }
 
 /* Secciones pensadas para el flujo del documento: en una estación de una
@@ -620,47 +696,6 @@ html[data-spatial="on"] .spatial-station [data-depth] {
 html[data-spatial="on"] .spatial-station .hero-media {
   scale: 1.06;
   translate: calc(var(--px, 0) * 16px) calc(var(--py, 0) * 12px);
-}
-
-/* ── Enfoque al posarse ──────────────────────────────────────────────
-   Mientras la cámara vuela, el contenido de las estaciones está un poco
-   hundido y desvaído; al posarse sube a su sitio, escalonado. */
-html[data-spatial="on"]
-  .spatial-station
-  :is(
-    .sp-rise,
-    .projects-heading,
-    .project-card,
-    .faq-heading,
-    .faq-list details,
-    .contact-copy,
-    .bottleneck-heading,
-    .bottleneck-panel,
-    .bottleneck-footer
-  ) {
-  transition:
-    opacity 600ms ease,
-    translate 900ms cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--rise-i, 0) * 60ms + 80ms);
-}
-
-html[data-spatial="on"]
-  .spatial-station:not([data-arrived])
-  :is(
-    .sp-rise,
-    .projects-heading,
-    .project-card,
-    .faq-heading,
-    .faq-list details,
-    .contact-copy,
-    .bottleneck-heading,
-    .bottleneck-panel,
-    .bottleneck-footer
-  ) {
-  opacity: 0.8;
-  translate: 0 14px;
-  transition-duration: 250ms;
-  transition-delay: 0s;
 }
 
 /* ── Objetos sobre la mesa ─────────────────────────────────────────── */
@@ -973,6 +1008,29 @@ html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-vignette {
 
 /* ── Móvil ─────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
+  /* Lo que atascaba el móvil era pintar la mesa entera —siete pantallas con
+     fotos, vídeo y sombras— en una sola capa 3D. En reposo y durante el vuelo
+     sólo se pintan la estación de salida y la de llegada; sin sombras grandes
+     ni viñeta, que son lo más caro de repintar. */
+  html[data-spatial="on"] .spatial-station:not([data-active]):not([data-from]) {
+    visibility: hidden;
+  }
+
+  html[data-spatial="on"] .spatial-station {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+  }
+
+  html[data-spatial="on"] .spatial-vignette {
+    display: none;
+  }
+
+  html[data-spatial="on"] .spatial-print,
+  .spatial-tag,
+  .spatial-exit,
+  .spatial-station-tag {
+    box-shadow: none;
+  }
+
   html[data-spatial="on"] .spatial-viewport {
     --decor-scale: 1.6;
 
@@ -993,9 +1051,6 @@ html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-vignette {
     scrollbar-width: none;
   }
 
-  html[data-spatial="on"] .spatial-viewport[data-flying] .spatial-station {
-    border-radius: 16px;
-  }
 
   .spatial-tag,
   .spatial-exit,
