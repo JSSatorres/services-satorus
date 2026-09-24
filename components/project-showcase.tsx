@@ -292,18 +292,27 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 </p>
                 <p className={styles.eyebrow}>{project.eyebrow}</p>
                 <h3>{project.name}</h3>
+                {project.client && (
+                  <p className={styles.client}>
+                    <span>Cliente</span>
+                    <a href={project.client.url} target="_blank" rel="noopener noreferrer">
+                      {project.client.domain}
+                      <ArrowUpRight aria-hidden="true" size={14} />
+                    </a>
+                  </p>
+                )}
                 <p className={styles.summary}>{project.summary}</p>
                 <dl className={styles.story}>
                   <div>
-                    <dt><span className={styles.stepNumber}>01</span> El reto</dt>
+                    <dt><span className={styles.stepNumber}>01</span> {project.storyLabels?.[0] ?? "El reto"}</dt>
                     <dd>{project.challenge}</dd>
                   </div>
                   <div>
-                    <dt><span className={styles.stepNumber}>02</span> Qué mejoramos</dt>
+                    <dt><span className={styles.stepNumber}>02</span> {project.storyLabels?.[1] ?? "Qué mejoramos"}</dt>
                     <dd>{project.improvement}</dd>
                   </div>
                   <div>
-                    <dt><span className={styles.stepNumber}>03</span> Por qué así</dt>
+                    <dt><span className={styles.stepNumber}>03</span> {project.storyLabels?.[2] ?? "Por qué así"}</dt>
                     <dd>{project.reason}</dd>
                   </div>
                 </dl>
