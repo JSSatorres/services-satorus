@@ -31,6 +31,10 @@ export type ProjectCatalogItem = {
   portrait?: boolean;
   /** Rótulo de la barra de navegador con la que se enseñan las webs. */
   domain?: string;
+  /** Empresa externa que encargó el proyecto: se enseña bajo el nombre, con enlace a su web. */
+  client?: { name: string; url: string; domain: string };
+  /** Títulos propios para los tres pasos del relato (por defecto: reto, mejora, motivo). */
+  storyLabels?: [string, string, string];
 };
 
 export const appProjects: ProjectCatalogItem[] = [
@@ -38,13 +42,15 @@ export const appProjects: ProjectCatalogItem[] = [
     slug: "goblintrader",
     kind: "app",
     name: "GoblinTrader",
-    eyebrow: "Desarrollo a medida · Comercio",
-    status: "Proyecto destacado",
+    eyebrow: "Encargo a medida · Tienda de juegos y hobby",
+    status: "Proyecto para cliente",
+    client: { name: "GoblinTrader", url: "https://www.goblintrader.es/", domain: "goblintrader.es" },
     summary:
-      "La aplicación con la que una tienda lleva su día a día entero: caja y tickets con Verifactu, compras, stock, empleados, fichaje y accesos en un mismo sistema.",
-    challenge: "Unir caja, compras, almacén y equipo en una sola herramienta hecha para su forma de trabajar.",
-    improvement: "Cada venta, pedido y fichaje queda registrado en el mismo sitio, y los tickets salen listos para Verifactu.",
-    reason: "Un desarrollo a medida evita encajar el negocio en cinco programas distintos que no se hablan entre sí.",
+      "GoblinTrader nos buscó con un problema claro: su día a día estaba repartido entre programas que no se hablaban. Le construimos a medida la aplicación que necesitaba: caja y tickets con Verifactu, compras, stock, empleados, fichaje y accesos en un mismo sistema.",
+    storyLabels: ["Lo que nos pidió", "Lo que construimos", "Por qué a medida"],
+    challenge: "Juntar caja, compras, almacén y equipo en una sola herramienta, hecha a su forma de trabajar y no al revés.",
+    improvement: "Una aplicación propia donde cada venta, pedido y fichaje queda registrado en el mismo sitio, con los tickets listos para Verifactu.",
+    reason: "En lugar de encajar su negocio en un programa genérico, partimos de cómo trabaja su equipo y lo construimos a partir de ahí.",
     href: "/proyectos/goblintrader",
     image: "/projects/goblintrader/overview-desktop.webp",
     mobileImage: "/projects/goblintrader/overview-mobile.webp",

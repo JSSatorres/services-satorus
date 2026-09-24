@@ -379,6 +379,12 @@
   letter-spacing: -0.05em;
 }
 
+/* Empresa que encargó el proyecto: deja claro que es trabajo para un cliente. */
+.client { display: flex; align-items: center; gap: .55rem; margin: -.2rem 0 1rem; font-size: .88rem; }
+.client span { font-size: .68rem; font-weight: 760; letter-spacing: .1em; text-transform: uppercase; opacity: .6; }
+.client a { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .7rem; border: 1px solid var(--accent); border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, #fffefa); color: var(--bench-graphite); font-weight: 740; text-decoration: none; }
+.client a:hover, .client a:focus-visible { text-decoration: underline; }
+
 .summary {
   margin: 0 0 1.25rem;
   max-width: 32rem;
