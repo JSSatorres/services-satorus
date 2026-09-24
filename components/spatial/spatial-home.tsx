@@ -51,18 +51,11 @@ const MIN_WHEEL_DELTA = 4
  * el vuelo no puede lanzar otro. El tiempo para ver que la sección se acaba lo
  * dan los márgenes vacíos de cada hoja (`--sheet-rest` en `app/spatial.css`).
  */
-const ARRIVAL_COOLDOWN_MS = 700
+const ARRIVAL_COOLDOWN_MS = 450
 const SWIPE_THRESHOLD = 60
 /** Paso de la rejilla mayor de la alfombrilla de corte: ver `.spatial-mat`. */
 const MAT_TILE = 240
 const MOBILE_QUERY = "(max-width: 900px)"
-/**
- * La mesa es sólo para escritorio. En móvil la cámara peleaba con el scroll
- * nativo —inercia, barra de direcciones— y la capa 3D de siete pantallas no
- * llegaba a pintarse a tiempo; allí el home es el documento vertical, con las
- * secciones como hojas sobre la mesa (ver `app/spatial.css`).
- */
-const DESKTOP_QUERY = "(min-width: 901px)"
 
 type Direction = 1 | -1
 
@@ -267,6 +260,11 @@ export function SpatialHome() {
 
   const [spatial, setSpatial] = useState(false)
   const [active, setActive] = useState(0)
+  // Estación de la que sale el vuelo en curso; -1 en reposo.
+  const [from, setFrom] = useState(-1)
+  // El vuelo en curso aleja tanto la cámara que se ve la mesa alrededor
+  // (intro, saltos largos): sólo entonces se pintan las hojas vecinas.
+  const [wide, setWide] = useState(false)
   const [arrived, setArrived] = useState(true)
   const [visited, setVisited] = useState(false)
 
@@ -288,12 +286,11 @@ export function SpatialHome() {
     }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
-    const desktop = window.matchMedia(DESKTOP_QUERY)
 
     // El modo depende del navegador y tiene que fijarse antes de pintar. Se
-    // vuelve a decidir si la ventana cruza el corte o cambia la preferencia.
+    // vuelve a decidir si cambia la preferencia de movimiento.
     const sync = () => {
-      const on = !reduced.matches && desktop.matches
+      const on = !reduced.matches
       if (on) {
         root.dataset.spatial = "on"
       } else {
@@ -305,13 +302,11 @@ export function SpatialHome() {
 
     sync()
     reduced.addEventListener("change", sync)
-    desktop.addEventListener("change", sync)
 
     // `data-spatial-intro` no se toca aquí: lo retira la propia intro al
     // acabar, y borrarlo en el doble montaje de desarrollo la cortaría.
     return () => {
       reduced.removeEventListener("change", sync)
-      desktop.removeEventListener("change", sync)
       delete document.documentElement.dataset.spatial
     }
   }, [])
@@ -368,7 +363,10 @@ export function SpatialHome() {
     const mobile = () => window.matchMedia(MOBILE_QUERY).matches
 
     let lastWheelAt = 0
-    let scrollGesture = false
+    // El gesto de rueda que lanzó el vuelo sigue llegando como inercia; no
+    // puede mover la estación nueva al aterrizar.
+    let flightGesture = false
+    const lastTops: number[] = []
     let arrivedAt = 0
     let cancelled = false
 
@@ -415,6 +413,8 @@ export function SpatialHome() {
       flyingRef.current = false
       arrivedAt = performance.now()
       delete viewport.dataset.flying
+      setFrom(-1)
+      setWide(false)
       setArrived(true)
 
       const spot = STATION_SPOTS[index]
@@ -467,10 +467,12 @@ export function SpatialHome() {
       if (station) {
         station.scrollTop =
           direction === -1 ? contentEndTop(station) : contentStartTop(station)
+        lastTops[index] = station.scrollTop
       }
 
-      activeRef.current = index
       flyingRef.current = true
+      setFrom(activeRef.current)
+      activeRef.current = index
       setActive(index)
       setArrived(false)
       setVisited(true)
@@ -483,46 +485,71 @@ export function SpatialHome() {
       // Vuelo corto y contenido: la cámara se aleja lo justo para ver la
       // mesa alrededor, no para marear. Sólo los saltos largos (brújula,
       // header) se alejan más.
-      const duration = gsap.utils.clamp(1.1, 1.75, 0.9 + distance * 0.26)
-      const baseLift = mobile() ? 0.8 : 0.74
+      const duration = gsap.utils.clamp(0.85, 1.3, 0.75 + distance * 0.2)
+      const baseLift = mobile() ? 0.86 : 0.8
       const lift = gsap.utils.clamp(
         0.46,
         baseLift,
         baseLift - (distance - 1.4) * 0.12,
       )
-      const climb = duration * 0.45
+      setWide(lift < 0.7)
+      const peakX = mobile() ? 5 : 9
+      const peakY = Math.sign(dx) * (mobile() ? 1.5 : 3)
+
+      // La cámara hace UN solo movimiento: una campana, `sin(πp)`, que sube y
+      // baja sin detenerse arriba. Antes eran dos tweens encadenados —subir y
+      // bajar— y en la cumbre la velocidad llegaba a cero: ese era el parón a
+      // mitad de vuelo. Parte de donde esté la cámara (un vuelo puede
+      // redirigirse a medias) y termina siempre plana.
+      const start = {
+        scale: Number(gsap.getProperty(camera, "scale")),
+        rotationX: Number(gsap.getProperty(camera, "rotationX")),
+        rotationY: Number(gsap.getProperty(camera, "rotationY")),
+      }
+      const progress = { p: 0 }
+      const renderCamera = () => {
+        const p = progress.p
+        const bell = Math.sin(Math.PI * p)
+        gsap.set(camera, {
+          scale: start.scale + (1 - start.scale) * p - (1 - lift) * bell,
+          rotationX: start.rotationX * (1 - p) + peakX * bell,
+          rotationY: start.rotationY * (1 - p) + peakY * bell,
+          rotationZ: 0,
+        })
+      }
 
       flightRef.current = gsap
         .timeline({ onUpdate: syncMat, onComplete: () => arrive(index) })
-        .to(world, { ...target, duration, ease: "power3.inOut" }, 0)
+        .to(world, { ...target, duration, ease: "power2.inOut" }, 0)
         .to(
-          camera,
-          {
-            scale: lift,
-            rotationX: mobile() ? 7 : 12,
-            rotationY: Math.sign(dx) * (mobile() ? 2 : 4),
-            rotationZ: 0,
-            duration: climb,
-            ease: "sine.out",
-          },
+          progress,
+          { p: 1, duration, ease: "sine.inOut", onUpdate: renderCamera },
           0,
-        )
-        .to(
-          camera,
-          {
-            scale: 1,
-            rotationX: 0,
-            rotationY: 0,
-            rotationZ: 0,
-            duration: duration - climb,
-            ease: "power2.inOut",
-          },
-          climb,
         )
     }
 
     const step = (direction: Direction) => {
+      flightGesture = true
       flyRef.current(activeRef.current + direction, direction)
+    }
+
+    // ── Llegar al borde es cambiar ──────────────────────────────────────
+    // El margen vacío de la hoja ya ha avisado: en cuanto el scroll toca el
+    // final (bajando) o el principio (subiendo), la cámara sale sola. Sin
+    // gesto extra, que era lo que hacía que pareciera atascado.
+    const onStationScroll = (event: Event) => {
+      const station = event.currentTarget as HTMLElement
+      const index = stations.indexOf(station as HTMLDivElement)
+      const top = station.scrollTop
+      const previous = lastTops[index] ?? top
+      lastTops[index] = top
+
+      if (index !== activeRef.current || flyingRef.current) return
+      if (performance.now() - arrivedAt < ARRIVAL_COOLDOWN_MS) return
+
+      const max = station.scrollHeight - station.clientHeight
+      if (top > previous && top >= max - 1) step(1)
+      else if (top < previous && top <= 1) step(-1)
     }
 
     // ── Punto de partida ────────────────────────────────────────────────
@@ -543,9 +570,17 @@ export function SpatialHome() {
     syncMat()
     const startStation = stations[startIndex]
     if (startStation) startStation.scrollTop = contentStartTop(startStation)
+    // Punto de partida de cada hoja, para saber hacia dónde va su primer scroll.
+    stations.forEach((station, index) => {
+      lastTops[index] = station?.scrollTop ?? 0
+    })
 
     flyingRef.current = true
     setArrived(false)
+    // La entrada cuenta como vuelo desde la propia estación: así, con la
+    // cámara alejada, también se pintan las hojas vecinas de la mesa.
+    setFrom(startIndex)
+    setWide(introFromScript)
     viewport.dataset.flying = "true"
 
     let entrance: gsap.core.Timeline | null = null
@@ -600,6 +635,14 @@ export function SpatialHome() {
         return
       }
 
+      if (flightGesture) {
+        if (continues) {
+          event.preventDefault()
+          return
+        }
+        flightGesture = false
+      }
+
       // Sólo vertical: el desplazamiento lateral del trackpad se escapa sin
       // querer y no puede cambiar de estación.
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return
@@ -614,10 +657,7 @@ export function SpatialHome() {
       const station = stations[activeRef.current]
       if (!station) return
 
-      if (!continues) scrollGesture = false
-
       if (canScrollWithin(event.target, station, direction)) {
-        scrollGesture = true
         // Sobre el header o la brújula la rueda no llega a la estación.
         if (!station.contains(event.target as Node)) {
           event.preventDefault()
@@ -626,10 +666,9 @@ export function SpatialHome() {
         return
       }
 
+      // Ya en el borde sin scroll que hacer (llegó a él durante la pausa del
+      // aterrizaje, o la rueda está fuera de la estación): el gesto cambia.
       event.preventDefault()
-      // El gesto que ha llevado el texto hasta el borde no cuenta: hace falta
-      // soltar y volver a empezar.
-      if (continues && scrollGesture) return
       if (performance.now() - arrivedAt < ARRIVAL_COOLDOWN_MS) return
       step(direction)
     }
@@ -847,6 +886,9 @@ export function SpatialHome() {
     window.addEventListener("wheel", onWheel, { passive: false })
     window.addEventListener("touchstart", onTouchStart, { passive: true })
     window.addEventListener("touchend", onTouchEnd, { passive: true })
+    stations.forEach((station) =>
+      station?.addEventListener("scroll", onStationScroll, { passive: true }),
+    )
     window.addEventListener("keydown", onKeyDown)
     window.addEventListener("resize", onResize)
     window.addEventListener("pointermove", onPointerMove, { passive: true })
@@ -858,6 +900,9 @@ export function SpatialHome() {
       window.removeEventListener("touchstart", onTouchStart)
       cancelled = true
       window.removeEventListener("touchend", onTouchEnd)
+      stations.forEach((station) =>
+        station?.removeEventListener("scroll", onStationScroll),
+      )
       window.removeEventListener("keydown", onKeyDown)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("pointermove", onPointerMove)
@@ -886,6 +931,19 @@ export function SpatialHome() {
             {STATION_SPOTS.map((spot, index) => {
               const isActive = index === active
               const next = STATION_SPOTS[index + 1]
+              // En un vuelo se pintan la de salida y la de llegada. Sus vecinas
+              // sólo cuando la cámara se aleja lo bastante para verlas (intro,
+              // saltos largos). Pintar menos es lo que mantiene fluido el vuelo.
+              const near =
+                wide &&
+                from >= 0 &&
+                [from, active].some((other) => {
+                  const a = STATION_SPOTS[other]
+                  return (
+                    Math.abs(a.col - spot.col) <= 1 &&
+                    Math.abs(a.row - spot.row) <= 1
+                  )
+                })
               return (
                 <Fragment key={spot.id}>
                 <div
@@ -899,6 +957,8 @@ export function SpatialHome() {
                   data-prev={index > 0 || undefined}
                   data-next={Boolean(next) || undefined}
                   data-active={(spatial && isActive) || undefined}
+                  data-from={(spatial && index === from) || undefined}
+                  data-near={(spatial && near) || undefined}
                   data-arrived={(spatial && isActive && arrived) || undefined}
                   inert={spatial && !isActive ? true : undefined}
                   tabIndex={spatial ? -1 : undefined}
