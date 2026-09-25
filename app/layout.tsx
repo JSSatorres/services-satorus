@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/atkinson-hyperlegible-next";
 import "./globals.css";
@@ -107,6 +108,7 @@ export default function RootLayout({
         <MaskedHeadings />
         <SpatialLanding />
         <MotionProvider>{children}</MotionProvider>
+        <Analytics />
       </body>
     </html>
   );
