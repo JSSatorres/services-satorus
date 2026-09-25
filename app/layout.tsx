@@ -3,13 +3,14 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/atkinson-hyperlegible-next";
+import "@fontsource-variable/caveat";
 import "./globals.css";
-import "./spatial.css";
+import "./book.css";
+import "./home-sections.css";
 import { MaskedHeadings } from "@/components/masked-headings";
 import { MotionProvider } from "@/components/motion-provider";
 import { ScrollProgressRail } from "@/components/scroll-progress-rail";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { SpatialLanding } from "@/components/spatial/spatial-landing";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
 const socialImage = absoluteUrl("/opengraph-image");
@@ -87,8 +88,7 @@ export default function RootLayout({
           if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
             delete root.dataset.heroMotion;
           } else if (window.location.pathname === "/") {
-            root.dataset.spatial = "on";
-            if (!window.location.hash) root.dataset.spatialIntro = "on";
+            root.dataset.book = "on";
           }`}
         </Script>
         <noscript>
@@ -106,7 +106,6 @@ export default function RootLayout({
         <SmoothScroll />
         <ScrollProgressRail />
         <MaskedHeadings />
-        <SpatialLanding />
         <MotionProvider>{children}</MotionProvider>
         <Analytics />
       </body>
