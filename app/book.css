@@ -96,7 +96,8 @@
 
 html[data-book="on"] .bk {
   /* 100svh de escenario + un tramo por unidad (abrir + una por historia). */
-  height: calc(100svh + var(--units, 9) * 85svh);
+  --unit-h: 85svh;
+  height: calc(100svh + var(--units, 9) * var(--unit-h));
 }
 
 html[data-book="on"] .bk-stage {
@@ -1978,5 +1979,42 @@ html[data-book="on"] .bk-problems {
   html[data-book="on"] .bk-app-body {
     flex: 1;
     grid-auto-rows: minmax(min-content, 1fr);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Móvil: una página por gesto
+
+   Con el dedo el scroll es nativo y tiene mucha inercia: un gesto fuerte
+   pasaba dos o tres hojas. Cada página tiene una parada obligatoria
+   (`scroll-snap-stop: always`) y cada tramo es más largo. Las paradas sólo
+   existen dentro del libro; fuera, el scroll es libre (`proximity`).
+   -------------------------------------------------------------------------- */
+
+.bk-snap {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  html[data-book="on"] {
+    scroll-snap-type: y proximity;
+  }
+
+  html[data-book="on"] .bk {
+    --unit-h: 120svh;
+  }
+
+  /* La parada queda en la posición de lectura: la cabecera fija aparta el
+     ajuste (`scroll-padding-top`), así que se compensa. */
+  html[data-book="on"] .bk-snap {
+    position: absolute;
+    top: calc(var(--u) * var(--unit-h) + var(--header-height));
+    left: 0;
+    display: block;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 }
