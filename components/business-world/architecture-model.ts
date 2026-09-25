@@ -19,6 +19,7 @@ export function createArchitecture(invalidate: () => void) {
   const facade = new THREE.Group();
   const interior = new THREE.Group();
   const services = new THREE.Group();
+  const screens: THREE.Mesh[] = [];
   root.add(roof, westWall, backWall, facade, interior, services);
   const textures: THREE.Texture[] = [];
   const materials: THREE.Material[] = [];
@@ -41,7 +42,7 @@ export function createArchitecture(invalidate: () => void) {
     draw(context);
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
-    texture.anisotropy = 4;
+    texture.anisotropy = 8;
     textures.push(texture);
     return texture;
   }
@@ -52,12 +53,12 @@ export function createArchitecture(invalidate: () => void) {
       const n = random();
       c.fillStyle =
         n > 0.5
-          ? `rgba(255,250,235,${n * 0.14})`
-          : `rgba(62,49,36,${n * 0.12})`;
+          ? `rgba(255,250,235,${n * 0.06})`
+          : `rgba(62,49,36,${n * 0.05})`;
       c.fillRect(random() * 512, random() * 512, 1 + random() * 2, 1);
     }
     for (let i = 0; i < 70; i++) {
-      c.fillStyle = `rgba(81,67,48,${random() * 0.035})`;
+      c.fillStyle = `rgba(81,67,48,${random() * 0.015})`;
       c.fillRect(0, random() * 512, 512, random() * 3);
     }
   });
@@ -65,7 +66,7 @@ export function createArchitecture(invalidate: () => void) {
     c.fillStyle = "#9d7750";
     c.fillRect(0, 0, 512, 512);
     for (let x = 0; x < 512; x++) {
-      c.strokeStyle = `rgba(${random() > 0.4 ? "49,25,10" : "241,214,161"},${0.04 + random() * 0.2})`;
+      c.strokeStyle = `rgba(${random() > 0.4 ? "49,25,10" : "241,214,161"},${0.025 + random() * 0.065})`;
       c.lineWidth = 0.5 + random();
       c.beginPath();
       c.moveTo(x, 0);
@@ -78,7 +79,7 @@ export function createArchitecture(invalidate: () => void) {
     c.fillRect(0, 0, 512, 512);
     for (let y = 0; y < 512; y += 3)
       for (let x = 0; x < 512; x += 3) {
-        c.fillStyle = `rgba(30,28,22,${random() * 0.18})`;
+        c.fillStyle = `rgba(30,28,22,${random() * 0.065})`;
         c.fillRect(x, y, 1, 2);
       }
   });
@@ -90,33 +91,37 @@ export function createArchitecture(invalidate: () => void) {
   const stone = standard({
     map: stoneMap,
     bumpMap: stoneMap,
-    bumpScale: 0.018,
+    bumpScale: 0.003,
     roughness: 0.86,
   });
   const wallConcrete = standard({
     map: stoneMap,
     roughness: 0.88,
     bumpMap: stoneMap,
-    bumpScale: 0.012,
+    bumpScale: 0.003,
   });
   const oak = standard({
     map: woodMap,
     bumpMap: woodMap,
-    bumpScale: 0.008,
-    roughness: 0.48,
+    bumpScale: 0.002,
+    roughness: 0.9,
   });
-  const darkOak = standard({ map: woodMap, color: "#917965", roughness: 0.58 });
-  const metal = standard({ color: "#282b29", roughness: 0.32, metalness: 0.8 });
+  const darkOak = standard({ map: woodMap, color: "#aba08c", roughness: 0.94 });
+  const metal = standard({
+    color: "#282b29",
+    roughness: 0.43,
+    metalness: 0.75,
+  });
   const aluminum = standard({
     color: "#999d9b",
-    roughness: 0.29,
+    roughness: 0.38,
     metalness: 0.88,
   });
   const plaster = standard({
     color: "#d6d1c5",
     roughness: 0.9,
     bumpMap: stoneMap,
-    bumpScale: 0.008,
+    bumpScale: 0.002,
   });
   const cloth = standard({ map: fabricMap, roughness: 0.97 });
   const paper = standard({ color: "#ded9ca", roughness: 0.96 });
@@ -317,7 +322,7 @@ export function createArchitecture(invalidate: () => void) {
     flooring.setMatrixAt(index, boardTransform.matrix);
     flooring.setColorAt(
       index,
-      new THREE.Color().setHSL(0.09, 0.06, 0.8 + random() * 0.13),
+      new THREE.Color().setHSL(0.09, 0.06, 0.87 + random() * 0.055),
     );
   });
   flooring.castShadow = true;
@@ -405,48 +410,57 @@ export function createArchitecture(invalidate: () => void) {
     box(group, [0.42, 0.025, 0.3], [0.2, 0.925, -0.2], aluminum, 0.012);
     const screenMap = canvasTexture(
       (c) => {
-        c.fillStyle = "#e8e7df";
-        c.fillRect(0, 0, 1024, 640);
-        c.fillStyle = "#293832";
-        c.fillRect(0, 0, 195, 640);
-        c.fillStyle = "#f9f8f2";
-        c.font = "22px Arial";
-        c.fillText("SATORUS", 25, 50);
-        c.fillStyle = "#62716a";
-        for (let i = 0; i < 6; i++)
-          c.fillRect(25, 112 + i * 49, 125 - i * 7, 6);
-        c.fillStyle = "#293832";
-        c.font = "32px Arial";
-        c.fillText("Todo, en su sitio.", 239, 80);
+        c.fillStyle = "#eeece3";
+        c.fillRect(0, 0, 1600, 900);
+        c.fillStyle = "#243d33";
+        c.fillRect(0, 0, 1600, 84);
+        c.fillStyle = "#f3f0e6";
+        c.font = "24px Arial";
+        c.fillText("satorus.   /   APLICACIONES A MEDIDA", 64, 53);
+        c.fillStyle = "#526252";
+        c.font = "23px Arial";
+        c.fillText("TU FORMA DE TRABAJAR, CONECTADA.", 90, 227);
+        c.fillStyle = "#243d33";
+        c.font = "68px Georgia";
+        c.fillText("Una herramienta", 90, 350);
+        c.fillText("a tu manera.", 90, 432);
+        c.font = "27px Arial";
+        c.fillText("De buscar en tres sitios", 90, 535);
+        c.fillText("a tenerlo todo a mano.", 90, 576);
+        c.fillStyle = "#243d33";
+        c.fillRect(90, 666, 380, 70);
+        c.fillStyle = "#ffffff";
+        c.fillText("Explorar la aplicación  →", 113, 711);
+        c.fillStyle = "#d8ddcf";
+        c.fillRect(930, 205, 575, 535);
         for (let i = 0; i < 3; i++) {
-          c.fillStyle = "#ffffff";
-          c.fillRect(240 + i * 249, 121, 221, 140);
-          c.fillStyle = "#8b7853";
-          c.font = "43px Arial";
-          c.fillText(["24", "08", "96%"][i], 263 + i * 249, 190);
-        }
-        for (let i = 0; i < 5; i++) {
-          c.fillStyle = i % 2 ? "#f6f5ef" : "#dddcd2";
-          c.fillRect(240, 305 + i * 52, 716, 45);
-          c.fillStyle = "#a6b5a0";
-          c.fillRect(832, 318 + i * 52, 89, 13);
+          c.fillStyle = "#faf8f1";
+          c.fillRect(970, 275 + i * 130, 495, 105);
+          c.fillStyle = "#243d33";
+          c.fillText(
+            ["01   Pedidos", "02   Equipo", "03   Reservas"][i],
+            1000,
+            337 + i * 130,
+          );
         }
       },
-      1024,
-      640,
+      1600,
+      900,
     );
-    box(
+    const screenMaterial = new THREE.MeshBasicMaterial({
+      map: screenMap,
+      toneMapped: false,
+    });
+    materials.push(screenMaterial);
+    const screen = box(
       group,
       [1.01, 0.565, 0.009],
       [0.2, 1.35, -0.241],
-      standard({
-        map: screenMap,
-        emissiveMap: screenMap,
-        emissive: "#ffffff",
-        emissiveIntensity: 0.2,
-        roughness: 0.4,
-      }),
+      screenMaterial,
     );
+    screen.castShadow = false;
+    screen.receiveShadow = false;
+    screens.push(screen);
     box(group, [0.7, 0.024, 0.23], [0.16, 0.92, 0.23], aluminum, 0.014);
     for (let i = 0; i < 4; i++)
       for (let j = 0; j < 12; j++)
@@ -559,22 +573,45 @@ export function createArchitecture(invalidate: () => void) {
       members: materials.filter(
         (m) => m instanceof THREE.MeshStandardMaterial && m.map === woodMap,
       ) as THREE.MeshStandardMaterial[],
-      normal: 0.22,
+      normal: 0.065,
     },
-    { asset: "concrete_wall_001", members: [wallConcrete], normal: 0.18 },
+    { asset: "concrete_wall_001", members: [wallConcrete], normal: 0.045 },
   ];
   for (const set of materialSets) {
     for (const kind of ["Diffuse", "nor_gl", "Rough"] as const) {
       loader.load(
         `/materials/architecture/${set.asset}-${kind}.jpg`,
-        (texture) => {
+        (texture: THREE.Texture) => {
           if (disposed) {
             texture.dispose();
             return;
           }
           textures.push(texture);
-          texture.anisotropy = 4;
+          texture.anisotropy = 8;
           if (kind === "Diffuse") texture.colorSpace = THREE.SRGBColorSpace;
+          // A sealed veneer has restrained albedo variation and a satin finish.
+          // Remap measured roughness to this finish instead of multiplying into mirror-like grain.
+          if (set.asset === "oak_veneer_01") {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(2, 1);
+            if (kind !== "nor_gl") {
+              const image = texture.image as HTMLImageElement;
+              const canvas = document.createElement("canvas");
+              canvas.width = image.naturalWidth;
+              canvas.height = image.naturalHeight;
+              const context = canvas.getContext("2d")!;
+              if (kind === "Diffuse")
+                context.filter = "saturate(0.78) contrast(0.68)";
+              else {
+                context.fillStyle = "#c7c7c7";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.globalAlpha = 0.18;
+              }
+              context.drawImage(image, 0, 0);
+              texture.source = new THREE.Source(canvas);
+              texture.needsUpdate = true;
+            }
+          }
           for (const material of set.members) {
             if (kind === "Diffuse") material.map = texture;
             if (kind === "nor_gl") {
@@ -603,6 +640,7 @@ export function createArchitecture(invalidate: () => void) {
     interior,
     services,
     signals,
+    screens,
     paths,
     dispose() {
       disposed = true;

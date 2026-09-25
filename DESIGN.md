@@ -299,3 +299,11 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 - **Don't** usar robots, neón, dashboards, fondos de datos ni iconografía futurista genérica de IA.
 - **Don't** sustituir la materialidad por sombras de tarjeta, glassmorphism o radios blandos universales.
 - **Don't** romper el titular hero en más de dos ideas visuales ni separar el CTA naranja de la ruta que lo justifica.
+
+### Monitor como entrada a aplicaciones — 25/09/2026
+
+- El puesto de trabajo contiene la entrada a la sección existente «Una herramienta a tu manera». Se puede pulsar el monitor 3D o su marcador accesible.
+- La cámara abre el edificio, se acerca por encima del escritorio y encuadra la pantalla. El contenido HTML toma el relevo con el mismo papel cálido y verde de la pantalla física.
+- Pedidos, equipo y reservas muestran ejemplos ilustrativos seleccionables. GoblinTrader aporta evidencia real mediante su captura y enlace al caso.
+- El diálogo permite volver, usar Escape, conservar el capítulo y contactar. El foco queda dentro y regresa al punto de entrada. Con movimiento reducido o sin WebGL se accede al mismo contenido.
+- Madera satinada con contraste y rugosidad acotados; relieve más fino, tela menos contrastada, juntas de piedra discretas, oclusión de menor alcance y antialias reforzado. Los mapas CC0 mantienen sus créditos originales.

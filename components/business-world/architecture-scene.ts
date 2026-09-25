@@ -78,6 +78,8 @@ export function createArchitecturalScene(
   host: HTMLDivElement,
   initialChapter: number,
   onLost: () => void,
+  hotspot: HTMLButtonElement,
+  onScreenSelect: (index: number) => void,
 ) {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -94,7 +96,7 @@ export function createArchitecturalScene(
   renderer.domElement.dataset.architectureCanvas = "true";
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 180);
+  const camera = new THREE.PerspectiveCamera(37, 1, 0.025, 180);
   const lookAt = new THREE.Vector3(0, 1.3, 0);
   const model = createArchitecture(() => invalidate());
   scene.add(model.root);
@@ -102,12 +104,12 @@ export function createArchitecturalScene(
   const room = new RoomEnvironment();
   const environment = pmrem.fromScene(room, 0.055);
   scene.environment = environment.texture;
-  scene.environmentIntensity = 0.65;
+  scene.environmentIntensity = 0.8;
   room.dispose();
   pmrem.dispose();
-  const ambient = new THREE.HemisphereLight(0xe9eff4, 0x74614b, 0.48);
+  const ambient = new THREE.HemisphereLight(0xe9eff4, 0x74614b, 0.65);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffe8c5, 2.35);
+  const sun = new THREE.DirectionalLight(0xffe8c5, 1.75);
   sun.position.set(-8, 14, 9);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -115,7 +117,7 @@ export function createArchitecturalScene(
   sun.shadow.camera.right = 15;
   sun.shadow.camera.top = 14;
   sun.shadow.camera.bottom = -14;
-  sun.shadow.normalBias = 0.025;
+  sun.shadow.normalBias = 0.012;
   sun.shadow.bias = -0.0002;
   sun.shadow.radius = 6;
   scene.add(sun);
@@ -137,20 +139,26 @@ export function createArchitecturalScene(
   scene.add(ground);
   const renderTarget = new THREE.WebGLRenderTarget(1, 1, {
     type: THREE.HalfFloatType,
-    samples: 2,
+    samples: 4,
   });
   const composer = new EffectComposer(renderer, renderTarget);
   const beautyPass = new RenderPass(scene, camera);
-  const occlusion = new ArchitecturalOcclusion(scene, camera, 1, 1, 16);
-  occlusion.kernelRadius = 0.65;
+  const occlusion = new ArchitecturalOcclusion(scene, camera, 1, 1, 32);
+  occlusion.kernelRadius = 0.28;
   occlusion.minDistance = 0.001;
-  occlusion.maxDistance = 0.065;
+  occlusion.maxDistance = 0.022;
   const output = new OutputPass();
   composer.addPass(beautyPass);
   composer.addPass(occlusion);
   composer.addPass(output);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   let chapter = initialChapter;
+  let focusedScreen: number | null = null;
+  let transitionComplete: (() => void) | undefined;
+  let hoveredScreen = 1;
+  const projected = new THREE.Vector3();
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
   let timeline: gsap.core.Timeline | null = null;
   let renderFrame = 0;
   let disposed = false;
@@ -160,11 +168,26 @@ export function createArchitecturalScene(
     if (disposed || !visible || document.hidden) return;
     camera.lookAt(lookAt);
     composer.render();
+    model.screens[1].getWorldPosition(projected);
+    projected.project(camera);
+    const inView =
+      projected.z > -1 &&
+      projected.z < 1 &&
+      Math.abs(projected.x) < 0.93 &&
+      Math.abs(projected.y) < 0.86;
+    hotspot.style.left = inView
+      ? ((projected.x + 1) * host.clientWidth) / 2 + "px"
+      : "65%";
+    hotspot.style.top = inView
+      ? ((1 - projected.y) * host.clientHeight) / 2 + "px"
+      : "60%";
   }
   function invalidate() {
     if (!renderFrame && !disposed) renderFrame = requestAnimationFrame(render);
   }
-  function goTo(index: number, immediate = false) {
+  function goTo(index: number, immediate = false, onComplete?: () => void) {
+    if (focusedScreen !== null) return;
+    transitionComplete = onComplete;
     chapter = Math.max(0, Math.min(shots.length - 1, index));
     timeline?.kill();
     const shot = shots[chapter];
@@ -175,7 +198,12 @@ export function createArchitecturalScene(
     host.dataset.view = String(chapter);
     timeline = gsap.timeline({
       onUpdate: invalidate,
-      onComplete: invalidate,
+      onComplete: () => {
+        invalidate();
+        const complete = transitionComplete;
+        transitionComplete = undefined;
+        complete?.();
+      },
       defaults: { duration, ease: "power2.inOut" },
     });
     timeline
@@ -220,6 +248,97 @@ export function createArchitecturalScene(
     }
     invalidate();
   }
+  function screenDestination(index: number) {
+    model.root.updateMatrixWorld(true);
+    const target = model.screens[index].getWorldPosition(new THREE.Vector3());
+    // Fit the physical monitor before handing over to accessible HTML.
+    const distance =
+      Math.max(0.565, 1.01 / camera.aspect) /
+      (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    return { target, distance: distance * 1.035 };
+  }
+  function enterScreen(onComplete: () => void, index = 1) {
+    timeline?.kill();
+    focusedScreen = index;
+    transitionComplete = onComplete;
+    model.services.visible = false;
+    model.interior.position.y = 0;
+    const { target, distance } = screenDestination(focusedScreen);
+    const duration = reduced.matches ? 0 : 1.25;
+    timeline = gsap.timeline({
+      onUpdate: invalidate,
+      onComplete: () => {
+        invalidate();
+        const complete = transitionComplete;
+        transitionComplete = undefined;
+        complete?.();
+      },
+    });
+    timeline
+      .to(model.roof.position, { y: 7, duration, ease: "power2.inOut" }, 0)
+      .to(
+        model.facade.position,
+        { z: 7, y: 0, duration, ease: "power2.inOut" },
+        0,
+      )
+      .to(
+        camera.position,
+        {
+          x: target.x,
+          y: target.y + 1.5,
+          z: target.z + 2.8,
+          duration,
+          ease: "power2.inOut",
+        },
+        0,
+      )
+      .to(
+        lookAt,
+        {
+          x: target.x,
+          y: target.y,
+          z: target.z,
+          duration,
+          ease: "power2.inOut",
+        },
+        0,
+      )
+      .to(camera.position, {
+        x: target.x,
+        y: target.y,
+        z: target.z + distance,
+        duration: reduced.matches ? 0 : 1.3,
+        ease: "power2.inOut",
+      });
+    invalidate();
+  }
+  function leaveScreen(onComplete: () => void) {
+    focusedScreen = null;
+    goTo(chapter, false, onComplete);
+  }
+  function pickScreen(event: PointerEvent | MouseEvent) {
+    if (focusedScreen !== null || chapter > 3) return false;
+    const bounds = renderer.domElement.getBoundingClientRect();
+    pointer.set(
+      ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+      -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(model.screens, false)[0];
+    if (!hit) return false;
+    hoveredScreen = model.screens.indexOf(hit.object as THREE.Mesh);
+    return true;
+  }
+  const pointerMove = (event: PointerEvent) => {
+    renderer.domElement.style.cursor = pickScreen(event)
+      ? "pointer"
+      : "default";
+  };
+  const screenClick = (event: MouseEvent) => {
+    if (pickScreen(event)) onScreenSelect(hoveredScreen);
+  };
+  renderer.domElement.addEventListener("pointermove", pointerMove);
+  renderer.domElement.addEventListener("click", screenClick);
   let previousWidth = 0;
   let previousHeight = 0;
   function resize() {
@@ -241,10 +360,21 @@ export function createArchitecturalScene(
     camera.fov = camera.aspect < 1.2 ? 40 : 37;
     camera.updateProjectionMatrix();
     composer.setPixelRatio(
-      Math.min(window.devicePixelRatio, width < 680 ? 1 : 1.5),
+      Math.min(
+        Math.max(window.devicePixelRatio, 1.25),
+        width < 680 ? 1.25 : 1.75,
+      ),
     );
     composer.setSize(width, height);
-    goTo(chapter, true);
+    if (focusedScreen === null && !transitionComplete) goTo(chapter, true);
+    else {
+      if (focusedScreen !== null && !timeline?.isActive()) {
+        const { target, distance } = screenDestination(focusedScreen);
+        camera.position.copy(target).add(new THREE.Vector3(0, 0, distance));
+        lookAt.copy(target);
+      }
+      invalidate();
+    }
   }
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(host);
@@ -263,7 +393,10 @@ export function createArchitecturalScene(
       invalidate();
     }
   };
-  const motionChange = () => goTo(chapter, true);
+  const motionChange = () => {
+    if (reduced.matches && timeline?.isActive()) timeline.progress(1);
+    else if (focusedScreen === null) goTo(chapter, true);
+  };
   const contextLost = (event: Event) => {
     event.preventDefault();
     timeline?.kill();
@@ -280,6 +413,8 @@ export function createArchitecturalScene(
   }
   return {
     goTo,
+    enterScreen,
+    leaveScreen,
     dispose() {
       disposed = true;
       cancelAnimationFrame(renderFrame);
@@ -289,6 +424,8 @@ export function createArchitecturalScene(
       document.removeEventListener("visibilitychange", visibility);
       reduced.removeEventListener("change", motionChange);
       renderer.domElement.removeEventListener("webglcontextlost", contextLost);
+      renderer.domElement.removeEventListener("pointermove", pointerMove);
+      renderer.domElement.removeEventListener("click", screenClick);
       model.dispose();
       environment.dispose();
       groundGeometry.dispose();

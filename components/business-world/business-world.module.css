@@ -1246,3 +1246,17 @@
   animation: none;
   transform: none;
 }
+
+/* The selected object takes over the stage while its screen is being visited. */
+.stage[data-screen-active="true"] .scene {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.stage[data-screen-active="true"] > :not(.scene),
+.stage[data-screen-active="true"] .sceneCaption {
+  visibility: hidden;
+}

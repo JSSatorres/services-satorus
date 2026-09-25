@@ -281,8 +281,11 @@ export function addConstructionDetails(
   // Skirting, stone panel joints and the exposed edges of the structural deck.
   box(westWall, [0.027, 0.09, 6.25], [-4.87, 0.16, 0], aluminum, 0.004);
   box(backWall, [9.7, 0.09, 0.027], [0, 0.16, -3.07], aluminum, 0.004);
-  for (let z = -3.2; z <= 3.2; z += 1.6)
-    box(westWall, [0.226, 3.4, 0.006], [-5, 1.84, z], gasket);
+  const stoneJoint = t.standard({ color: "#99988c", roughness: 1 });
+  for (let z = -3.2; z <= 3.2; z += 1.6) {
+    const joint = box(westWall, [0.229, 3.4, 0.009], [-5, 1.84, z], stoneJoint);
+    joint.castShadow = false;
+  }
   box(root, [10.4, 0.04, 6.85], [0, -0.125, 0], aluminum, 0.008);
   for (const z of [-3.32, 3.32])
     box(interior, [10.05, 0.035, 0.035], [0, 0.075, z], darkOak, 0.004);

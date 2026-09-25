@@ -116,6 +116,7 @@ export function BusinessJourney({ projects }: { projects: JourneyProject[] }) {
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [selectedProject, setSelectedProject] = useState(0);
+  const [screenActive, setScreenActive] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
   const chapter = chapters[active];
   const project = projects[selectedProject];
@@ -181,11 +182,16 @@ export function BusinessJourney({ projects }: { projects: JourneyProject[] }) {
         <div
           className={styles.stage}
           data-world-stage=""
+          data-screen-active={screenActive}
           data-chapter={active}
           data-document={active >= 5 ? "true" : "false"}
         >
           <div className={styles.scene}>
-            <BusinessWorld chapter={active} replayKey={replayKey} />
+            <BusinessWorld
+              chapter={active}
+              replayKey={replayKey}
+              onScreenActive={setScreenActive}
+            />
           </div>
           <div className={styles.cornerLabel} aria-hidden="true">
             <span className={styles.statusDot} />
