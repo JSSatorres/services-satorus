@@ -1,12 +1,12 @@
 import { SiteHeader } from "@/components/site-header"
-import { SpatialHome } from "@/components/spatial/spatial-home"
+import { BookHome } from "@/components/book/book-home"
 
 export default function Home() {
   return (
     <>
       <SiteHeader />
       <main id="contenido">
-        <SpatialHome />
+        <BookHome />
       </main>
     </>
   )

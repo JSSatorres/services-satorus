@@ -1,47 +1,22 @@
 "use client"
 
-import gsap from "gsap"
-import {
-  resumeCurtainTakeover,
-  suspendCurtainTakeover,
-} from "@/lib/curtain-nav"
-import { jumpToScrollTop } from "@/lib/lenis"
-import { SPATIAL_ACTIVE_EVENT } from "@/lib/spatial-nav"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ArrowUpRight, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react"
 import { BrandLogo } from "@/components/brand-logo"
 import { RollLabel } from "@/components/roll-label"
-import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-motion"
+import { BOOK_SPREAD_EVENT } from "@/lib/book-content"
+import { scrollToSection } from "@/lib/lenis"
 
 const links = [
   { href: "/#como-trabajamos", label: "Cómo trabajamos" },
-  { href: "/#proyectos", label: "Proyectos" },
-  { href: "/#diagnostico", label: "Soluciones" },
+  { href: "/#que-hacemos", label: "Qué hacemos" },
+  { href: "/#preguntas", label: "Preguntas" },
 ]
-
-const SECTION_TRANSITION_DURATION = 0.62
-const SECTION_SCROLL_SETTLE_DURATION = 0.8
-const SECTION_HANDOFF_DURATION = 0.14
 
 function getSectionId(href: string) {
   return href.startsWith("/#") ? href.slice(2) : null
-}
-
-function getSectionElements(sectionId: string) {
-  const section = document.getElementById(sectionId)
-  return section ? [section] : []
-}
-
-function findVisibleSection(sectionId: string) {
-  const sections = getSectionElements(sectionId)
-  return (
-    sections.find((section) => section.getClientRects().length > 0) ??
-    sections[0] ??
-    null
-  )
 }
 
 function canHandleSectionLink(event: MouseEvent<HTMLAnchorElement>) {
@@ -54,111 +29,12 @@ function canHandleSectionLink(event: MouseEvent<HTMLAnchorElement>) {
   )
 }
 
-function createSectionPreview(section: HTMLElement) {
-  const preview = section.cloneNode(true) as HTMLElement
-  preview.classList.add("section-transition-preview")
-  preview.classList.remove("curtain-panel--masked")
-  preview.removeAttribute("id")
-  preview.setAttribute("aria-hidden", "true")
-  preview.inert = true
-
-  preview
-    .querySelectorAll("[id]")
-    .forEach((element) => element.removeAttribute("id"))
-  preview
-    .querySelectorAll<HTMLElement>(
-      "a, button, input, select, summary, textarea",
-    )
-    .forEach((element) => element.setAttribute("tabindex", "-1"))
-  preview
-    .querySelectorAll<HTMLElement>(".section-curtain-surface")
-    .forEach((surface) => {
-      surface.style.setProperty("mask-image", "none")
-      surface.style.setProperty("-webkit-mask-image", "none")
-    })
-
-  return preview
-}
-
-function getSectionScrollTop(section: HTMLElement) {
-  return Math.max(0, window.scrollY + section.getBoundingClientRect().top)
-}
-
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const pathname = usePathname()
-  const reducedMotion = useHydratedReducedMotion()
   const headerRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
-  const activeTransitionRef = useRef<gsap.core.Animation | null>(null)
-  const transitionStageRef = useRef<HTMLDivElement | null>(null)
-  const resumeScrollTriggersRef = useRef<(() => void) | null>(null)
-
-  function removeTransitionStage() {
-    activeTransitionRef.current?.kill()
-    activeTransitionRef.current = null
-    transitionStageRef.current?.remove()
-    transitionStageRef.current = null
-    document.documentElement.removeAttribute("data-section-transition")
-  }
-
-  function handOffToSection() {
-    const stage = transitionStageRef.current
-    if (!stage) {
-      removeTransitionStage()
-      return
-    }
-
-    activeTransitionRef.current = gsap.to(stage, {
-      autoAlpha: 0,
-      duration: SECTION_HANDOFF_DURATION,
-      ease: "power1.out",
-      onComplete: removeTransitionStage,
-    })
-  }
-
-  function resumeSectionScrollTriggers() {
-    resumeScrollTriggersRef.current?.()
-    resumeScrollTriggersRef.current = null
-    resumeCurtainTakeover()
-  }
-
-  function suspendSectionScrollTriggers(section: HTMLElement) {
-    resumeSectionScrollTriggers()
-    gsap.registerPlugin(ScrollTrigger)
-    suspendCurtainTakeover()
-
-    const panel = section.closest<HTMLElement>(".section-curtain-panel")
-    // Los triggers del relevo por gesto sólo publican geometría: deshabilitarlos
-    // dejaría al stack sin fronteras con las que decidir, y el salto del header
-    // ya queda cubierto suspendiendo el relevo.
-    const triggers = panel
-      ? ScrollTrigger.getAll().filter(
-          (trigger) =>
-            trigger.vars.id !== "curtain-relay" &&
-            (trigger.trigger === panel || trigger.vars.endTrigger === panel),
-        )
-      : []
-
-    triggers.forEach((trigger) => {
-      trigger.disable(true)
-      trigger.animation?.progress(1).pause()
-    })
-
-    const resume = () => {
-      window.removeEventListener("wheel", resume)
-      window.removeEventListener("touchstart", resume)
-      triggers.forEach((trigger) => trigger.enable())
-      ScrollTrigger.refresh()
-      resumeCurtainTakeover()
-      resumeScrollTriggersRef.current = null
-    }
-
-    resumeScrollTriggersRef.current = resume
-    window.addEventListener("wheel", resume, { passive: true, once: true })
-    window.addEventListener("touchstart", resume, { passive: true, once: true })
-  }
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", open)
@@ -176,100 +52,14 @@ export function SiteHeader() {
     return () => desktop.removeEventListener("change", closeOnDesktop)
   }, [])
 
-  useEffect(() => removeTransitionStage, [])
-
-  useEffect(() => resumeSectionScrollTriggers, [])
-
-  function navigateToSection(section: HTMLElement, hashId = section.id) {
-    resumeSectionScrollTriggers()
-    // El salto del header cruza varias fronteras de golpe; sin esto el stack
-    // de cortinas encadenaría relevos por debajo de su propia cobertura.
-    suspendCurtainTakeover()
-
-    // Única pieza que coloca la sección, y a propósito: corrige el SCROLL, no
-    // la sección. Antes se remataba con un `transform` sobre la propia sección
-    // que se quedaba puesto hasta el primer gesto de rueda. Eso hacía dos
-    // daños: un elemento transformado crea bloque contenedor y le rompe el
-    // `position: fixed` a sus descendientes —el pin de la historia de
-    // escritorio y el vídeo del hero viven ahí dentro—, y al limpiarlo en el
-    // primer `wheel` la sección se desplazaba de golpe justo cuando el usuario
-    // empezaba a moverse. `getSectionScrollTop` ya es `scrollY + rect.top`, así
-    // que repetirlo converge a `rect.top = 0` sin tocar el DOM.
-    const alignSectionWithViewport = () => {
-      jumpToScrollTop(getSectionScrollTop(section))
-    }
-    const settleSectionPosition = (onSettled: () => void) => {
-      let remainingFrames = 6
-
-      const alignAfterScrollTriggerUpdate = () => {
-        alignSectionWithViewport()
-        remainingFrames -= 1
-
-        if (remainingFrames > 0) {
-          window.requestAnimationFrame(alignAfterScrollTriggerUpdate)
-          return
-        }
-
-        onSettled()
-      }
-
-      alignAfterScrollTriggerUpdate()
-    }
-
-    if (reducedMotion) {
-      suspendSectionScrollTriggers(section)
-      settleSectionPosition(() => {
-        window.history.pushState(null, "", `/#${hashId}`)
-      })
-      return
-    }
-
-    removeTransitionStage()
-
-    const stage = document.createElement("div")
-    const preview = createSectionPreview(section)
-    stage.className = "section-transition-stage"
-    stage.append(preview)
-    document.body.append(stage)
-    document.documentElement.setAttribute("data-section-transition", "true")
-    transitionStageRef.current = stage
-
-    const transition = gsap.timeline({
-      onComplete: () => {
-        suspendSectionScrollTriggers(section)
-        settleSectionPosition(() => {
-          window.history.pushState(null, "", `/#${hashId}`)
-          activeTransitionRef.current = gsap.delayedCall(
-            SECTION_SCROLL_SETTLE_DURATION,
-            handOffToSection,
-          )
-        })
-      },
-    })
-
-    transition.fromTo(
-      preview,
-      {
-        y: stage.clientHeight,
-        scale: 1.03,
-      },
-      {
-        y: 0,
-        scale: 1,
-        duration: SECTION_TRANSITION_DURATION,
-        ease: "power4.out",
-      },
-    )
-
-    activeTransitionRef.current = transition
-  }
-
+  // En el home, los enlaces a secciones pasan de página con el mismo scroll
+  // que la rueda: sin cortinas ni clones de la sección.
   function handleSectionLinkClick(
     event: MouseEvent<HTMLAnchorElement>,
     href: string,
   ) {
-    // La mesa del home atiende los enlaces en captura: si ya ha mandado la
-    // cámara a la sección, aquí sólo queda cerrar el menú.
+    // El libro atiende en captura los enlaces a sus historias: si ya ha
+    // pasado las hojas, aquí sólo queda cerrar el menú.
     if (event.defaultPrevented) {
       setOpen(false)
       return
@@ -278,67 +68,57 @@ export function SiteHeader() {
     const sectionId = getSectionId(href)
     if (!sectionId || pathname !== "/" || !canHandleSectionLink(event)) return
 
-    const section = findVisibleSection(sectionId)
+    const section = document.getElementById(sectionId)
     if (!section) return
 
     event.preventDefault()
     setOpen(false)
-    navigateToSection(section, sectionId)
+    window.history.pushState(null, "", `/#${sectionId}`)
+    scrollToSection(section)
   }
 
   useEffect(() => {
-    const sectionId = window.location.hash.slice(1)
-    if (!sectionId || pathname !== "/") return
+    if (pathname !== "/") return
 
-    const target = document.getElementById(sectionId)
-    if (target && target.getClientRects().length > 0) return
-
-    const visible = findVisibleSection(sectionId)
-    if (!visible || visible === target) return
-
-    jumpToScrollTop(getSectionScrollTop(visible))
-  }, [pathname])
-
-  // En la mesa las secciones no pasan por el viewport al hacer scroll: la
-  // cámara avisa de dónde se ha posado.
-  useEffect(() => {
-    const onStation = (event: Event) => {
-      setActiveSection((event as CustomEvent<string>).detail)
-    }
-
-    window.addEventListener(SPATIAL_ACTIVE_EVENT, onStation)
-    return () => window.removeEventListener(SPATIAL_ACTIVE_EVENT, onStation)
-  }, [])
-
-  useEffect(() => {
     const sections = links
       .map((link) => getSectionId(link.href))
       .filter((sectionId): sectionId is string => sectionId !== null)
-      .flatMap((sectionId) => getSectionElements(sectionId))
+      .map((sectionId) => document.getElementById(sectionId))
+      // Las historias del libro no pasan por el viewport: las anuncia el libro.
+      .filter(
+        (section): section is HTMLElement =>
+          section !== null && !section.closest(".bk"),
+      )
 
     if (sections.length === 0 || !("IntersectionObserver" in window)) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // En la mesa quien sabe la sección activa es la cámara.
-        if (document.documentElement.dataset.spatial === "on") return
-
         const visibleSection = entries
           .filter((entry) => entry.isIntersecting)
           .sort(
             (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
           )[0]
 
-        if (visibleSection) {
-          setActiveSection(visibleSection.target.id.replace(/-movil$/, ""))
-        }
+        if (visibleSection) setActiveSection(visibleSection.target.id)
       },
       { rootMargin: "-28% 0px -58%", threshold: 0 },
     )
 
     sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
-  }, [])
+
+    const onSpread = (event: Event) => {
+      const id = (event as CustomEvent<string | null>).detail
+      if (links.some((link) => getSectionId(link.href) === id)) setActiveSection(id)
+      else setActiveSection(null)
+    }
+    window.addEventListener(BOOK_SPREAD_EVENT, onSpread)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener(BOOK_SPREAD_EVENT, onSpread)
+    }
+  }, [pathname])
 
   function handleMenuKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (!open) return

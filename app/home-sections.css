@@ -1,0 +1,246 @@
+/* ==========================================================================
+   Secciones del home que van después del libro: notas al margen (preguntas)
+   y la página en blanco (contacto).
+   ========================================================================== */
+
+.nb-after {
+  padding: 0 var(--page-pad);
+  background: var(--cool-paper);
+}
+
+.nb-after > * {
+  max-width: 74rem;
+}
+
+.nb-note summary,
+.nb-chapter-head h2,
+.nb-contact h2 {
+  font-family: var(--font-display-family);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.nb-contact {
+  --nb-tape-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+}
+
+.nb-notes {
+  --nb-tape-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+}
+
+.nb-chapter-num {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.nb-chapter-num span {
+  padding: 0.35rem 0.55rem;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+}
+
+/* Capítulos */
+
+.nb-chapter {
+  padding: var(--section-pad) 0;
+  border-top: 2px solid var(--bench-graphite);
+}
+
+.nb-chapter-head {
+  max-width: 52rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.nb-chapter-head .nb-chapter-num {
+  margin-bottom: 1.1rem;
+}
+
+.nb-chapter-head h2 {
+  max-width: 17ch;
+  margin: 0 0 1.2rem;
+  font-size: clamp(2.5rem, 5vw, 5.2rem);
+  font-variation-settings: "wdth" 72, "wght" 790;
+  line-height: 0.9;
+}
+
+.nb-chapter-lead {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--graphite-soft);
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+}
+
+/* --------------------------------------------------------------------------
+   04 · Notas al margen
+   -------------------------------------------------------------------------- */
+
+.nb-notes {
+  max-width: 58rem;
+  border-top: 2px solid var(--bench-graphite);
+}
+
+.nb-note {
+  border-bottom: 1px solid var(--line);
+}
+
+.nb-note summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 0;
+  cursor: pointer;
+  font-size: clamp(1.15rem, 1.9vw, 1.55rem);
+  font-variation-settings: "wdth" 85, "wght" 720;
+  line-height: 1.12;
+  list-style: none;
+}
+
+.nb-note summary::-webkit-details-marker {
+  display: none;
+}
+
+.nb-note-mark {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  background: var(--cool-paper);
+  border: 2px solid var(--bench-graphite);
+  border-radius: 50%;
+  font-family: var(--font-body-family);
+  font-size: 0.85rem;
+  font-variation-settings: normal;
+  font-weight: 760;
+  letter-spacing: 0;
+  transition: background-color 160ms ease;
+}
+
+.nb-note[open] .nb-note-mark,
+.nb-note summary:hover .nb-note-mark {
+  background: var(--label-lime);
+}
+
+.nb-note-sign {
+  position: relative;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.nb-note-sign::before,
+.nb-note-sign::after {
+  position: absolute;
+  top: calc(50% - 1.5px);
+  left: 0;
+  width: 100%;
+  height: 3px;
+  content: "";
+  background: var(--bench-graphite);
+  transition: transform 220ms ease;
+}
+
+.nb-note-sign::after {
+  transform: rotate(90deg);
+}
+
+.nb-note[open] .nb-note-sign::after {
+  transform: rotate(0deg);
+}
+
+.nb-note p {
+  max-width: 62ch;
+  margin: 0 0 1.4rem calc(2.1rem + 1rem);
+  padding: 0.9rem 1.1rem;
+  background: #fff;
+  border-left: 4px solid var(--action-orange);
+  box-shadow: var(--nb-tape-shadow);
+  transform: rotate(-0.4deg);
+}
+
+@media (max-width: 620px) {
+  .nb-note p {
+    margin-left: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   05 · La página en blanco
+   -------------------------------------------------------------------------- */
+
+.nb-contact {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(3rem, 7vw, 8rem);
+  padding: var(--section-pad) var(--page-pad);
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+}
+
+.nb-contact::before {
+  position: absolute;
+  top: -9px;
+  left: 0;
+  width: 42%;
+  height: 18px;
+  content: "";
+  background: var(--action-orange);
+  border-radius: 0 999px 999px 0;
+}
+
+.nb-contact .nb-chapter-num span {
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+}
+
+.nb-contact h2 {
+  max-width: 10ch;
+  margin: 1.1rem 0 1.8rem;
+  font-size: clamp(3rem, 5.6vw, 6.2rem);
+  font-variation-settings: "wdth" 70, "wght" 800;
+  line-height: 0.88;
+}
+
+.nb-contact-copy > p:not(.nb-chapter-num) {
+  max-width: 39ch;
+  margin: 0 0 2rem;
+  color: rgba(243, 245, 238, 0.82);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+}
+
+.nb-contact-copy > a {
+  display: inline-block;
+  color: var(--label-lime);
+  border-bottom: 2px solid currentColor;
+  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  font-weight: 710;
+}
+
+/* La hoja del formulario es una página de cuaderno: pautada y con margen. */
+.nb-contact-sheet .contact-form {
+  background-color: var(--cool-paper);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0.85rem,
+      rgba(229, 103, 72, 0.45) 0.85rem calc(0.85rem + 2px),
+      transparent calc(0.85rem + 2px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 2.2rem,
+      rgba(41, 72, 199, 0.1) 2.2rem calc(2.2rem + 1px)
+    );
+}
+
+@media (max-width: 900px) {
+  .nb-contact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
