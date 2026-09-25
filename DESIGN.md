@@ -307,3 +307,13 @@ Los campos y listas son rectos, con bordes de uno o dos píxeles. Los controles 
 - Pedidos, equipo y reservas muestran ejemplos ilustrativos seleccionables. GoblinTrader aporta evidencia real mediante su captura y enlace al caso.
 - El diálogo permite volver, usar Escape, conservar el capítulo y contactar. El foco queda dentro y regresa al punto de entrada. Con movimiento reducido o sin WebGL se accede al mismo contenido.
 - Madera satinada con contraste y rugosidad acotados; relieve más fino, tela menos contrastada, juntas de piedra discretas, oclusión de menor alcance y antialias reforzado. Los mapas CC0 mantienen sus créditos originales.
+
+### Oficina como navegación principal — 25/09/2026
+
+La portada se concentra en el modelo, centrado y sin copy lateral. El recorrido parte del primer encuentro, plantea las soluciones, enseña proyectos y termina en una carta. Cada lugar tiene una función: monitor izquierdo para cómo trabajamos, monitor nuevo de recepción para soluciones, monitor derecho para proyectos y sobre sobre la mesa de café para contacto y dudas.
+
+El contenido procede de development (f58b6fe): se conservan los cuatro pasos y sus fotografías, el diagnóstico, los servicios, el mensaje de hablamos claro, las dos puertas de proyectos, el contacto y las siete preguntas. La estructura 3D agrupa las secciones, sin sustituir sus explicaciones.
+
+Un gesto abre el estudio y acerca la cámara al objeto. Dentro se lee con scroll nativo. Solo al terminar el contenido, otro gesto inicia el vuelo de salida; la cámara vuelve al interior antes de dirigirse al siguiente puesto. Los marcadores y el índice permiten elegir una sección, y Escape vuelve a la oficina. Las secciones permanecen montadas para conservar formularios y controles.
+
+Los vuelos usan el render directo y las vistas quietas recuperan la oclusión de contacto. Las sombras del mobiliario se reutilizan mientras solo cambia la cámara. La inercia residual no inicia otra navegación; teclado, swipe, movimiento reducido y alternativa sin WebGL comparten el contenido.

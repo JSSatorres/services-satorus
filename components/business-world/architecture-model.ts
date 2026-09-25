@@ -395,54 +395,53 @@ export function createArchitecture(invalidate: () => void) {
   for (const z of [-2.7, 2.7])
     box(roof, [8.8, 0.02, 0.035], [0, roofY - 0.16, z], light);
 
-  function desk(x: number, z: number, rotation = 0) {
-    const group = new THREE.Group();
-    group.position.set(x, 0, z);
-    group.rotation.y = rotation;
-    interior.add(group);
-    box(group, [2.8, 0.085, 1.16], [0, 0.86, 0], oak, 0.025);
-    for (const px of [-1.16, 1.16]) {
-      box(group, [0.065, 0.76, 0.065], [px, 0.46, 0], metal, 0.014);
-      box(group, [0.13, 0.035, 0.89], [px, 0.105, 0], metal, 0.012);
-    }
+  function addMonitor(group: THREE.Group, sectionIndex: number) {
     box(group, [1.08, 0.64, 0.048], [0.2, 1.35, -0.27], aluminum, 0.025);
-    box(group, [0.15, 0.25, 0.06], [0.2, 1, -0.26], aluminum, 0.015);
+    box(group, [0.09, 0.2, 0.045], [0.2, 0.995, -0.305], aluminum, 0.015);
     box(group, [0.42, 0.025, 0.3], [0.2, 0.925, -0.2], aluminum, 0.012);
     const screenMap = canvasTexture(
       (c) => {
-        c.fillStyle = "#eeece3";
+        const labels = ["CÓMO TRABAJAMOS", "SOLUCIONES", "PROYECTOS"];
+        const titles = [
+          ["Una mejora concreta.", "Un plan claro."],
+          ["Menos caos.", "Más avance."],
+          ["Una idea puede acabar", "en una app o en una web."],
+        ];
+        const accent = ["#c8a678", "#c1805b", "#88a298"][sectionIndex];
+        c.fillStyle = "#f1eee5";
         c.fillRect(0, 0, 1600, 900);
-        c.fillStyle = "#243d33";
-        c.fillRect(0, 0, 1600, 84);
+        c.fillStyle = "#24352e";
+        c.fillRect(0, 0, 1600, 95);
         c.fillStyle = "#f3f0e6";
         c.font = "24px Arial";
-        c.fillText("satorus.   /   APLICACIONES A MEDIDA", 64, 53);
-        c.fillStyle = "#526252";
-        c.font = "23px Arial";
-        c.fillText("TU FORMA DE TRABAJAR, CONECTADA.", 90, 227);
-        c.fillStyle = "#243d33";
-        c.font = "68px Georgia";
-        c.fillText("Una herramienta", 90, 350);
-        c.fillText("a tu manera.", 90, 432);
-        c.font = "27px Arial";
-        c.fillText("De buscar en tres sitios", 90, 535);
-        c.fillText("a tenerlo todo a mano.", 90, 576);
-        c.fillStyle = "#243d33";
-        c.fillRect(90, 666, 380, 70);
-        c.fillStyle = "#ffffff";
-        c.fillText("Explorar la aplicación  →", 113, 711);
-        c.fillStyle = "#d8ddcf";
-        c.fillRect(930, 205, 575, 535);
-        for (let i = 0; i < 3; i++) {
-          c.fillStyle = "#faf8f1";
-          c.fillRect(970, 275 + i * 130, 495, 105);
-          c.fillStyle = "#243d33";
-          c.fillText(
-            ["01   Pedidos", "02   Equipo", "03   Reservas"][i],
-            1000,
-            337 + i * 130,
-          );
-        }
+        c.fillText("satorus.   /   " + labels[sectionIndex], 65, 60);
+        c.fillStyle = accent;
+        c.fillRect(90, 205, 9, 315);
+        c.fillStyle = "#263a30";
+        c.font = "65px Arial";
+        c.fillText(titles[sectionIndex][0], 140, 330);
+        c.fillText(titles[sectionIndex][1], 140, 415);
+        c.font = "28px Arial";
+        c.fillText(
+          [
+            "Te escuchamos. Lo dejamos por escrito. Lo pruebas tú.",
+            "Vemos el problema y lo convertimos en una solución útil.",
+            "Dos puertas de entrada a lo que hacemos.",
+          ][sectionIndex],
+          140,
+          515,
+        );
+        c.fillStyle = "#24352e";
+        c.fillRect(140, 650, 440, 74);
+        c.fillStyle = "#f3f0e6";
+        c.fillText(
+          "Entrar en " + labels[sectionIndex].toLowerCase() + "  →",
+          160,
+          697,
+        );
+        c.fillStyle = accent;
+        c.font = "180px Georgia";
+        c.fillText("0" + (sectionIndex + 1), 1220, 750);
       },
       1600,
       900,
@@ -460,7 +459,20 @@ export function createArchitecture(invalidate: () => void) {
     );
     screen.castShadow = false;
     screen.receiveShadow = false;
-    screens.push(screen);
+    screens[sectionIndex] = screen;
+  }
+
+  function desk(x: number, z: number, sectionIndex: number) {
+    const group = new THREE.Group();
+    group.position.set(x, 0, z);
+
+    interior.add(group);
+    box(group, [2.8, 0.085, 1.16], [0, 0.86, 0], oak, 0.025);
+    for (const px of [-1.16, 1.16]) {
+      box(group, [0.065, 0.76, 0.065], [px, 0.46, 0], metal, 0.014);
+      box(group, [0.13, 0.035, 0.89], [px, 0.105, 0], metal, 0.012);
+    }
+    addMonitor(group, sectionIndex);
     box(group, [0.7, 0.024, 0.23], [0.16, 0.92, 0.23], aluminum, 0.014);
     for (let i = 0; i < 4; i++)
       for (let j = 0; j < 12; j++)
@@ -478,8 +490,12 @@ export function createArchitecture(invalidate: () => void) {
     addTaskChair(group, detailTools);
     contactShadow(interior, x, z + 0.35, 3.9, 2.7, 0.101);
   }
-  desk(-1.4, -0.65);
-  desk(2.05, -0.65);
+  desk(-1.4, -0.65, 0);
+  desk(2.05, -0.65, 2);
+  const receptionMonitor = new THREE.Group();
+  receptionMonitor.position.set(-3.45, 0.31, 1.62);
+  interior.add(receptionMonitor);
+  addMonitor(receptionMonitor, 1);
 
   // Reception, waiting area, fabric seams and a low stone table.
   box(interior, [2.35, 1.02, 0.74], [-3.45, 0.62, 1.62], stone, 0.025);
@@ -508,6 +524,48 @@ export function createArchitecture(invalidate: () => void) {
   cylinder(interior, 0.48, 0.48, 0.055, [2.15, 0.5, 1.95], stone);
   cylinder(interior, 0.14, 0.22, 0.36, [2.15, 0.295, 1.95], metal);
   box(interior, [0.24, 0.028, 0.32], [2.13, 0.545, 1.96], paper, 0.005);
+
+  // The contact destination is a physical letter on the coffee table.
+  const envelopeMap = canvasTexture(
+    (c) => {
+      c.fillStyle = "#ece5d3";
+      c.fillRect(0, 0, 1024, 640);
+      c.strokeStyle = "#afa68e";
+      c.lineWidth = 3;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(512, 350);
+      c.lineTo(1024, 0);
+      c.moveTo(0, 640);
+      c.lineTo(350, 310);
+      c.moveTo(1024, 640);
+      c.lineTo(674, 310);
+      c.stroke();
+      c.fillStyle = "#bd704e";
+      c.beginPath();
+      c.arc(512, 350, 49, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = "#f9edda";
+      c.font = "42px Georgia";
+      c.textAlign = "center";
+      c.fillText("S", 512, 365);
+      c.fillStyle = "#4b5949";
+      c.font = "22px Arial";
+      c.fillText("TU SIGUIENTE PASO", 512, 550);
+    },
+    1024,
+    640,
+  );
+  const envelopeMaterial = standard({ map: envelopeMap, roughness: 0.92 });
+  const envelope = box(
+    interior,
+    [0.58, 0.38, 0.012],
+    [2.15, 0.572, 1.95],
+    envelopeMaterial,
+    0.004,
+  );
+  envelope.rotation.x = -Math.PI / 2;
+  envelope.rotation.z = -0.12;
 
   addFicus(interior, -4.3, -2.28, detailTools);
   addFicus(interior, 4.05, 2.65, detailTools);
@@ -641,6 +699,7 @@ export function createArchitecture(invalidate: () => void) {
     services,
     signals,
     screens,
+    envelope,
     paths,
     dispose() {
       disposed = true;

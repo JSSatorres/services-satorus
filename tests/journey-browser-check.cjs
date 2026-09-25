@@ -1,81 +1,85 @@
-/** Run with a Playwright Page against the production preview on port 3117.
- * Regression: focusing an entering sticky panel must not change the chapter.
- * Contact submission is intercepted and never sends mail.
- */
+/** Current home: wheel reads each screen before flying to the next object. Contact is mocked. */
 module.exports = async function checkJourney(page) {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("http://localhost:3117/");
-  await page.locator('[data-render-state="ready"]').waitFor();
-  const ids = [
-    "inicio",
-    "como-trabajamos",
-    "diagnostico",
-    "herramientas",
-    "automatizacion",
-    "proyectos",
-    "preguntas",
-    "contacto",
-  ];
-  const nav = (id) =>
-    page.locator(`nav[aria-label="Capítulos del negocio"] a[href="#${id}"]`);
-  for (let index = 0; index < ids.length; index++) {
-    await nav(ids[index]).click();
-    await page.waitForFunction(
-      (index) =>
-        document
-          .querySelector("[data-world-stage]")
-          ?.getAttribute("data-chapter") === String(index),
-      index,
-    );
-  }
-  await page.locator('input[name="name"]').fill("Prueba Satorus");
-  await nav("preguntas").click();
-  await page.locator("aside:not([hidden]) summary").first().click();
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("http://localhost:3117/#inicio");
+  await page.reload();
+  await page.locator('[data-office-tour][data-render-state="ready"]').waitFor();
+  await page.mouse.move(720, 480);
+  await page.mouse.wheel(0, 180);
+  const arrived = (index) =>
+    page
+      .locator(
+        `[data-office-tour][data-phase="reading"][data-destination="${index}"]`,
+      )
+      .waitFor({ timeout: 12000 });
+  await arrived(0);
+  if (!page.url().endsWith("#como-trabajamos"))
+    throw Error("First destination hash is wrong");
+  await page.waitForTimeout(900);
+  await page.mouse.move(1050, 500);
+  await page.mouse.wheel(0, 220);
+  await page.waitForFunction(
+    () => document.querySelector('[data-office-panel="0"]').scrollTop > 0,
+  );
   if (
     (await page
-      .locator("aside:not([hidden]) details")
-      .first()
-      .getAttribute("open")) === null
+      .locator("[data-office-tour]")
+      .getAttribute("data-destination")) !== "0"
   )
-    throw new Error("FAQ did not open");
-  await nav("contacto").click();
+    throw Error("Reading started another flight");
+  for (let index = 0; index < 3; index++) {
+    await page.waitForTimeout(900);
+    await page.mouse.wheel(0, 6000);
+    await page.waitForFunction((index) => {
+      const panel = document.querySelector(`[data-office-panel="${index}"]`);
+      return panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 2;
+    }, index);
+    await page.waitForTimeout(220);
+    await page.mouse.wheel(0, 180);
+    await arrived(index + 1);
+  }
+  await page.getByLabel("Tu nombre", { exact: true }).fill("Prueba oficina");
+  await page
+    .getByRole("button", { name: "Ver la oficina", exact: true })
+    .click();
+  await page.locator('[data-office-tour][data-phase="office"]').waitFor();
+  await page
+    .getByRole("button", { name: "Entrar en Hablemos", exact: true })
+    .click();
+  await arrived(3);
   if (
-    (await page.locator('input[name="name"]').inputValue()) !== "Prueba Satorus"
+    (await page.getByLabel("Tu nombre", { exact: true }).inputValue()) !==
+    "Prueba oficina"
   )
-    throw new Error("Contact draft was lost");
+    throw Error("Contact draft lost");
   await page.route("**/api/contact", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ message: "Envío simulado correcto" }),
+      body: JSON.stringify({
+        message: "Consulta simulada. No se ha enviado correo.",
+      }),
     }),
   );
-  await page.locator('input[name="email"]').fill("prueba@example.com");
+  await page
+    .getByLabel("Tu correo", { exact: true })
+    .fill("prueba@example.com");
   await page
     .locator('textarea[name="message"]')
-    .fill("Prueba automatizada del formulario sin enviar correo real.");
+    .fill(
+      "Prueba automatizada del recorrido de la oficina sin enviar correo real.",
+    );
   await page.locator('input[name="consent"]').check();
-  await page.locator('form button[type="submit"]').click({ timeout: 5000 });
-  await page.getByText("Envío simulado correcto").waitFor();
-  await nav("proyectos").click();
-  await page.getByRole("button", { name: "Enrolla2", exact: true }).click();
   await page
-    .locator('aside:not([hidden]) a[href="/proyectos/enrolla2"]')
-    .first()
-    .click({ timeout: 5000 });
-  await page.waitForURL("**/proyectos/enrolla2");
-  await page.goBack();
-  await page.locator('[data-world-stage][data-chapter="5"]').waitFor();
-  if (
-    await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)
-  )
-    throw new Error("Horizontal overflow");
+    .getByRole("button", { name: "Enviar consulta", exact: true })
+    .click();
+  await page.getByText("Consulta simulada. No se ha enviado correo.").waitFor();
   return {
-    chapters: 8,
-    faq: "passed",
-    contactDraft: "passed",
-    mockedSubmit: "passed",
-    projectHistory: "passed",
-    horizontalOverflow: false,
+    scrollReading: "passed",
+    threeScreens: "passed",
+    envelope: "passed",
+    draft: "passed",
+    mockedContact: "passed",
   };
 };
