@@ -9,11 +9,15 @@ import {
 test("development anchors resolve to physical destinations", () => {
   assert.equal(destinationFromHash("#como-trabajamos"), 0);
   assert.equal(destinationFromHash("#diagnostico"), 1);
-  assert.equal(destinationFromHash("#hablamos-claro"), 1);
+  assert.equal(destinationFromHash("#hablamos-claro"), 2);
   assert.equal(destinationFromHash("#proyectos"), 2);
   assert.equal(destinationFromHash("#contacto"), 3);
   assert.equal(destinationFromHash("#preguntas"), 3);
   assert.equal(destinationFromHash("#inicio"), -1);
+  assert.equal(destinationFromHash("#tu-app"), 1);
+  assert.equal(destinationFromHash("#que-hacemos"), 2);
+  assert.equal(destinationFromHash("#pasos-3-y-4"), 0);
+  assert.equal(destinationFromHash("#tu-siguiente-paso"), 3);
 });
 test("route traverses three screens and finishes at contact", () => {
   assert.equal(nextDestination(-1, 1), 0);

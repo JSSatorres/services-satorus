@@ -7,6 +7,9 @@ module.exports = async function checkJourney(page) {
   await page.locator('[data-office-tour][data-render-state="ready"]').waitFor();
   await page.mouse.move(720, 480);
   await page.mouse.wheel(0, 180);
+  await page.locator('[data-intro="office"]').waitFor({ timeout: 15000 });
+  await page.waitForTimeout(900);
+  await page.mouse.wheel(0, 180);
   const arrived = (index) =>
     page
       .locator(

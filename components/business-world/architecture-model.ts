@@ -403,9 +403,9 @@ export function createArchitecture(invalidate: () => void) {
       (c) => {
         const labels = ["CÓMO TRABAJAMOS", "SOLUCIONES", "PROYECTOS"];
         const titles = [
-          ["Una mejora concreta.", "Un plan claro."],
-          ["Menos caos.", "Más avance."],
-          ["Una idea puede acabar", "en una app o en una web."],
+          ["Primero, tu día a día.", "Después, la herramienta."],
+          ["Tu lista,", "convertida en una app."],
+          ["Lo que hacemos,", "dicho claro."],
         ];
         const accent = ["#c8a678", "#c1805b", "#88a298"][sectionIndex];
         c.fillStyle = "#f1eee5";
@@ -426,7 +426,7 @@ export function createArchitecture(invalidate: () => void) {
           [
             "Te escuchamos. Lo dejamos por escrito. Lo pruebas tú.",
             "Vemos el problema y lo convertimos en una solución útil.",
-            "Dos puertas de entrada a lo que hacemos.",
+            "Cuatro necesidades. Cuatro proyectos reales.",
           ][sectionIndex],
           140,
           515,

@@ -496,6 +496,18 @@ summary {
   display: none;
 }
 
+/* Entre tableta y escritorio pequeño no caben los dos botones y los enlaces
+   se partían en dos líneas: se queda la acción principal. */
+.desktop-nav a {
+  white-space: nowrap;
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .header-secondary-cta {
+    display: none;
+  }
+}
+
 /* Hero */
 .hero {
   /* Cuanto mide el hero DE MAS por debajo de la primera pantalla. En escritorio

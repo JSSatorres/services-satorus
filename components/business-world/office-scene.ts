@@ -6,6 +6,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { ArchitecturalOcclusion } from "./architectural-occlusion";
 import { gsap } from "gsap";
 import { createArchitecture } from "./architecture-model";
+import { createBusinessDesk } from "./business-desk";
 
 import type { OfficePhase } from "@/lib/office-route";
 
@@ -19,6 +20,7 @@ export function createOfficeScene(
   markers: HTMLButtonElement[],
   onSelect: (index: number) => void,
   onLost: () => void,
+  introMarkers: HTMLButtonElement[],
 ) {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -39,6 +41,9 @@ export function createOfficeScene(
   const lookAt = new THREE.Vector3(0, 1.3, 0);
   const model = createArchitecture(() => invalidate());
   scene.add(model.root);
+  const businessDesk = createBusinessDesk();
+  scene.add(businessDesk.root);
+  model.root.visible = false;
   const pmrem = new THREE.PMREMGenerator(renderer);
   const room = new RoomEnvironment();
   const environment = pmrem.fromScene(room, 0.055);
@@ -101,6 +106,9 @@ export function createOfficeScene(
   const projected = new THREE.Vector3();
   const lookUp = new THREE.Vector3(0, 1, 0);
   let timeline: gsap.core.Timeline | null = null;
+  let introduction = true;
+  let organizing = false;
+  let arrival: gsap.core.Timeline | null = null;
   let current = -1;
   let opened = false;
   let travelling = false;
@@ -115,11 +123,25 @@ export function createOfficeScene(
     if (disposed || !visible || document.hidden) return;
     camera.up.copy(lookUp).normalize();
     camera.lookAt(lookAt);
-    if (unfolding && (timeline?.time() ?? 0) < 1.15)
+    if (
+      organizing ||
+      arrival?.isActive() ||
+      (unfolding && (timeline?.time() ?? 0) < 1.15)
+    )
       renderer.shadowMap.needsUpdate = true;
     // Keep the expensive contact-occlusion pass for settled views.
-    if (travelling) renderer.render(scene, camera);
+    if (travelling || arrival?.isActive()) renderer.render(scene, camera);
     else composer.render();
+    introMarkers.forEach((marker, i) => {
+      businessDesk.pieces[i].getWorldPosition(projected);
+      projected.y += 0.3;
+      projected.z -= 0.9;
+      projected.project(camera);
+      marker.style.left = ((projected.x + 1) * host.clientWidth) / 2 + "px";
+      marker.style.top = ((1 - projected.y) * host.clientHeight) / 2 + "px";
+      marker.style.visibility =
+        introduction && !organizing ? "visible" : "hidden";
+    });
     objects.forEach((object, index) => {
       object.getWorldPosition(projected).project(camera);
       const inView =
@@ -211,8 +233,115 @@ export function createOfficeScene(
         start,
       );
   }
+  function deskView() {
+    const distance = camera.aspect < 0.9 ? 1.7 : camera.aspect < 1.3 ? 1.2 : 1;
+    return {
+      camera: new THREE.Vector3(0.3, 7.8, 8.8).multiplyScalar(distance),
+      target: new THREE.Vector3(0, 1.15, 0),
+    };
+  }
+  function showOffice() {
+    introduction = false;
+    businessDesk.root.visible = false;
+    model.root.visible = true;
+    renderer.shadowMap.needsUpdate = true;
+  }
+  function organize(callbacks: { ordered: () => void; complete: () => void }) {
+    if (!introduction || organizing) return;
+    arrival?.kill();
+    timeline?.kill();
+    organizing = true;
+    travelling = true;
+    timeline = gsap.timeline({
+      onUpdate: invalidate,
+      onComplete: () => {
+        showOffice();
+        organizing = false;
+        travelling = false;
+        renderer.shadowMap.needsUpdate = true;
+        invalidate();
+        callbacks.complete();
+      },
+    });
+    businessDesk.pieces.forEach((piece, i) => {
+      const start = i * 0.1;
+      timeline!
+        .to(
+          piece.position,
+          { y: 0.32, duration: 0.35, ease: "power2.out" },
+          start,
+        )
+        .to(
+          piece.position,
+          {
+            x: ((i % 3) - 1) * 2.25,
+            z: i < 3 ? -0.65 : 1.1,
+            duration: 0.95,
+            ease: "power2.inOut",
+          },
+          start,
+        )
+        .to(
+          piece.rotation,
+          { y: 0, duration: 0.9, ease: "power2.inOut" },
+          start,
+        )
+        .to(
+          piece.position,
+          { y: 0.015 + i * 0.003, duration: 0.4, ease: "power2.inOut" },
+          start + 0.55,
+        );
+    });
+    timeline.call(
+      () => {
+        businessDesk.ordered();
+        callbacks.ordered();
+      },
+      [],
+      1.6,
+    );
+    timeline.to({}, { duration: 1.5 });
+    timeline.to(businessDesk.root.scale, {
+      x: 0.78,
+      y: 0.78,
+      z: 0.78,
+      duration: 0.65,
+      ease: "power2.in",
+    });
+    timeline.to(
+      businessDesk.root.position,
+      { y: -4.5, duration: 0.65, ease: "power2.in" },
+      "<",
+    );
+    timeline.call(() => {
+      showOffice();
+      const view = overview();
+      camera.position.copy(view.camera).multiplyScalar(1.14);
+      lookAt.copy(view.target);
+      model.root.position.y = -0.7;
+    });
+    const view = overview();
+    const start = timeline.duration();
+    pose(view.camera, view.target, 1.2, start);
+    timeline.to(
+      model.root.position,
+      { y: 0, duration: 1.2, ease: "power2.out" },
+      start,
+    );
+    if (reduced.matches) timeline.progress(1);
+    invalidate();
+  }
   function visit(index: number, callbacks: VisitCallbacks) {
     timeline?.kill();
+    arrival?.kill();
+    organizing = false;
+    if (introduction) {
+      showOffice();
+      const view = overview();
+      camera.position.copy(view.camera);
+      lookAt.copy(view.target);
+    }
+    model.root.position.y = 0;
     const previous = current;
     unfolding = !opened && index >= 0;
     current = Math.max(-1, Math.min(3, index));
@@ -300,7 +429,7 @@ export function createOfficeScene(
       ),
     );
     composer.setSize(width, height);
-    if (travelling && lastCallbacks) {
+    if (organizing || (travelling && lastCallbacks)) {
       // A new aspect ratio must not leave the destination camera behind the HTML.
       timeline?.progress(1);
     }
@@ -310,7 +439,7 @@ export function createOfficeScene(
       lookAt.copy(next.target);
       lookUp.copy(next.up);
     } else {
-      const view = overview();
+      const view = introduction ? deskView() : overview();
       camera.position.copy(view.camera);
       lookAt.copy(view.target);
       lookUp.set(0, 1, 0);
@@ -318,7 +447,7 @@ export function createOfficeScene(
     invalidate();
   }
   function pick(event: MouseEvent) {
-    if (travelling || current >= 0) return -1;
+    if (introduction || travelling || current >= 0) return -1;
     const bounds = renderer.domElement.getBoundingClientRect();
     pointer.set(
       ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
@@ -339,12 +468,18 @@ export function createOfficeScene(
     if (index >= 0) onSelect(index);
   };
   const motion = () => {
-    if (reduced.matches) timeline?.progress(1);
+    if (reduced.matches) {
+      timeline?.progress(1);
+      arrival?.progress(1);
+    }
   };
   const visibility = () => {
-    if (document.hidden) timeline?.pause();
-    else {
+    if (document.hidden) {
+      timeline?.pause();
+      arrival?.pause();
+    } else {
       timeline?.resume();
+      arrival?.resume();
       invalidate();
     }
   };
@@ -369,13 +504,37 @@ export function createOfficeScene(
   document.addEventListener("visibilitychange", visibility);
   reduced.addEventListener("change", motion);
   resize();
+  if (!reduced.matches) {
+    arrival = gsap.timeline({
+      onUpdate: invalidate,
+      onComplete: () => {
+        renderer.shadowMap.needsUpdate = true;
+        invalidate();
+      },
+    });
+    businessDesk.pieces.forEach((piece, i) => {
+      arrival!.from(
+        piece.position,
+        { y: 0.3 + i * 0.08, duration: 1.1, ease: "power2.out" },
+        i * 0.09,
+      );
+    });
+    arrival.to(
+      businessDesk.pieces[0].rotation,
+      { y: -0.16, duration: 0.07, repeat: 5, yoyo: true },
+      1.7,
+    );
+  }
   return {
     visit,
+    organize,
     dispose() {
       gsap.ticker.lagSmoothing(500, 33);
       disposed = true;
       cancelAnimationFrame(frame);
       timeline?.kill();
+      arrival?.kill();
+      businessDesk.dispose();
       observer.disconnect();
       intersection.disconnect();
       renderer.domElement.removeEventListener("pointermove", move);

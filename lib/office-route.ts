@@ -25,11 +25,15 @@ export const officeDestinations = [
   },
 ] as const;
 export type OfficePhase =
-  "office" | "departing" | "interior" | "entering" | "reading";
+  "organizing" | "office" | "departing" | "interior" | "entering" | "reading";
 export function destinationFromHash(hash: string) {
   const id = hash.replace(/^#/, "");
   const aliases: Record<string, number> = {
-    "hablamos-claro": 1,
+    "hablamos-claro": 2,
+    "tu-app": 1,
+    "que-hacemos": 2,
+    "pasos-3-y-4": 0,
+    "tu-siguiente-paso": 3,
     herramientas: 1,
     automatizacion: 1,
     preguntas: 3,

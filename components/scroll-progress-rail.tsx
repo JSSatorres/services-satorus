@@ -1,15 +1,19 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 /**
  * Raíl de progreso propio, como el de lenis.dev: una pista fina pegada al borde
  * derecho cuyo pulgar mide la porción visible del documento y se arrastra.
  * No sustituye a la barra del sistema —se deja intacta— sino que la acompaña.
+ * En el home no se pinta: allí el progreso lo cuentan las pestañas del cuaderno.
  */
 export function ScrollProgressRail() {
   const railRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const hidden = pathname === "/";
 
   useEffect(() => {
     const rail = railRef.current;
@@ -65,7 +69,9 @@ export function ScrollProgressRail() {
       window.removeEventListener("resize", schedule);
       observer.disconnect();
     };
-  }, []);
+  }, [hidden]);
+
+  if (hidden) return null;
 
   return (
     <div

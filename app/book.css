@@ -1,0 +1,2020 @@
+/* ==========================================================================
+   Home como libro
+
+   Dos modos:
+   - `html[data-book="on"]` (hay JS y movimiento): el libro vive en un
+     escenario fijo y el scroll lo abre y pasa las hojas (`components/book/book.tsx`).
+   - Sin la marca: las dobles páginas se pintan planas, una detrás de otra, ya
+     pasadas a limpio. Es el estado final de todo, sin animación.
+
+   Las variables que mueve el scroll: `--flip` (giro de cada hoja), `--band`
+   (goma de la portada), `--s` (una página derecha asentándose), `--st` (sello
+   de una página izquierda) y `--t` (papel suelto guardado / pestaña fuera).
+   ========================================================================== */
+
+.bk {
+  --paper: #fffdf8;
+  --paper-left: #fbf8ec;
+  --ink: #1f2f7a;
+  --rule: rgba(41, 72, 199, 0.13);
+  --font-hand: "Caveat Variable", "Segoe Print", cursive;
+  --page-w: min(40rem, 90vw);
+  --fs: 16px;
+  position: relative;
+  background: var(--cool-paper);
+}
+
+/* La portada con la mesa ocupa la primera pantalla entera: el libro entra al
+   bajar. En la mesa espacial esa altura se la daba la estación. */
+#contenido > .hero {
+  min-height: max(100svh, 640px);
+}
+
+/* --------------------------------------------------------------------------
+   Escenario
+   -------------------------------------------------------------------------- */
+
+.bk-stage {
+  padding: calc(var(--header-height) + 2rem) var(--page-pad) 3rem;
+}
+
+.bk-controls {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Modo plano (sin movimiento): dobles páginas una tras otra
+   -------------------------------------------------------------------------- */
+
+.bk-pages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 76rem;
+  margin: 0 auto;
+  border: 2px solid var(--bench-graphite);
+  border-top: 0;
+}
+
+.bk-leaf {
+  display: contents;
+}
+
+.bk-face {
+  position: relative;
+  min-width: 0;
+}
+
+.bk-face[data-side="cover"],
+.bk-loose,
+.bk-tabs,
+.bk-board {
+  display: none;
+}
+
+.bk-face[data-side="left"] {
+  border-top: 2px solid var(--bench-graphite);
+  border-right: 1px solid var(--line);
+}
+
+.bk-face[data-side="right"] {
+  border-top: 2px solid var(--bench-graphite);
+}
+
+@media (max-width: 900px) {
+  .bk-pages {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bk-face[data-side="right"] {
+    border-top: 1px dashed var(--line);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Modo libro
+   -------------------------------------------------------------------------- */
+
+html[data-book="on"] .bk {
+  /* 100svh de escenario + un tramo por unidad (abrir + una por historia). */
+  --unit-h: 85svh;
+  height: calc(100svh + var(--units, 9) * var(--unit-h));
+}
+
+html[data-book="on"] .bk-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding: 0;
+  overflow: hidden;
+}
+
+html[data-book="on"] .bk-scene {
+  position: absolute;
+  inset: var(--header-height) 0 0;
+  /* Flex y no grid: en móvil el libro (dos páginas) es más ancho que la
+     pantalla y tiene que quedar centrado, desbordando por los dos lados. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 4.5rem;
+  perspective: 2400px;
+  perspective-origin: 50% 30%;
+}
+
+html[data-book="on"] .bk {
+  --page-h: min(calc(100svh - var(--header-height) - 7.5rem), 50rem);
+  --page-w: min(calc(var(--page-h) * 0.72), 44vw);
+  --fs: calc(var(--page-w) * 0.03);
+}
+
+html[data-book="on"] .bk-book {
+  position: relative;
+  flex: none;
+  width: calc(var(--page-w) * 2);
+  height: var(--page-h);
+  transform-origin: 50% 55%;
+  will-change: transform;
+}
+
+/* Tapas duras: un poco mayores que las hojas. */
+html[data-book="on"] .bk-board {
+  position: absolute;
+  top: -1.2%;
+  bottom: -2.6%;
+  display: block;
+  background: var(--tool-blue);
+  border: 2px solid var(--bench-graphite);
+  box-shadow: 0 30px 50px rgba(16, 20, 17, 0.28);
+}
+
+html[data-book="on"] .bk-board--right {
+  right: -1.6%;
+  left: 50%;
+  border-radius: 0 8px 8px 0;
+}
+
+html[data-book="on"] .bk-board--left {
+  right: 50%;
+  left: -1.6%;
+  border-radius: 8px 0 0 8px;
+  opacity: 0;
+}
+
+html[data-book="on"] .bk-pages {
+  position: absolute;
+  inset: 0;
+  display: block;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  perspective: 2600px;
+}
+
+/* Canto de las hojas: el grosor del bloque de papel bajo la derecha. */
+
+html[data-book="on"] .bk-leaf,
+html[data-book="on"] .bk-face--base {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+}
+
+html[data-book="on"] .bk-face--base {
+  z-index: 5;
+  display: block;
+  overflow: hidden;
+  border: 0;
+}
+
+html[data-book="on"] .bk-leaf {
+  display: block;
+  transform: rotateY(calc(var(--flip, 0) * -180deg));
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+}
+
+html[data-book="on"] .bk-leaf .bk-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border: 0;
+  backface-visibility: hidden;
+}
+
+html[data-book="on"] .bk-face--back {
+  transform: rotateY(180deg);
+}
+
+/* Sombra del papel mientras gira: máxima a media vuelta. */
+html[data-book="on"] .bk-leaf .bk-face::after {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  content: "";
+  background: linear-gradient(90deg, rgba(16, 20, 17, 0.5), rgba(16, 20, 17, 0.05) 60%);
+  opacity: calc(sin(var(--flip, 0) * 180deg) * 0.55);
+  pointer-events: none;
+}
+
+html[data-book="on"] .bk-face--back::after {
+  background: linear-gradient(270deg, rgba(16, 20, 17, 0.5), rgba(16, 20, 17, 0.05) 60%);
+}
+
+html[data-book="on"] .bk-face[data-side="cover"] {
+  display: block;
+}
+
+html[data-book="on"] .bk-hint,
+html[data-book="on"] .bk-controls {
+  will-change: opacity, transform;
+}
+
+html[data-book="on"] .bk-controls {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.35rem;
+  background: var(--cool-paper);
+  border: 2px solid var(--bench-graphite);
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+  opacity: 0;
+  translate: -50% 0;
+}
+
+.bk-controls p {
+  min-width: 11rem;
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.bk-controls b {
+  font-family: var(--font-display-family);
+  font-variation-settings: "wdth" 80, "wght" 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.bk-controls button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.bk-controls button:hover:not(:disabled) {
+  background: var(--tool-blue);
+}
+
+.bk-controls button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* --------------------------------------------------------------------------
+   Portada del libro
+   -------------------------------------------------------------------------- */
+
+.bk-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: var(--tool-blue);
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1.5px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.22), transparent 7%);
+  background-size: 6px 6px, 100% 100%;
+  border: 2px solid var(--bench-graphite);
+  border-radius: 0 8px 8px 0;
+}
+
+.bk-cover-label {
+  display: grid;
+  gap: 0.1em;
+  width: 62%;
+  padding: 1.3em 1.2em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--bench-graphite);
+  box-shadow: 0 6px 0 rgba(16, 20, 17, 0.2);
+  font-size: calc(var(--fs) * 1.2);
+  text-align: center;
+  transform: rotate(-1.5deg);
+}
+
+.bk-cover-label span {
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.bk-cover-label strong {
+  font-size: 2.7em;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.bk-cover-imprint {
+  position: absolute;
+  bottom: 6%;
+  color: var(--cool-paper);
+  font-family: var(--font-display-family);
+  font-size: calc(var(--fs) * 1.4);
+  font-variation-settings: "wdth" 70, "wght" 800;
+  letter-spacing: -0.03em;
+}
+
+/* Goma elástica: se suelta al abrir. */
+.bk-band {
+  position: absolute;
+  top: -3%;
+  bottom: -3%;
+  right: 12%;
+  width: 4.5%;
+  background: var(--action-orange);
+  border-inline: 2px solid var(--bench-graphite);
+  opacity: calc(1 - var(--band, 0));
+  transform: translateX(calc(var(--band, 0) * 260%));
+}
+
+/* --------------------------------------------------------------------------
+   Páginas
+   -------------------------------------------------------------------------- */
+
+.bk-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: calc(var(--fs) * 2.4) calc(var(--fs) * 2.2) calc(var(--fs) * 2.8);
+  color: var(--bench-graphite);
+  font-size: var(--fs);
+  line-height: 1.45;
+}
+
+html[data-book="on"] .bk-page {
+  position: absolute;
+  inset: 0;
+}
+
+.bk-page-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.bk-folio {
+  position: absolute;
+  bottom: calc(var(--fs) * 1.1);
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--graphite-soft);
+}
+
+/* Izquierda: papel pautado, margen rojo y letra a mano. */
+.bk-page--left {
+  background-color: var(--paper-left);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent calc(var(--fs) * 1.3),
+      rgba(229, 103, 72, 0.5) calc(var(--fs) * 1.3) calc(var(--fs) * 1.3 + 2px),
+      transparent calc(var(--fs) * 1.3 + 2px)
+    ),
+    linear-gradient(270deg, rgba(16, 20, 17, 0.14), transparent 9%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--fs) * 2 - 1px),
+      var(--rule) calc(var(--fs) * 2 - 1px) calc(var(--fs) * 2)
+    );
+}
+
+.bk-page--left .bk-folio {
+  left: calc(var(--fs) * 2.2);
+}
+
+.bk-page--right {
+  background-color: var(--paper);
+  background-image: linear-gradient(90deg, rgba(16, 20, 17, 0.12), transparent 8%);
+}
+
+.bk-page--right .bk-folio {
+  right: calc(var(--fs) * 2.2);
+}
+
+.bk-hand {
+  font-family: var(--font-hand);
+  font-weight: 500;
+}
+
+.bk-page-title {
+  margin: 0 0 0.6em;
+  color: var(--ink);
+  font-size: 2.3em;
+  line-height: 1;
+  transform: rotate(-1.5deg);
+  transform-origin: left;
+}
+
+.bk-kicker {
+  margin: 0 0 0.7em;
+  font-size: 0.78em;
+  font-weight: 760;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.bk-page-heading {
+  margin: 0 0 0.9em;
+  font-family: var(--font-display-family);
+  font-size: 2.15em;
+  font-variation-settings: "wdth" 74, "wght" 800;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+/* Sello «pasado a limpio» sobre la página izquierda. */
+.bk-stamp {
+  position: absolute;
+  right: 9%;
+  bottom: 12%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.35em 0.7em;
+  color: var(--action-orange-dark);
+  border: 3px solid currentColor;
+  border-radius: 6px;
+  font-size: 1.05em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: calc(var(--st, 1) * 0.9);
+  transform: rotate(-9deg) scale(calc(1.7 - 0.7 * var(--st, 1)));
+  mix-blend-mode: multiply;
+}
+
+/* Piezas que se asientan en la página derecha. */
+.bk-settle {
+  --si: clamp(0, calc(var(--s, 1) * 1.8 - var(--k, 0) * 0.14), 1);
+  transform:
+    translate(
+      calc(var(--sx, 0) * (1 - var(--si)) * 1%),
+      calc(var(--sy, 0) * (1 - var(--si)) * 1%)
+    )
+    rotate(calc(var(--sr, 0) * (1 - var(--si)) * 1deg));
+  opacity: calc(0.35 + 0.65 * var(--si));
+}
+
+.bk-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  border-bottom: 2px solid currentColor;
+  font-weight: 760;
+}
+
+
+
+
+.bk-page-body > .bk-link {
+  display: flex;
+  width: max-content;
+}
+
+/* --------------------------------------------------------------------------
+   Papeles sueltos y pestañas (sólo en modo libro)
+   -------------------------------------------------------------------------- */
+
+html[data-book="on"] .bk-loose {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 13%;
+  aspect-ratio: 1;
+  opacity: calc(1 - var(--t, 0));
+  transform:
+    translate(calc(var(--dx) * var(--t, 0)), calc(var(--dy) * var(--t, 0)))
+    rotate(var(--r));
+  font-size: var(--fs);
+}
+
+html[data-book="on"] .bk-loose[data-kind="postit"] {
+  background: var(--label-lime);
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-loose[data-kind="ticket"] {
+  width: 9%;
+  aspect-ratio: 0.45;
+  background: #fff repeating-linear-gradient(to bottom, transparent 0 0.7em, rgba(16, 20, 17, 0.25) 0.7em calc(0.7em + 1.5px));
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-loose[data-kind="photo"] {
+  width: 15%;
+  aspect-ratio: 1.3;
+  background: linear-gradient(#8fb2e8, #8fb2e8) 50% 40% / 84% 70% no-repeat, #fff;
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-loose[data-kind="card"] {
+  width: 12%;
+  aspect-ratio: 1.6;
+  background: linear-gradient(90deg, var(--action-orange) 18%, #fff 18%);
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-loose[data-kind="flag"] {
+  width: 3.2%;
+  aspect-ratio: 0.3;
+  background: var(--action-orange);
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-loose[data-kind="letter"] {
+  width: 17%;
+  aspect-ratio: 1.5;
+  background:
+    linear-gradient(160deg, transparent 49%, rgba(16, 20, 17, 0.4) 50%, transparent 51%),
+    linear-gradient(20deg, transparent 49%, rgba(16, 20, 17, 0.4) 50%, transparent 51%),
+    #fff;
+  border: 1.5px solid var(--bench-graphite);
+}
+
+html[data-book="on"] .bk-tabs {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  z-index: 2;
+  display: block;
+  width: 7.5rem;
+}
+
+.bk-tabs a {
+  position: absolute;
+  left: 0;
+  display: block;
+  padding: 0.35rem 0.6rem 0.35rem 0.8rem;
+  color: var(--bench-graphite);
+  background: var(--tab-bg);
+  border: 1.5px solid var(--bench-graphite);
+  border-left: 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.74rem;
+  font-weight: 760;
+  white-space: nowrap;
+  /* Sale de debajo de las hojas cuando su historia queda pasada a limpio. */
+  transform: translateX(calc(-100% + var(--t, 0) * 100% + var(--t, 0) * 0.6rem));
+  transition: padding 200ms ease;
+}
+
+.bk-tabs a[data-tone="0"] {
+  --tab-bg: var(--action-orange);
+}
+
+.bk-tabs a[data-tone="1"] {
+  --tab-bg: var(--tool-blue);
+  color: var(--cool-paper);
+}
+
+.bk-tabs a[data-tone="2"] {
+  --tab-bg: var(--label-lime);
+}
+
+.bk-tabs a[aria-current="page"],
+.bk-tabs a:hover {
+  padding-left: 1.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Móvil: una página a la vista
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  html[data-book="on"] .bk {
+    --page-w: min(86vw, 26rem);
+    --page-h: min(calc(100svh - var(--header-height) - 6rem), calc(var(--page-w) * 1.72));
+    --fs: calc(var(--page-w) * 0.039);
+  }
+
+  html[data-book="on"] .bk-scene {
+    padding-bottom: 4rem;
+  }
+
+  html[data-book="on"] .bk-tabs {
+    display: none !important;
+  }
+
+  .bk-controls p {
+    min-width: 8.5rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Acabado: materiales, grosor y luz
+
+   El libro tiene que parecer un objeto sobre la mesa, no un dibujo: tela en
+   las tapas, papel con grano, grosor de hojas en los cantos, sombra de
+   contacto y bordes finos en lugar del contorno grafito de la ilustración.
+   -------------------------------------------------------------------------- */
+
+.bk {
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --edge: rgba(12, 20, 64, 0.55);
+  --cloth: #2744b8;
+}
+
+html[data-book="on"] .bk-stage {
+  background:
+    radial-gradient(ellipse 70% 62% at 50% 46%, #fbfaf5 0%, #f0eee6 58%, #e3e1d6 100%);
+}
+
+/* Tapas: tela con grano, luz de arriba a la izquierda. */
+html[data-book="on"] .bk-board {
+  background-color: var(--cloth);
+  background-image:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.12), transparent 45%, rgba(0, 0, 0, 0.2)),
+    var(--noise);
+  border: 1px solid var(--edge);
+  box-shadow:
+    0 1px 1px rgba(10, 14, 30, 0.3),
+    0 18px 26px -8px rgba(18, 22, 40, 0.38),
+    0 44px 70px -18px rgba(18, 22, 40, 0.32);
+}
+
+html[data-book="on"] .bk-board--right {
+  border-radius: 0 6px 6px 0;
+}
+
+html[data-book="on"] .bk-board--left {
+  border-radius: 6px 0 0 6px;
+}
+
+.bk-cover {
+  background-color: var(--cloth);
+  background-image:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.05) 36%, transparent 55%, rgba(0, 0, 0, 0.24) 100%),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.32) 0,
+      rgba(0, 0, 0, 0.06) 2.4%,
+      rgba(255, 255, 255, 0.16) 4.6%,
+      rgba(0, 0, 0, 0.22) 5.4%,
+      transparent 6.6%
+    ),
+    var(--noise),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 3px);
+  background-size: auto, auto, 180px 180px, auto, auto;
+  border: 1px solid var(--edge);
+  border-radius: 2px 6px 6px 2px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset -3px -3px 8px rgba(0, 0, 0, 0.28);
+}
+
+/* Etiqueta de papel pegada a la tapa. */
+.bk-cover-label {
+  color: #1d2b6e;
+  background-color: #fbf8ee;
+  background-image: var(--noise-paper);
+  background-size: 180px 180px;
+  border: 1px solid rgba(40, 32, 12, 0.28);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 0 14px rgba(120, 96, 48, 0.14);
+}
+
+/* Estampado en seco. */
+.bk-cover-imprint {
+  color: rgba(242, 241, 234, 0.72);
+  text-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Goma: cilíndrica, con su sombra sobre la tela. */
+.bk-band {
+  width: 3.6%;
+  background: linear-gradient(
+    90deg,
+    #963722 0%,
+    #d65a3d 24%,
+    #f39275 47%,
+    #df6448 70%,
+    #9a3923 100%
+  );
+  border: 0;
+  box-shadow:
+    4px 0 6px rgba(0, 0, 0, 0.35),
+    -1px 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Papel: grano y curva del lomo. */
+.bk-page--left {
+  background-image:
+    var(--noise-paper),
+    linear-gradient(
+      90deg,
+      transparent calc(var(--fs) * 1.3),
+      rgba(229, 103, 72, 0.45) calc(var(--fs) * 1.3) calc(var(--fs) * 1.3 + 1.5px),
+      transparent calc(var(--fs) * 1.3 + 1.5px)
+    ),
+    linear-gradient(270deg, rgba(40, 32, 12, 0.24), rgba(40, 32, 12, 0.07) 3%, transparent 11%),
+    linear-gradient(90deg, rgba(40, 32, 12, 0.07), transparent 4%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--fs) * 2 - 1px),
+      var(--rule) calc(var(--fs) * 2 - 1px) calc(var(--fs) * 2)
+    );
+  background-size: 180px 180px, auto, auto, auto, auto;
+}
+
+.bk-page--right {
+  background-image:
+    var(--noise-paper),
+    linear-gradient(90deg, rgba(40, 32, 12, 0.22), rgba(40, 32, 12, 0.06) 3%, transparent 10%),
+    linear-gradient(270deg, rgba(40, 32, 12, 0.06), transparent 4%);
+  background-size: 180px 180px, auto, auto;
+}
+
+/* Grosor del bloque de hojas: capas de papel en los cantos. La derecha la
+   lleva la última página; la izquierda aparece al abrir. */
+html[data-book="on"] .bk-face--base {
+  box-shadow:
+    1px 1px 0 #f4f0e3,
+    2px 2px 0 #d9d3c0,
+    3px 3px 0 #f2eee0,
+    4px 4px 0 #d6cfbb,
+    5px 5px 0 #f0ebdd,
+    6px 6px 0 #cfc7b1,
+    7px 7px 0 rgba(12, 20, 64, 0.35);
+}
+
+html[data-book="on"] .bk-pages::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 50%;
+  height: 100%;
+  content: "";
+  background: var(--paper-left);
+  box-shadow:
+    -1px 1px 0 #f4f0e3,
+    -2px 2px 0 #d9d3c0,
+    -3px 3px 0 #f2eee0,
+    -4px 4px 0 #d6cfbb,
+    -5px 5px 0 #f0ebdd,
+    -6px 6px 0 #cfc7b1,
+    -7px 7px 0 rgba(12, 20, 64, 0.35);
+  opacity: var(--open, 0);
+}
+
+/* Papeles sueltos y pestañas: bordes finos y sombra, como papel real. */
+html[data-book="on"] .bk-loose {
+  border: 1px solid rgba(16, 20, 17, 0.28) !important;
+  box-shadow: 0 2px 4px rgba(16, 20, 17, 0.22);
+}
+
+.bk-tabs a {
+  border: 1px solid rgba(16, 20, 17, 0.3);
+  border-left: 0;
+  box-shadow: 0 2px 3px rgba(16, 20, 17, 0.18);
+}
+
+/* Pista para abrir el libro. */
+.bk-hint {
+  display: none;
+}
+
+html[data-book="on"] .bk-hint {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  margin: 0;
+  color: var(--graphite-soft);
+  font-size: 0.85rem;
+  font-weight: 700;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+html[data-book="on"] .bk-hint span {
+  animation: bk-hint 1.6s ease-in-out infinite;
+}
+
+@keyframes bk-hint {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* Las pestañas necesitan sitio a la derecha del libro abierto. */
+@media (max-width: 1180px) {
+  html[data-book="on"] .bk-tabs {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1 · El lío: dos páginas de caos
+   -------------------------------------------------------------------------- */
+
+.bk-page--chaos {
+  overflow: hidden;
+}
+
+/* En el libro plano la página no tiene alto propio: se lo da su proporción. */
+html:not([data-book="on"]) .bk-page--chaos {
+  aspect-ratio: 0.72;
+}
+
+/* Página derecha del caos: mismo papel pautado, con el lomo a la izquierda. */
+.bk-page--mirror {
+  background-image:
+    var(--noise-paper),
+    linear-gradient(90deg, rgba(40, 32, 12, 0.24), rgba(40, 32, 12, 0.07) 3%, transparent 11%),
+    linear-gradient(270deg, rgba(40, 32, 12, 0.07), transparent 4%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--fs) * 2 - 1px),
+      var(--rule) calc(var(--fs) * 2 - 1px) calc(var(--fs) * 2)
+    );
+  background-size: 180px 180px, auto, auto, auto;
+}
+
+.bk-page--mirror .bk-folio {
+  right: calc(var(--fs) * 2.2);
+  left: auto;
+}
+
+.bk-chaos {
+  position: absolute;
+  inset: 0;
+}
+
+.bk-chaos > * {
+  position: absolute;
+  margin: 0;
+  transform: rotate(var(--r, 0deg));
+}
+
+.bk-cx-title {
+  top: 5%;
+  left: 8%;
+  z-index: 6;
+}
+
+/* Móvil de WhatsApp con chats sin contestar. */
+.bk-cx-phone {
+  z-index: 3;
+  padding: 0.9em 0.55em 1.1em;
+  background: #1b1f1c;
+  border-radius: 1.4em;
+  box-shadow: 0 10px 18px rgba(16, 20, 17, 0.35);
+}
+
+.bk-cx-phone-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 0.35em;
+  padding: 0.45em 0.6em;
+  color: #fff;
+  background: #1f8c5a;
+  border-radius: 0.7em 0.7em 0 0;
+  font-size: 0.72em;
+  font-weight: 800;
+}
+
+.bk-cx-badge {
+  min-width: 2.2em;
+  padding: 0.1em 0.45em;
+  color: #fff;
+  background: #e0362c;
+  border-radius: 999px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.bk-cx-phone ul {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #d9ddd6;
+  border-radius: 0 0 0.7em 0.7em;
+  list-style: none;
+}
+
+.bk-cx-phone li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.4em;
+  padding: 0.45em 0.6em;
+  background: #fff;
+  font-size: 0.6em;
+  line-height: 1.25;
+}
+
+.bk-cx-phone li b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bk-cx-phone li span {
+  grid-column: 1;
+  overflow: hidden;
+  color: #59605a;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bk-cx-phone li small {
+  grid-row: 1;
+  grid-column: 2;
+  color: #1f8c5a;
+  font-size: 0.9em;
+  font-weight: 700;
+}
+
+.bk-cx-phone li i {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: end;
+  min-width: 1.5em;
+  padding: 0 0.35em;
+  color: #fff;
+  background: #25b36a;
+  border-radius: 999px;
+  font-style: normal;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Tarjetas de aviso: llamadas, correo, agenda, reseña. */
+.bk-cx-card {
+  z-index: 4;
+  display: grid;
+  gap: 0.2em;
+  padding: 0.6em 0.75em;
+  background: #fff;
+  border: 1px solid rgba(16, 20, 17, 0.2);
+  border-radius: 0.6em;
+  box-shadow: 0 6px 14px rgba(16, 20, 17, 0.22);
+  font-size: 0.72em;
+  line-height: 1.25;
+}
+
+.bk-cx-card small {
+  color: #6a716b;
+}
+
+.bk-cx-calls {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.55em;
+  border-left: 4px solid #e0362c;
+}
+
+.bk-cx-calls b {
+  color: #c62a21;
+}
+
+.bk-cx-calls small {
+  grid-column: 2;
+}
+
+.bk-cx-dot {
+  grid-row: span 2;
+  width: 0.8em;
+  height: 0.8em;
+  background: #e0362c;
+  border-radius: 50%;
+}
+
+.bk-cx-inbox {
+  z-index: 2;
+}
+
+.bk-cx-inbox span {
+  height: 0.5em;
+  background: #d5d9d2;
+  border-radius: 2px;
+}
+
+.bk-cx-inbox span:nth-of-type(2) {
+  width: 80%;
+}
+
+.bk-cx-inbox span:nth-of-type(3) {
+  width: 60%;
+}
+
+/* Mancha de café. */
+.bk-cx-coffee {
+  z-index: 1;
+  width: 9em;
+  height: 9em;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    transparent 52%,
+    rgba(120, 72, 32, 0.28) 55%,
+    rgba(120, 72, 32, 0.12) 62%,
+    transparent 66%
+  );
+}
+
+.bk-cx-postit {
+  z-index: 5;
+  max-width: 9em;
+  padding: 0.45em 0.6em 0.8em;
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border: 1px solid rgba(16, 20, 17, 0.25);
+  box-shadow: 0 5px 10px rgba(16, 20, 17, 0.22);
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+.bk-cx-postit--pink {
+  background: #f7b8c4;
+}
+
+/* Presupuesto en borrador: cruza el lomo de una página a otra. */
+.bk-cx-budget {
+  z-index: 2;
+  padding: 0.9em 1em 1em;
+  background: #fff;
+  border: 1px solid rgba(16, 20, 17, 0.2);
+  box-shadow: 0 6px 14px rgba(16, 20, 17, 0.2);
+  font-size: 0.72em;
+}
+
+.bk-cx-budget-title {
+  margin: 0 0 0.6em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bk-cx-draft {
+  position: absolute;
+  top: 38%;
+  left: 18%;
+  padding: 0.15em 0.6em;
+  color: #c62a21;
+  border: 3px solid currentColor;
+  border-radius: 4px;
+  font-size: 1.6em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  transform: rotate(-14deg);
+}
+
+.bk-cx-lines {
+  display: block;
+  height: 5.5em;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 0.8em,
+    #d5d9d2 0.8em calc(0.8em + 2px)
+  );
+}
+
+.bk-cx-budget-total {
+  margin: 0.5em 0 0;
+  font-weight: 700;
+}
+
+.bk-cx-budget-note {
+  margin: 0.4em 0 0;
+  color: var(--ink);
+  font-size: 1.7em;
+  line-height: 1;
+}
+
+.bk-cx-budget-note s {
+  text-decoration-color: var(--action-orange);
+}
+
+/* Tickets arrugados, uno roto y otro cayéndose por el borde. */
+.bk-cx-ticket {
+  z-index: 3;
+  filter: drop-shadow(0 4px 5px rgba(16, 20, 17, 0.28));
+}
+
+.bk-cx-ticket svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bk-cx-ticket--torn {
+  clip-path: polygon(0 0, 100% 0, 100% 48%, 82% 54%, 64% 47%, 45% 56%, 24% 49%, 0 55%);
+}
+
+.bk-cx-agenda {
+  z-index: 4;
+  padding-right: 2.6em;
+}
+
+.bk-cx-agenda b {
+  margin-bottom: 0.2em;
+  color: var(--tool-blue);
+}
+
+.bk-cx-agenda p {
+  margin: 0;
+  padding: 0.25em 0.4em;
+  background: #fde6e2;
+  border-left: 3px solid #e0362c;
+}
+
+.bk-cx-agenda span {
+  font-weight: 800;
+}
+
+.bk-cx-agenda em {
+  position: absolute;
+  top: 28%;
+  right: 0.3em;
+  color: #c62a21;
+  font-size: 2.2em;
+  font-style: normal;
+  transform: rotate(10deg);
+}
+
+.bk-cx-review {
+  z-index: 3;
+}
+
+.bk-cx-review p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.bk-cx-stars {
+  color: #f0a020;
+  letter-spacing: 0.1em;
+}
+
+.bk-cx-stars i {
+  color: #d5d9d2;
+  font-style: normal;
+}
+
+.bk-cx-note {
+  z-index: 5;
+  color: #c62a21;
+  font-size: 1.7em;
+  line-height: 1;
+  text-decoration: underline wavy rgba(198, 42, 33, 0.6) 1.5px;
+  text-underline-offset: 0.25em;
+}
+
+.bk-cx-question {
+  right: 9%;
+  bottom: 9%;
+  z-index: 6;
+  color: var(--ink);
+  font-size: 2.6em;
+  line-height: 1;
+  --r: -6deg;
+}
+
+/* El caos está vivo: el móvil vibra y un pósit se va despegando. */
+html[data-book="on"] .bk-cx-buzz {
+  animation: bk-buzz 3.6s infinite;
+}
+
+html[data-book="on"] .bk-cx-slip {
+  transform-origin: 50% 0;
+  animation: bk-slip 5s ease-in-out infinite alternate;
+}
+
+html[data-book="on"] .bk-cx-dot {
+  animation: bk-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes bk-buzz {
+  0%,
+  86%,
+  100% {
+    transform: rotate(var(--r));
+  }
+  88% {
+    transform: rotate(calc(var(--r) - 2deg)) translateX(-2px);
+  }
+  90% {
+    transform: rotate(calc(var(--r) + 2deg)) translateX(2px);
+  }
+  92% {
+    transform: rotate(calc(var(--r) - 2deg)) translateX(-2px);
+  }
+  94% {
+    transform: rotate(calc(var(--r) + 1deg)) translateX(1px);
+  }
+}
+
+@keyframes bk-slip {
+  to {
+    transform: rotate(calc(var(--r) + 7deg)) translateY(0.4em);
+  }
+}
+
+@keyframes bk-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1 · Lo que construimos: la lista de problemas y la app que la resuelve
+   -------------------------------------------------------------------------- */
+
+/* Número que une cada problema con su pieza de la app. */
+.bk-num {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  color: #fff;
+  background: var(--tool-blue);
+  border-radius: 50%;
+  font-family: var(--font-body-family);
+  font-size: 0.72em;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.bk-problems {
+  display: grid;
+  gap: 0.75em;
+  margin: 0.6em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-problems li {
+  --done: clamp(0, calc(var(--s, 1) * 1.8 - var(--k, 0) * 0.14), 1);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.6em;
+  row-gap: 0.15em;
+  align-items: center;
+}
+
+.bk-problem {
+  position: relative;
+  justify-self: start;
+  color: #c62a21;
+  font-size: 1.6em;
+  line-height: 1.05;
+}
+
+/* Cada problema se tacha cuando su pieza está en la app… */
+.bk-problem::after {
+  position: absolute;
+  top: 55%;
+  left: -0.1em;
+  width: calc(100% + 0.2em);
+  height: 0.11em;
+  content: "";
+  background: var(--ink);
+  border-radius: 2px;
+  transform: scaleX(var(--done)) rotate(-1.5deg);
+  transform-origin: left center;
+}
+
+/* …y aparece la pieza que lo resuelve. */
+.bk-fix {
+  grid-column: 2;
+  justify-self: start;
+  padding: 0.15em 0.55em;
+  color: #fff;
+  background: var(--tool-blue);
+  border-radius: 4px;
+  font-size: 0.78em;
+  font-weight: 760;
+  opacity: var(--done);
+  transform: translateX(calc((1 - var(--done)) * -0.8em));
+}
+
+.bk-problems-note {
+  margin: 1.2em 0 0;
+  color: var(--ink);
+  font-size: 1.45em;
+  transform: rotate(-2deg);
+}
+
+/* La app: una ventana con sus módulos. */
+.bk-app {
+  overflow: hidden;
+  background: #f4f6fb;
+  border: 1px solid rgba(16, 20, 17, 0.25);
+  border-radius: 0.7em;
+  box-shadow: 0 10px 22px rgba(16, 20, 17, 0.16);
+}
+
+.bk-app-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.5em 0.7em;
+  color: #fff;
+  background: var(--tool-blue);
+  font-size: 0.78em;
+}
+
+.bk-app-bar span {
+  width: 0.6em;
+  height: 0.6em;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+}
+
+.bk-app-bar b {
+  margin-left: 0.4em;
+  font-weight: 800;
+}
+
+.bk-app-bar em {
+  margin-left: auto;
+  font-family: var(--font-display-family);
+  font-style: normal;
+  font-variation-settings: "wdth" 80, "wght" 760;
+  opacity: 0.85;
+}
+
+.bk-app-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65em;
+  padding: 0.75em;
+}
+
+.bk-app-card {
+  display: grid;
+  gap: 0.4em;
+  align-content: start;
+  padding: 0.7em 0.75em;
+  background: #fff;
+  border: 1px solid rgba(16, 20, 17, 0.14);
+  border-radius: 0.5em;
+  box-shadow: 0 2px 5px rgba(16, 20, 17, 0.08);
+  font-size: 0.8em;
+  line-height: 1.3;
+}
+
+.bk-app-card--wide {
+  grid-column: 1 / -1;
+}
+
+.bk-app-card header {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 800;
+}
+
+.bk-app-card header svg {
+  color: var(--tool-blue);
+}
+
+.bk-app-card-body {
+  display: grid;
+  gap: 0.25em;
+}
+
+.bk-app-card footer {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  color: #17804d;
+  font-weight: 700;
+}
+
+.bk-app-row {
+  margin: 0;
+  color: #3d443e;
+}
+
+.bk-app-row b {
+  margin-right: 0.3em;
+  color: var(--bench-graphite);
+}
+
+.bk-app-msg {
+  max-width: 80%;
+  margin: 0;
+  padding: 0.35em 0.6em;
+  border-radius: 0.8em;
+}
+
+.bk-app-msg--in {
+  justify-self: start;
+  background: #eef0ec;
+  border-bottom-left-radius: 0.2em;
+}
+
+.bk-app-msg--out {
+  justify-self: end;
+  background: #d8f5c8;
+  border-bottom-right-radius: 0.2em;
+}
+
+/* --------------------------------------------------------------------------
+   2 · Cómo trabajamos: una página por paso
+   -------------------------------------------------------------------------- */
+
+.bk-page--step {
+  background-color: var(--paper);
+}
+
+.bk-page--step-left {
+  background-image:
+    var(--noise-paper),
+    linear-gradient(270deg, rgba(40, 32, 12, 0.22), rgba(40, 32, 12, 0.06) 3%, transparent 10%),
+    linear-gradient(90deg, rgba(40, 32, 12, 0.06), transparent 4%);
+  background-size: 180px 180px, auto, auto;
+}
+
+.bk-page--step-left .bk-folio {
+  left: calc(var(--fs) * 2.2);
+}
+
+.bk-page--step-right {
+  background-image:
+    var(--noise-paper),
+    linear-gradient(90deg, rgba(40, 32, 12, 0.22), rgba(40, 32, 12, 0.06) 3%, transparent 10%),
+    linear-gradient(270deg, rgba(40, 32, 12, 0.06), transparent 4%);
+  background-size: 180px 180px, auto, auto;
+}
+
+.bk-page--step-right .bk-folio {
+  right: calc(var(--fs) * 2.2);
+}
+
+/* Dónde estás en el camino: hechos en naranja con check, el actual en azul. */
+.bk-step-map {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 11em;
+  margin: 0 0 1.1em;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-step-map::before {
+  position: absolute;
+  top: 50%;
+  right: 0.5em;
+  left: 0.5em;
+  height: 2px;
+  content: "";
+  background: rgba(16, 20, 17, 0.18);
+}
+
+.bk-step-map li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  color: var(--graphite-soft);
+  background: var(--paper);
+  border: 1.5px solid rgba(16, 20, 17, 0.3);
+  border-radius: 50%;
+  font-size: 0.78em;
+  font-weight: 800;
+}
+
+.bk-step-map li[data-state="done"] {
+  color: #fff;
+  background: var(--action-orange);
+  border-color: transparent;
+}
+
+.bk-step-map li[data-state="current"] {
+  color: #fff;
+  background: var(--tool-blue);
+  border-color: transparent;
+  box-shadow: 0 0 0 0.3em rgba(41, 72, 199, 0.2);
+}
+
+.bk-step-photo {
+  position: relative;
+  margin: 0 0 1em;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 0.4em solid #fff;
+  box-shadow: 0 8px 18px rgba(16, 20, 17, 0.18);
+  rotate: -0.8deg;
+}
+
+.bk-page--step-right .bk-step-photo {
+  rotate: 0.8deg;
+}
+
+.bk-step-photo img {
+  object-fit: cover;
+}
+
+.bk-step-text {
+  margin: 0 0 1em;
+  font-size: 1.02em;
+  line-height: 1.5;
+}
+
+.bk-step-takeaway {
+  padding: 0.75em 1em;
+  background: #fff;
+  border-left: 4px solid var(--action-orange);
+  box-shadow: 0 4px 12px rgba(16, 20, 17, 0.1);
+}
+
+.bk-step-takeaway span {
+  color: var(--action-orange-dark);
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bk-step-takeaway p {
+  margin: 0.2em 0 0;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* --------------------------------------------------------------------------
+   3 · Qué hacemos: lo que nos piden y cómo lo resolvemos
+   -------------------------------------------------------------------------- */
+
+.bk-requests {
+  display: grid;
+  gap: 1.4em;
+  margin: 0.8em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-requests li {
+  display: grid;
+  gap: 0.35em;
+}
+
+.bk-requests span {
+  color: var(--ink);
+  font-size: 1.65em;
+  line-height: 1.1;
+}
+
+.bk-requests b {
+  justify-self: start;
+  padding: 0.15em 0.55em;
+  color: #fff;
+  background: var(--tool-blue);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.bk-offers {
+  display: grid;
+  gap: 0.7em;
+  margin: 0 0 0.4em;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-offer {
+  display: grid;
+  grid-template-columns: 11em minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9em;
+  padding-bottom: 0.7em;
+  border-bottom: 1px solid var(--line);
+}
+
+.bk-offer-shot {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(16, 20, 17, 0.18);
+  border-radius: 0.4em;
+}
+
+.bk-offer-shot img {
+  object-fit: cover;
+}
+
+.bk-offer-shot[data-fit="contain"] img {
+  object-fit: contain;
+}
+
+.bk-offer-shot[data-top] img {
+  object-position: top;
+}
+
+.bk-offer strong {
+  display: block;
+  font-family: var(--font-display-family);
+  font-size: 1.15em;
+  font-variation-settings: "wdth" 84, "wght" 780;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.bk-offer p {
+  margin: 0.25em 0 0.4em;
+  color: var(--graphite-soft);
+  font-size: 0.86em;
+  line-height: 1.4;
+}
+
+.bk-offer .bk-link {
+  font-size: 0.82em;
+}
+
+/* En móvil la página es estrecha: cada oferta se queda en título y ejemplo,
+   y la última página se compacta para que el botón y su nota quepan. */
+@media (max-width: 900px) {
+  .bk-offer {
+    grid-template-columns: 7.5em minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .bk-offers {
+    gap: 0.6em;
+  }
+
+  .bk-offer p {
+    display: none;
+  }
+
+  .bk-offer strong {
+    margin-bottom: 0.3em;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4 · Tu siguiente paso: dos caminos y la última página
+   -------------------------------------------------------------------------- */
+
+.bk-paths {
+  position: relative;
+  margin: 0.8em 0 0;
+}
+
+.bk-paths svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.bk-paths path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bk-paths-axis {
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.bk-paths-same {
+  stroke: #979d98;
+  stroke-width: 3;
+  stroke-dasharray: 6 8;
+}
+
+.bk-paths-rival {
+  stroke: rgba(41, 72, 199, 0.5);
+  stroke-width: 3;
+}
+
+/* La línea de crecer con nosotros se dibuja al abrir la doble página. */
+.bk-paths-us {
+  stroke: var(--action-orange);
+  stroke-width: 5.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--s, 1));
+}
+
+.bk-paths figcaption {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bk-paths-label,
+.bk-paths-axis-label {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.bk-paths-label {
+  font-size: 1.4em;
+}
+
+.bk-paths-label--us {
+  top: -2%;
+  left: 60%;
+  color: var(--action-orange-dark);
+  font-weight: 700;
+  opacity: var(--s, 1);
+}
+
+.bk-paths-label--rival {
+  top: 47%;
+  left: 60%;
+  color: var(--tool-blue);
+  transform: rotate(-9deg);
+}
+
+.bk-paths-label--same {
+  top: 68%;
+  left: 56%;
+  color: #6f756f;
+  transform: rotate(9deg);
+}
+
+.bk-paths-axis-label {
+  color: var(--ink);
+  font-size: 1.15em;
+}
+
+.bk-paths-axis-label--y {
+  top: -7%;
+  left: 0;
+}
+
+.bk-paths-axis-label--x {
+  right: 0;
+  bottom: -7%;
+}
+
+.bk-paths-note {
+  margin: 1.4em 0 0;
+  color: var(--ink);
+  font-size: 1.65em;
+  line-height: 1.15;
+}
+
+/* Última página: papel como las demás; destaca el botón, no la hoja. */
+.bk-page--final .bk-page-heading {
+  font-size: 2.45em;
+}
+
+.bk-page--final .bk-page-heading span {
+  display: block;
+  color: var(--action-orange-dark);
+}
+
+.bk-final-lead {
+  margin: 0 0 1.2em;
+  color: var(--graphite-soft);
+  font-size: 1.02em;
+  line-height: 1.45;
+}
+
+.bk-final-supports {
+  display: grid;
+  gap: 0.55em;
+  margin: 0 0 1.4em;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-final-supports li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.7em;
+  padding: 0.7em 0.85em;
+  background: #fff;
+  border: 1px solid rgba(16, 20, 17, 0.14);
+  border-radius: 0.5em;
+  box-shadow: 0 2px 6px rgba(16, 20, 17, 0.06);
+}
+
+.bk-final-supports svg {
+  color: var(--tool-blue);
+}
+
+.bk-final-supports p {
+  margin: 0;
+  font-size: 0.92em;
+  line-height: 1.4;
+}
+
+.bk-final-supports strong {
+  color: var(--bench-graphite);
+}
+
+.bk-final-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+  padding: 1em 1.3em 1em 1.5em;
+  color: #fff;
+  background: var(--action-orange);
+  border: 2px solid var(--bench-graphite);
+  border-radius: 12px 34px 34px 12px;
+  box-shadow: 0 14px 26px rgba(32, 21, 12, 0.26);
+  font-size: 1.15em;
+  font-weight: 800;
+  transition:
+    background-color 180ms ease,
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bk-final-cta:hover {
+  background: var(--action-orange-dark);
+  transform: translateY(-2px) rotate(-0.4deg);
+}
+
+.bk-final-note {
+  margin: 0.7em 0 0;
+  color: var(--graphite-soft);
+  font-size: 0.85em;
+}
+
+@media (max-width: 900px) {
+  .bk-page--final .bk-page-heading {
+    font-size: 2.1em;
+  }
+
+  .bk-final-lead {
+    margin-bottom: 0.9em;
+    font-size: 0.95em;
+  }
+
+  .bk-final-supports {
+    margin-bottom: 1em;
+  }
+
+  .bk-final-supports li {
+    padding: 0.55em 0.7em;
+  }
+
+  .bk-final-supports p {
+    font-size: 0.85em;
+  }
+}
+
+.bk-paths-facts {
+  display: grid;
+  gap: 0.35em;
+  margin: 1em 0 0;
+  padding: 0;
+  color: var(--action-orange-dark);
+  font-size: 1.45em;
+  line-height: 1.1;
+  list-style: none;
+}
+
+.bk-paths-facts li::before {
+  content: "→ ";
+}
+
+/* --------------------------------------------------------------------------
+   Aprovechar la altura de la página en el libro: lo que puede crecer, crece,
+   en vez de dejar media hoja vacía abajo. En el libro plano no hay altura
+   fija y cada pieza conserva su proporción.
+   -------------------------------------------------------------------------- */
+
+/* Pasos: la foto ocupa el hueco que dejan el texto y «Te llevas». */
+html[data-book="on"] .bk-step-photo {
+  flex: 1 1 0;
+  min-height: 8em;
+  aspect-ratio: auto;
+}
+
+html[data-book="on"] .bk-step-takeaway {
+  margin-bottom: 1.2em;
+}
+
+/* «Lo que nos piden»: las peticiones se reparten por la hoja, dejando sitio
+   al sello. */
+html[data-book="on"] .bk-requests {
+  height: 100%;
+  align-content: space-evenly;
+  margin-top: 0;
+  padding-bottom: 5.5em;
+}
+
+html[data-book="on"] .bk-requests span {
+  font-size: 1.8em;
+}
+
+/* «Qué hacemos»: las cuatro filas llenan la página. */
+html[data-book="on"] .bk-offers {
+  height: 100%;
+  align-content: space-between;
+  margin-bottom: 0;
+}
+
+/* Última página: los apoyos se reparten y el botón baja hacia el pie. */
+html[data-book="on"] .bk-page--final .bk-final-supports {
+  flex: 1;
+  align-content: center;
+}
+
+/* «Tu lista de problemas»: la lista se reparte y deja sitio a la nota y al
+   sello. */
+html[data-book="on"] .bk-problems {
+  height: 72%;
+  align-content: space-evenly;
+}
+
+/* «Tu app»: la ventana ocupa la página y los módulos se estiran. Sólo en
+   escritorio: en móvil la hoja es estrecha y el contenido ya la llena. */
+@media (min-width: 901px) {
+  html[data-book="on"] .bk-app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  html[data-book="on"] .bk-app-body {
+    flex: 1;
+    grid-auto-rows: minmax(min-content, 1fr);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Móvil: una página por gesto
+
+   Con el dedo el scroll es nativo y tiene mucha inercia: un gesto fuerte
+   pasaba dos o tres hojas. Cada página tiene una parada obligatoria
+   (`scroll-snap-stop: always`) y cada tramo es más largo. Las paradas sólo
+   existen dentro del libro; fuera, el scroll es libre (`proximity`).
+   -------------------------------------------------------------------------- */
+
+.bk-snap {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  html[data-book="on"] {
+    scroll-snap-type: y proximity;
+  }
+
+  html[data-book="on"] .bk {
+    --unit-h: 120svh;
+  }
+
+  /* La parada queda en la posición de lectura: la cabecera fija aparta el
+     ajuste (`scroll-padding-top`), así que se compensa. */
+  html[data-book="on"] .bk-snap {
+    position: absolute;
+    top: calc(var(--u) * var(--unit-h) + var(--header-height));
+    left: 0;
+    display: block;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}

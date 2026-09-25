@@ -810,3 +810,495 @@
 .scene {
   touch-action: none;
 }
+/* development's problem → tool mapping, kept readable inside the monitor. */
+.takeaway {
+  margin-top: 18px;
+  padding: 15px 18px;
+  border-left: 2px solid #869a73;
+  background: #dfe5d580;
+}
+.takeaway b {
+  display: block;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  margin-bottom: 5px;
+  color: #435a39;
+}
+.solutionLayout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 5%;
+  align-items: start;
+}
+.problemList button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 20px 14px;
+  border: 0;
+  border-top: 1px solid #b9c4ae;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.problemList button[aria-pressed="true"] {
+  background: #dce4d1;
+  box-shadow: inset 3px 0 #587444;
+}
+.problemList button > span {
+  font-size: 10px;
+  color: #81916c;
+}
+.problemList button > div {
+  flex: 1;
+}
+.problemList strong {
+  display: block;
+  font-weight: 500;
+  font-size: 17px;
+}
+.problemList small {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+  color: #687955;
+}
+.appExample {
+  background: #e3e7db;
+  border: 1px solid #aebca0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.appExample > header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  background: #2d4436;
+  color: #f0eedf;
+  font-size: 11px;
+}
+.appExample > header strong {
+  flex: 1;
+  font-weight: 400;
+}
+.appExample > header small {
+  color: #b6c7a1;
+}
+.appLights {
+  color: #b0bda2;
+  font-size: 7px;
+  letter-spacing: 2px;
+}
+.appModules {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 20px;
+}
+.appModules section {
+  background: #f6f5ec;
+  padding: 18px 15px;
+  border: 1px solid #ccd2c0;
+  border-radius: 5px;
+  transition:
+    transform 350ms,
+    opacity 350ms;
+  opacity: 0.65;
+}
+.appModules section[data-active="true"] {
+  opacity: 1;
+  transform: translateY(-3px);
+  border-color: #657c52;
+  box-shadow: 0 8px 18px #1f301513;
+}
+.appModules section:first-child,
+.appModules section:last-child {
+  grid-column: 1 / -1;
+}
+.appModules h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.appModules p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+.appModules section:first-child p {
+  background: #e6e8df;
+  padding: 8px 12px;
+  max-width: 85%;
+  border-radius: 3px;
+}
+.appModules p[data-reply="true"] {
+  margin-left: auto;
+  background: #dce8cc !important;
+}
+.appModules footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: #61774e;
+  margin-top: 15px;
+}
+.exampleNote {
+  font-size: 10px;
+  color: #738162;
+  padding: 0 20px 12px;
+}
+.projectDoors {
+  row-gap: 65px;
+}
+.projectDoors blockquote {
+  margin: 0 0 25px;
+  min-height: 72px;
+  font-size: 21px;
+  line-height: 1.4;
+  color: #63734f;
+  letter-spacing: -0.02em;
+}
+.projectDoors + .plainTalk {
+  margin-top: 65px;
+}
+.supports {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 0 0 28px;
+  margin: 0 0 45px;
+  list-style: none;
+  border-bottom: 1px solid #b9c4ae;
+}
+.supports strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+.supports p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #687955;
+}
+.route[hidden] {
+  display: none;
+}
+.introCopy {
+  position: absolute;
+  top: calc(var(--header-height) + 32px);
+  left: 24px;
+  right: 24px;
+  text-align: center;
+  pointer-events: none;
+}
+.introCopy > p {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #b6c0ab;
+  margin: 0 0 18px;
+}
+.introCopy h2 {
+  font-family: var(--font-display-family);
+  font-size: clamp(35px, 4.4vw, 63px);
+  font-weight: 500;
+  line-height: 0.99;
+  letter-spacing: -0.045em;
+  margin: 0 0 19px;
+}
+.introCopy em,
+.officeMeaning em {
+  font-style: normal;
+  color: #dbba88;
+}
+.introCopy > div {
+  max-width: 620px;
+  margin: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c3c8b9;
+}
+.introActions {
+  position: absolute;
+  bottom: 96px;
+  left: 20px;
+  right: 20px;
+  text-align: center;
+}
+.introActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 25px;
+  padding: 16px 27px;
+  min-height: 52px;
+  border: 1px solid #d4ba8e;
+  color: #25362a;
+  background: #d4ba8e;
+  cursor: pointer;
+  font: 500 14px var(--font-body-family);
+}
+.introActions button:disabled {
+  cursor: default;
+}
+.introActions small {
+  display: block;
+  font-size: 10px;
+  color: #b9c3ac;
+  margin-top: 12px;
+}
+.introRail {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 23px;
+  padding: 10px 28px;
+  color: #899981;
+  font-size: 11px;
+  border-top: 1px solid #b7bdab26;
+  background: #1e2a23;
+}
+.introRail [data-active="true"] {
+  color: #dec79d;
+}
+.introRail button {
+  position: absolute;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #d3d9c5;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  padding: 12px 0;
+}
+.officeMeaning {
+  position: absolute;
+  top: calc(var(--header-height) + 65px);
+  left: 25px;
+  right: 25px;
+  text-align: center;
+  pointer-events: none;
+}
+.officeMeaning h2 {
+  font-family: var(--font-display-family);
+  font-size: clamp(30px, 3.2vw, 46px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin: 0 0 12px;
+}
+.officeMeaning p {
+  max-width: 510px;
+  margin: auto;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #bbc7b0;
+}
+.tour[data-intro="office"] .scene,
+.tour[data-intro="office"] .markers {
+  top: calc(var(--header-height) + 110px);
+}
+@media (max-width: 900px) {
+  .solutionLayout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .introRail {
+    justify-content: start;
+    gap: 12px;
+    font-size: 9px;
+    padding: 10px 20px;
+  }
+  .introRail button {
+    right: 20px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 760px) {
+  .introCopy {
+    top: calc(var(--header-height) + 32px);
+    left: 25px;
+    right: 25px;
+  }
+  .introCopy > p {
+    font-size: 7px;
+    line-height: 1.7;
+    max-width: 270px;
+    margin: 0 auto 20px;
+  }
+  .introCopy h2 {
+    font-size: clamp(32px, 8.5vw, 47px);
+  }
+  .introCopy > div {
+    font-size: 12px;
+    max-width: 320px;
+  }
+  .introActions {
+    bottom: 115px;
+  }
+  .introActions button {
+    font-size: 12px;
+    padding: 13px 20px;
+  }
+  .introRail {
+    min-height: 80px;
+    justify-content: center;
+    align-items: start;
+    padding-top: 15px;
+    gap: 13px;
+  }
+  .introRail button {
+    bottom: 4px;
+    right: auto;
+  }
+  .introRail > span {
+    font-size: 8px;
+  }
+  .officeMeaning {
+    top: calc(var(--header-height) + 66px);
+  }
+  .officeMeaning h2 {
+    font-size: 31px;
+  }
+  .officeMeaning p {
+    font-size: 11px;
+    max-width: 305px;
+  }
+  .supports {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .supports p {
+    margin: 5px 0 0;
+  }
+  .appModules {
+    padding: 10px;
+    gap: 8px;
+  }
+  .appModules section {
+    padding: 14px 10px;
+  }
+  .appExample > header small {
+    display: none;
+  }
+  .appModules h3 {
+    font-size: 11px;
+  }
+  .appModules p {
+    font-size: 11px;
+  }
+  .appModules footer {
+    font-size: 9px;
+  }
+  .problemList strong {
+    font-size: 16px;
+  }
+  .projectDoors blockquote {
+    min-height: 0;
+    font-size: 20px;
+  }
+}
+@media (max-height: 700px) and (min-width: 761px) {
+  .introCopy {
+    top: calc(var(--header-height) + 18px);
+  }
+  .introCopy h2 {
+    font-size: 35px;
+  }
+  .introCopy > p {
+    margin-bottom: 10px;
+  }
+  .introCopy > div {
+    font-size: 12px;
+  }
+  .introActions {
+    bottom: 85px;
+  }
+  .introActions button {
+    min-height: 40px;
+    padding: 10px 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .appModules section {
+    transition: none;
+  }
+}
+
+.introMarkers {
+  position: absolute;
+  inset: var(--header-height) 0 68px;
+  max-width: 1700px;
+  margin: auto;
+  pointer-events: none;
+}
+.introMarkers[hidden] {
+  display: none;
+}
+.introMarkers button {
+  position: absolute;
+  visibility: hidden;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  padding: 10px 13px;
+  background: #25392eef;
+  border: 1px solid #bd9d72aa;
+  color: #f3e5cf;
+  font: 11px var(--font-body-family);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.introMarkers button[aria-pressed="true"] {
+  background: #d4ba8e;
+  color: #25392e;
+}
+@media (max-width: 760px) {
+  .introMarkers button {
+    font-size: 8px;
+    gap: 4px;
+    padding: 8px 6px;
+  }
+  .introMarkers {
+    bottom: 67px;
+  }
+}
+@media (max-width: 760px) {
+  .introMarkers button {
+    top: 47% !important;
+    width: 30%;
+    min-height: 44px;
+    white-space: normal;
+    font-size: 9px;
+    line-height: 1.35;
+    text-align: left;
+  }
+  .introMarkers button:nth-child(1) {
+    left: 17% !important;
+  }
+  .introMarkers button:nth-child(2) {
+    left: 50% !important;
+  }
+  .introMarkers button:nth-child(3) {
+    left: 83% !important;
+  }
+  .introMarkers svg {
+    flex-shrink: 0;
+  }
+}

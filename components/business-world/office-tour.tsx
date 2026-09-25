@@ -8,6 +8,7 @@ import {
   Maximize2,
   Mail,
   MoveUpRight,
+  Plus,
 } from "lucide-react";
 import {
   officeDestinations,
@@ -29,6 +30,8 @@ export function OfficeTour() {
   const root = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const markers = useRef<(HTMLButtonElement | null)[]>([]);
+  const introMarkers = useRef<(HTMLButtonElement | null)[]>([]);
+  const [problem, setProblem] = useState<number | null>(null);
   const panels = useRef<(HTMLDivElement | null)[]>([]);
   const scene = useRef<Scene | null>(null);
   const statusRef = useRef("loading");
@@ -40,6 +43,8 @@ export function OfficeTour() {
   const sequence = useRef(0);
   const pending = useRef<number | null>(null);
   const anchor = useRef("");
+  const intro = useRef("chaos");
+  const [introStage, setIntroStage] = useState("chaos");
   const [status, setStatus] = useState("loading");
   const [index, setIndex] = useState(-1);
   const [phase, setPhase] = useState<OfficePhase>("office");
@@ -50,6 +55,8 @@ export function OfficeTour() {
       pending.current = target;
       return;
     }
+    intro.current = "office";
+    setIntroStage("office");
     const token = ++sequence.current;
     state.current.index = target;
     setIndex(target);
@@ -73,9 +80,12 @@ export function OfficeTour() {
         const panel = panels.current[target];
         if (
           anchor.current === "#preguntas" ||
-          anchor.current === "#hablamos-claro"
+          anchor.current === "#hablamos-claro" ||
+          anchor.current === "#pasos-3-y-4"
         ) {
-          const section = panel?.querySelector<HTMLElement>(anchor.current);
+          const section = panel?.querySelector<HTMLElement>(
+            anchor.current === "#pasos-3-y-4" ? "#paso-3" : anchor.current,
+          );
           if (section && panel)
             panel.scrollTop +=
               section.getBoundingClientRect().top -
@@ -90,7 +100,38 @@ export function OfficeTour() {
       scene.current.visit(target, { phase: changePhase, complete });
     else complete();
   }, []);
-  useOfficeInput(root, panels, state, navigate);
+  const organize = useCallback(() => {
+    if (intro.current !== "chaos" || statusRef.current === "loading") return;
+    intro.current = "sorting";
+    setIntroStage("sorting");
+    state.current.phase = "organizing";
+    setPhase("organizing");
+    const token = ++sequence.current;
+    const complete = () => {
+      if (sequence.current !== token) return;
+      intro.current = "office";
+      setIntroStage("office");
+      state.current.phase = "office";
+      setPhase("office");
+      state.current.arrived = performance.now();
+    };
+    if (scene.current && statusRef.current === "ready")
+      scene.current.organize({
+        ordered: () => {
+          if (sequence.current === token) setIntroStage("ordered");
+        },
+        complete,
+      });
+    else complete();
+  }, []);
+  const gestureNavigate = useCallback(
+    (target: number) => {
+      if (intro.current === "chaos" && target >= 0) organize();
+      else navigate(target);
+    },
+    [organize, navigate],
+  );
+  useOfficeInput(root, panels, state, gestureNavigate);
 
   useEffect(() => {
     const transitions = sequence;
@@ -101,7 +142,7 @@ export function OfficeTour() {
       if (cancelled) return;
       statusRef.current = "fallback";
       setStatus("fallback");
-      navigate(state.current.index);
+      if (intro.current !== "chaos") navigate(state.current.index);
     };
     import("./office-scene")
       .then(({ createOfficeScene }) => {
@@ -112,6 +153,7 @@ export function OfficeTour() {
             markers.current as HTMLButtonElement[],
             navigate,
             fallback,
+            introMarkers.current as HTMLButtonElement[],
           );
           statusRef.current = "ready";
           setStatus("ready");
@@ -172,13 +214,14 @@ export function OfficeTour() {
   }, [navigate]);
 
   const reading = phase === "reading";
-  const flying = phase !== "office" && !reading;
+  const flying = phase !== "office" && phase !== "organizing" && !reading;
   return (
     <div
       ref={root}
       className={styles.tour}
       data-office-tour=""
       data-phase={phase}
+      data-intro={introStage}
       data-destination={index}
       data-render-state={status}
       tabIndex={-1}
@@ -188,7 +231,10 @@ export function OfficeTour() {
         Satorus. Webs, herramientas e inteligencia artificial para tu negocio.
       </h1>
       <div className={styles.scene} ref={host} />
-      <div className={styles.markers} hidden={reading || flying}>
+      <div
+        className={styles.markers}
+        hidden={reading || flying || introStage !== "office"}
+      >
         {officeDestinations.map((destination, i) => (
           <button
             key={destination.id}
@@ -204,11 +250,110 @@ export function OfficeTour() {
           </button>
         ))}
       </div>
-      {phase === "office" && (
+      <div
+        className={styles.introMarkers}
+        hidden={introStage !== "chaos" || status !== "ready"}
+      >
+        {[
+          "12 mensajes pendientes",
+          "2 citas a la misma hora",
+          "3 presupuestos sin enviar",
+        ].map((label, i) => (
+          <button
+            key={label}
+            ref={(element) => {
+              introMarkers.current[i] = element;
+            }}
+            onClick={() => setProblem(i)}
+            aria-pressed={problem === i}
+            aria-controls="intro-problem"
+          >
+            {label}
+            <Plus size={11} aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+      {introStage !== "office" && (
+        <>
+          <header className={styles.introCopy} aria-live="polite">
+            <p>ANTES DE HABLAR DE TECNOLOGÍA, HABLEMOS DE TU DÍA A DÍA.</p>
+            <h2>
+              {introStage === "chaos" ? (
+                <>
+                  Tu negocio.
+                  <br />
+                  <em>En demasiados sitios.</em>
+                </>
+              ) : (
+                <>
+                  Tú llevas el negocio.
+                  <br />
+                  <em>Nosotros ponemos orden.</em>
+                </>
+              )}
+            </h2>
+            <div id="intro-problem">
+              {introStage === "chaos"
+                ? problem === null
+                  ? "Mensajes sin responder. Citas cruzadas. Presupuestos que se quedan para mañana."
+                  : [
+                      "Marta preguntó hace tres días. Luis sigue esperando. El trabajo llega por WhatsApp y se queda ahí.",
+                      "Dos personas reservadas a las 10:00. Una agenda que no te avisa de que algo se ha cruzado.",
+                      "El presupuesto está empezado. Falta enviarlo. Y entre llamadas y pedidos vuelve a quedarse para mañana.",
+                    ][problem]
+                : introStage === "sorting"
+                  ? "Reunimos lo que hoy está disperso. Decidimos contigo qué resolver primero."
+                  : "Una herramienta para cada necesidad. Un equipo que te acompaña."}
+            </div>
+          </header>
+          <div className={styles.introActions}>
+            <button
+              onClick={organize}
+              disabled={status === "loading" || introStage !== "chaos"}
+            >
+              {status === "loading"
+                ? "Preparando tu mesa…"
+                : introStage === "chaos"
+                  ? "Vamos a poner orden"
+                  : introStage === "sorting"
+                    ? "Cada cosa encuentra su lugar…"
+                    : "Así empieza nuestro trabajo"}
+              <ArrowDown size={17} aria-hidden="true" />
+            </button>
+            <small>
+              {introStage === "chaos"
+                ? "O desliza para empezar"
+                : "De tu día a día a una forma más clara de trabajar"}
+            </small>
+          </div>
+          <div className={styles.introRail}>
+            <span data-active={introStage === "chaos"}>Tu día a día</span>
+            <span aria-hidden="true">→</span>
+            <span data-active={introStage !== "chaos"}>Ponemos orden</span>
+            <span aria-hidden="true">→</span>
+            <span>Lo hacemos contigo</span>
+            <button onClick={() => navigate(0)}>
+              Ir al recorrido <ArrowRight size={14} />
+            </button>
+          </div>
+        </>
+      )}
+      {phase === "office" && introStage === "office" && (
         <>
           <div className={styles.officeLabel}>
-            <span>ESTUDIO SATORUS</span>
-            <span>UN LUGAR PARA DAR FORMA A TU NEGOCIO.</span>
+            <span>DE TU MESA A NUESTRO ESTUDIO</span>
+            <span>ENTENDER · RESOLVER · CONSTRUIR</span>
+          </div>
+          <div className={styles.officeMeaning}>
+            <h2>
+              Aquí le damos forma.
+              <br />
+              <em>Contigo.</em>
+            </h2>
+            <p>
+              Cada mesa, un paso: entendemos tu negocio, construimos la solución
+              y te enseñamos lo que ya hemos hecho.
+            </p>
           </div>
           <button
             className={styles.start}
@@ -217,7 +362,7 @@ export function OfficeTour() {
           >
             {status === "loading"
               ? "Preparando el estudio…"
-              : "Desliza para entrar"}
+              : "Entra y descubre cómo"}
             <ArrowDown size={17} aria-hidden="true" />
           </button>
           {status === "fallback" && (
@@ -311,7 +456,11 @@ export function OfficeTour() {
           </div>
         ))}
       </div>
-      <nav className={styles.route} aria-label="Recorrido de la oficina">
+      <nav
+        className={styles.route}
+        aria-label="Recorrido de la oficina"
+        hidden={introStage !== "office"}
+      >
         <button
           onClick={() => navigate(-1)}
           aria-label="Ver la oficina"
