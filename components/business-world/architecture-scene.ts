@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { ArchitecturalOcclusion } from "./architectural-occlusion";
 import { gsap } from "gsap";
 import { createArchitecture } from "./architecture-model";
 
@@ -98,12 +102,12 @@ export function createArchitecturalScene(
   const room = new RoomEnvironment();
   const environment = pmrem.fromScene(room, 0.055);
   scene.environment = environment.texture;
-  scene.environmentIntensity = 0.52;
+  scene.environmentIntensity = 0.65;
   room.dispose();
   pmrem.dispose();
-  const ambient = new THREE.HemisphereLight(0xe9eff4, 0x74614b, 0.65);
+  const ambient = new THREE.HemisphereLight(0xe9eff4, 0x74614b, 0.48);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffe8c5, 2.8);
+  const sun = new THREE.DirectionalLight(0xffe8c5, 2.35);
   sun.position.set(-8, 14, 9);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -113,7 +117,7 @@ export function createArchitecturalScene(
   sun.shadow.camera.bottom = -14;
   sun.shadow.normalBias = 0.025;
   sun.shadow.bias = -0.0002;
-  sun.shadow.radius = 3;
+  sun.shadow.radius = 6;
   scene.add(sun);
   const fill = new THREE.DirectionalLight(0xc2d6ef, 1.1);
   fill.position.set(10, 5, -6);
@@ -131,6 +135,20 @@ export function createArchitecturalScene(
   ground.position.y = -0.6;
   ground.receiveShadow = true;
   scene.add(ground);
+  const renderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType,
+    samples: 2,
+  });
+  const composer = new EffectComposer(renderer, renderTarget);
+  const beautyPass = new RenderPass(scene, camera);
+  const occlusion = new ArchitecturalOcclusion(scene, camera, 1, 1, 16);
+  occlusion.kernelRadius = 0.65;
+  occlusion.minDistance = 0.001;
+  occlusion.maxDistance = 0.065;
+  const output = new OutputPass();
+  composer.addPass(beautyPass);
+  composer.addPass(occlusion);
+  composer.addPass(output);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   let chapter = initialChapter;
   let timeline: gsap.core.Timeline | null = null;
@@ -141,7 +159,7 @@ export function createArchitecturalScene(
     renderFrame = 0;
     if (disposed || !visible || document.hidden) return;
     camera.lookAt(lookAt);
-    renderer.render(scene, camera);
+    composer.render();
   }
   function invalidate() {
     if (!renderFrame && !disposed) renderFrame = requestAnimationFrame(render);
@@ -222,6 +240,10 @@ export function createArchitecturalScene(
     camera.aspect = width / height;
     camera.fov = camera.aspect < 1.2 ? 40 : 37;
     camera.updateProjectionMatrix();
+    composer.setPixelRatio(
+      Math.min(window.devicePixelRatio, width < 680 ? 1 : 1.5),
+    );
+    composer.setSize(width, height);
     goTo(chapter, true);
   }
   const resizeObserver = new ResizeObserver(resize);
@@ -272,6 +294,10 @@ export function createArchitecturalScene(
       groundGeometry.dispose();
       groundMaterial.dispose();
       sun.shadow.dispose();
+      occlusion.dispose();
+      output.dispose();
+      beautyPass.dispose();
+      composer.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     },

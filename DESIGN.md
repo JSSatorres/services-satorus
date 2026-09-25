@@ -108,6 +108,10 @@ Una única arquitectura 3D representa el negocio. La cámara se aproxima al edif
 - Archivos activos: `components/business-world/*`, `app/page.tsx`, `lib/journey-progress.ts`. Las versiones anteriores permanecen sin montar como referencia.
 - Las páginas interiores mantienen su diseño. Analytics se monta exclusivamente cuando existe el entorno de Vercel.
 
+### Refinamiento del modelado
+Sillas con respaldo curvo, apoyabrazos y ruedas dobles; vegetación de hojas curvas y ramas; sofá con cojines y costuras; herrajes y juntas de carpintería; cubierta de junta alzada, lucernario con marco y luminarias suspendidas. Parquet de longitudes alternadas mediante instancias para no multiplicar llamadas de dibujo.
+
+La piedra del basamento mantiene grano fino y el hormigón de pared utiliza su propio material. El vidrio tiene menor rugosidad y espesor. Se añade oclusión ambiental con exclusión del vidrio y render final con antialiasing; el render sigue siendo bajo demanda y su resolución está limitada por dispositivo.
 ### Verificación
 Build, lint y tres pruebas de cálculo de capítulo. Comprobaciones en navegador: escritorio, móvil, ocho capítulos, preguntas, persistencia del formulario, envío simulado, navegación a proyecto y regreso. Prueba de regresión en `tests/journey-browser-check.cjs`.
 

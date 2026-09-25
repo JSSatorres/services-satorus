@@ -28,3 +28,9 @@ El trabajo se mantiene en el worktree aislado para no interferir con la variante
 - Texturas de roble y hormigón CC0 alojadas localmente; créditos junto a los mapas.
 - Regresión detectada y resuelta: Chromium desplazaba el documento al enfocar controles dentro de un panel sticky con transform animado. Los paneles se mantienen fijos y el movimiento se concentra en la cámara 3D. Prueba reproducible: tests/journey-browser-check.cjs.
 - Limitación: el render es en tiempo real y su fluidez depende de la GPU; DPR limitado y render bajo demanda para reducir coste. Los encuadres se adaptan a móvil.
+
+## Refinamiento solicitado del modelado
+- Sillas curvas, ruedas dobles, costuras y cojines, vegetación con hojas curvas, herrajes, marcos, juntas y luminarias suspendidas.
+- Parquet con tablas escalonadas e instancias; materiales independientes para basamento y pared; vidrio más fino.
+- Oclusión ambiental que excluye superficies transparentes, antialiasing y sombras suavizadas. Recursos GPU liberados al salir.
+- Revisadas vistas exterior, interior, despiece y móvil. Build, lint, navegación de ocho capítulos, formulario simulado e historial correctos.

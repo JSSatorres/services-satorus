@@ -1,6 +1,12 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
+import {
+  addTaskChair,
+  addFicus,
+  addConstructionDetails,
+} from "./architecture-details";
+
 type Surface = THREE.Material;
 type Point = [number, number, number];
 
@@ -87,6 +93,12 @@ export function createArchitecture(invalidate: () => void) {
     bumpScale: 0.018,
     roughness: 0.86,
   });
+  const wallConcrete = standard({
+    map: stoneMap,
+    roughness: 0.88,
+    bumpMap: stoneMap,
+    bumpScale: 0.012,
+  });
   const oak = standard({
     map: woodMap,
     bumpMap: woodMap,
@@ -121,13 +133,13 @@ export function createArchitecture(invalidate: () => void) {
   });
   const glass = new THREE.MeshPhysicalMaterial({
     color: "#ecf2eb",
-    roughness: 0.08,
+    roughness: 0.012,
     metalness: 0,
     transmission: 0.94,
-    thickness: 0.035,
+    thickness: 0.008,
     ior: 1.5,
     transparent: true,
-    opacity: 0.42,
+    opacity: 0.9,
     envMapIntensity: 1.1,
     depthWrite: false,
   });
@@ -141,7 +153,7 @@ export function createArchitecture(invalidate: () => void) {
     bevel = 0,
   ) {
     const geometry = bevel
-      ? new RoundedBoxGeometry(...size, 2, bevel)
+      ? new RoundedBoxGeometry(...size, 3, bevel)
       : new THREE.BoxGeometry(...size);
     geometries.push(geometry);
     const mesh = new THREE.Mesh(geometry, material);
@@ -240,31 +252,81 @@ export function createArchitecture(invalidate: () => void) {
     parent.add(mesh);
   }
 
+  const detailTools = {
+    box,
+    cylinder,
+    line,
+    standard,
+    geometries,
+    materials,
+    textures,
+    oak,
+    darkOak,
+    metal,
+    aluminum,
+    brass,
+    cloth,
+    stone,
+    leather,
+    paper,
+    light,
+    random,
+  };
+
   // A layered stone plinth and recessed service void anchor the architecture.
   box(root, [11.6, 0.22, 7.9], [0, -0.48, 0.35], stone, 0.035);
   box(root, [10.25, 0.2, 6.7], [0, -0.23, 0], metal, 0.025);
   box(interior, [10.3, 0.17, 6.75], [0, -0.025, 0], stone, 0.02);
-  for (let i = 0; i < 28; i++) {
-    const floorMaterial = standard({
-      map: woodMap,
-      color: new THREE.Color().setHSL(0.085, 0.16, 0.69 + random() * 0.13),
-      roughness: 0.58,
-      bumpMap: woodMap,
-      bumpScale: 0.006,
-    });
-    box(
-      interior,
-      [0.351, 0.035, 6.35],
-      [-4.77 + i * 0.355, 0.077, 0],
-      floorMaterial,
-    );
+  // Staggered boards share one instanced draw call; lengths and tones vary subtly.
+  const floorMaterial = standard({
+    map: woodMap,
+    roughness: 0.91,
+    bumpMap: woodMap,
+    bumpScale: 0.004,
+  });
+  const boardGeometry = new RoundedBoxGeometry(0.351, 0.035, 1, 2, 0.003);
+  geometries.push(boardGeometry);
+  const boards: { x: number; z: number; length: number }[] = [];
+  for (let row = 0; row < 28; row++) {
+    let z = -3.175;
+    let first = true;
+    while (z < 3.175 - 0.001) {
+      const length = Math.min(
+        first ? 0.64 + (row % 3) * 0.53 : 1.92,
+        3.175 - z,
+      );
+      boards.push({
+        x: -4.77 + row * 0.355,
+        z: z + length / 2,
+        length: length - 0.006,
+      });
+      z += length;
+      first = false;
+    }
   }
+  const flooring = new THREE.InstancedMesh(
+    boardGeometry,
+    floorMaterial,
+    boards.length,
+  );
+  const boardTransform = new THREE.Object3D();
+  boards.forEach((board, index) => {
+    boardTransform.position.set(board.x, 0.077, board.z);
+    boardTransform.scale.set(1, 1, board.length);
+    boardTransform.updateMatrix();
+    flooring.setMatrixAt(index, boardTransform.matrix);
+    flooring.setColorAt(
+      index,
+      new THREE.Color().setHSL(0.09, 0.06, 0.8 + random() * 0.13),
+    );
+  });
+  flooring.castShadow = true;
+  flooring.receiveShadow = true;
+  interior.add(flooring);
   box(root, [5.1, 0.13, 1], [1.3, -0.32, 4.37], stone, 0.02);
   box(root, [4.9, 0.12, 0.6], [1.3, -0.45, 4.99], stone, 0.02);
 
-  box(westWall, [0.22, 3.5, 6.5], [-5, 1.85, 0], stone, 0.016);
-  for (let z = -2.25; z <= 2.25; z += 1.5)
-    box(westWall, [0.224, 0.008, 1.49], [-5, 1.45, z], metal);
+  box(westWall, [0.22, 3.5, 6.5], [-5, 1.85, 0], wallConcrete, 0.016);
   box(backWall, [10, 3.5, 0.22], [0, 1.85, -3.2], plaster, 0.016);
   for (let x = -4.85; x < -0.2; x += 0.14)
     box(backWall, [0.055, 3.35, 0.095], [x, 1.83, -3.055], darkOak, 0.008);
@@ -335,7 +397,7 @@ export function createArchitecture(invalidate: () => void) {
     interior.add(group);
     box(group, [2.8, 0.085, 1.16], [0, 0.86, 0], oak, 0.025);
     for (const px of [-1.16, 1.16]) {
-      box(group, [0.07, 0.76, 0.75], [px, 0.46, 0], metal, 0.014);
+      box(group, [0.065, 0.76, 0.065], [px, 0.46, 0], metal, 0.014);
       box(group, [0.13, 0.035, 0.89], [px, 0.105, 0], metal, 0.012);
     }
     box(group, [1.08, 0.64, 0.048], [0.2, 1.35, -0.27], aluminum, 0.025);
@@ -399,34 +461,7 @@ export function createArchitecture(invalidate: () => void) {
     box(group, [0.38, 0.03, 0.48], [-0.9, 0.924, 0.03], leather, 0.01);
     box(group, [0.011, 0.011, 0.28], [-0.78, 0.946, 0.03], brass);
     cylinder(group, 0.066, 0.05, 0.11, [0.99, 0.96, -0.23], stone);
-    const chair = new THREE.Group();
-    chair.position.set(0, 0, 0.94);
-    group.add(chair);
-    box(chair, [0.64, 0.11, 0.62], [0, 0.54, 0], leather, 0.045);
-    const back = box(chair, [0.65, 0.59, 0.09], [0, 0.87, 0.28], leather, 0.04);
-    back.rotation.x = -0.12;
-    cylinder(chair, 0.035, 0.035, 0.41, [0, 0.31, 0], aluminum);
-    for (let i = 0; i < 5; i++) {
-      const a = (i * Math.PI * 2) / 5;
-      line(
-        chair,
-        [
-          [0, 0.2, 0],
-          [Math.sin(a) * 0.17, 0.13, Math.cos(a) * 0.17],
-          [Math.sin(a) * 0.34, 0.12, Math.cos(a) * 0.34],
-        ],
-        0.022,
-        metal,
-      );
-      cylinder(
-        chair,
-        0.045,
-        0.045,
-        0.065,
-        [Math.sin(a) * 0.34, 0.11, Math.cos(a) * 0.34],
-        metal,
-      );
-    }
+    addTaskChair(group, detailTools);
     contactShadow(interior, x, z + 0.35, 3.9, 2.7, 0.101);
   }
   desk(-1.4, -0.65);
@@ -460,41 +495,12 @@ export function createArchitecture(invalidate: () => void) {
   cylinder(interior, 0.14, 0.22, 0.36, [2.15, 0.295, 1.95], metal);
   box(interior, [0.24, 0.028, 0.32], [2.13, 0.545, 1.96], paper, 0.005);
 
-  function plant(x: number, z: number) {
-    cylinder(interior, 0.24, 0.18, 0.48, [x, 0.34, z], stone);
-    cylinder(interior, 0.215, 0.215, 0.015, [x, 0.585, z], leather);
-    const leafMat = standard({
-      color: "#3e4e35",
-      roughness: 0.65,
-      side: THREE.DoubleSide,
-    });
-    for (let i = 0; i < 18; i++) {
-      const a = i * 2.4,
-        h = 0.6 + random() * 1.05;
-      const px = x + Math.sin(a) * 0.35,
-        pz = z + Math.cos(a) * 0.35;
-      line(
-        interior,
-        [
-          [x, 0.58, z],
-          [x + Math.sin(a) * 0.1, h, z + Math.cos(a) * 0.1],
-          [px, h + 0.15, pz],
-        ],
-        0.006,
-        darkOak,
-      );
-      const geometry = new THREE.SphereGeometry(1, 12, 8);
-      geometries.push(geometry);
-      const leaf = new THREE.Mesh(geometry, leafMat);
-      leaf.scale.set(0.11, 0.014, 0.29);
-      leaf.position.set(px, h + 0.14, pz);
-      leaf.rotation.set(0.3, a, 0.35);
-      leaf.castShadow = true;
-      interior.add(leaf);
-    }
-  }
-  plant(-4.3, -2.28);
-  plant(4.05, 2.65);
+  addFicus(interior, -4.3, -2.28, detailTools);
+  addFicus(interior, 4.05, 2.65, detailTools);
+  addConstructionDetails(
+    { root, roof, westWall, backWall, facade, interior },
+    detailTools,
+  );
 
   // Service conduits are revealed below the raised floor, with a travelling signal.
   const paths: THREE.CatmullRomCurve3[] = [];
@@ -555,7 +561,7 @@ export function createArchitecture(invalidate: () => void) {
       ) as THREE.MeshStandardMaterial[],
       normal: 0.22,
     },
-    { asset: "concrete_wall_001", members: [stone], normal: 0.18 },
+    { asset: "concrete_wall_001", members: [wallConcrete], normal: 0.18 },
   ];
   for (const set of materialSets) {
     for (const kind of ["Diffuse", "nor_gl", "Rough"] as const) {
@@ -603,6 +609,7 @@ export function createArchitecture(invalidate: () => void) {
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
+      flooring.dispose();
     },
   };
 }
