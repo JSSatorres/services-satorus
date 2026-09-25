@@ -73,7 +73,7 @@ export default function RootLayout({
         <ScrollProgressRail />
         <MaskedHeadings />
         <MotionProvider>{children}</MotionProvider>
-        <Analytics />
+        {process.env.VERCEL === "1" && <Analytics />}
       </body>
     </html>
   );

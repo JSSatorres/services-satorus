@@ -1,0 +1,8 @@
+Architectural material photography: Poly Haven, CC0.
+
+Oak: https://polyhaven.com/a/oak_veneer_01
+Concrete: https://polyhaven.com/a/concrete_wall_001
+License: https://polyhaven.com/license
+
+Locally hosted 1K diffuse, OpenGL normal and roughness JPEG maps.
+All geometry and display textures are original procedural work for this project.

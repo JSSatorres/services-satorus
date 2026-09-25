@@ -1,0 +1,1248 @@
+.experience {
+  --world-blue: #202522;
+  --world-paper: #f2f1ea;
+  --world-lime: #d4ba8e;
+  --world-ink: #252e2d;
+  padding-top: var(--header-height);
+  color: var(--world-paper);
+  background: var(--world-blue);
+}
+:global(body):has(.experience) :global(.site-header) {
+  background: #1c211f;
+  color: #f2f1ea;
+  border-bottom-color: #ffffff26;
+}
+:global(body):has(.experience) :global(.header-cta) {
+  color: #171b18;
+  border-color: transparent;
+}
+:global(body):has(.experience) :global(.menu-button) {
+  color: #f2f1ea;
+  border-color: #ffffff60;
+}
+:global(body):has(.experience) :global(.mobile-nav) {
+  color: #171b18;
+}
+:global(body):has(.experience) :global(.scroll-rail) {
+  display: none;
+}
+.track {
+  position: relative;
+  height: calc(var(--chapters) * (100svh - var(--header-height)));
+}
+.stage {
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100svh - var(--header-height));
+  min-height: 550px;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(
+    ellipse at 70% 42%,
+    #52574e 0,
+    #303830 40%,
+    #202522 76%
+  );
+}
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 -50px 80px -80px #111611;
+  z-index: -1;
+}
+.scene {
+  position: absolute;
+  width: 78%;
+  height: calc(100% - 75px);
+  right: -3%;
+  top: -1%;
+  transform-origin: 64% 50%;
+  transition:
+    transform 850ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    opacity 700ms;
+}
+.world {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  font-family: var(--font-body-family);
+}
+.cornerLabel {
+  position: absolute;
+  top: 30px;
+  right: 5%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  color: #b6baad;
+}
+.statusDot {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: var(--world-lime);
+}
+.chapterCopy {
+  position: absolute;
+  left: var(--page-pad);
+  top: 50%;
+  transform: translateY(-58%);
+  width: 32%;
+  max-width: 440px;
+  max-height: calc(100% - 155px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d4ba8e66 transparent;
+  padding: 8px 10px 15px 0;
+  animation: copy-arrives 550ms both;
+}
+@keyframes copy-arrives {
+  from {
+    opacity: 0;
+    translate: 0 15px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.eyebrow {
+  margin: 0 0 27px;
+  font-size: 10px;
+  font-weight: 720;
+  letter-spacing: 0.095em;
+  color: #b6baad;
+}
+.chapterCopy h2 {
+  margin: 0 0 25px;
+  font-family: var(--font-display-family);
+  font-size: clamp(3.2rem, 5.2vw, 6.1rem);
+  font-variation-settings:
+    "wdth" 70,
+    "wght" 740;
+  font-weight: 740;
+  letter-spacing: -0.055em;
+  line-height: 0.97;
+}
+.chapterCopy h2 span {
+  display: block;
+}
+.titleAccent {
+  color: var(--world-lime);
+}
+.description {
+  margin: 0 0 24px;
+  max-width: 33ch;
+  font-size: clamp(1rem, 1.15vw, 1.18rem);
+  line-height: 1.6;
+  color: #d1d3c8;
+}
+.change {
+  margin: 0;
+  padding-left: 14px;
+  border-left: 2px solid #b69b72;
+  max-width: 31ch;
+  color: #bec3b7;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.enterLink {
+  display: inline-flex;
+  gap: 30px;
+  align-items: center;
+  padding: 14px 18px;
+  margin-top: 28px;
+  background: var(--world-lime);
+  color: var(--world-ink);
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition:
+    transform 180ms,
+    background 180ms;
+}
+.enterLink:hover {
+  transform: translateY(-3px);
+  background: #e4cfac;
+}
+.method {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: grid;
+  gap: 13px;
+}
+.method li {
+  display: flex;
+  gap: 13px;
+  align-items: start;
+}
+.method li > span {
+  font-size: 11px;
+  padding-top: 3px;
+  color: var(--world-lime);
+}
+.method strong {
+  font-size: 14px;
+  font-weight: 680;
+}
+.method p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  max-width: 32ch;
+  color: #bec3b7;
+}
+.stage[data-chapter="1"] .chapterCopy h2 {
+  font-size: clamp(2.7rem, 4.2vw, 4.6rem);
+}
+.stage[data-chapter="1"] .description {
+  font-size: 0.94rem;
+  margin-bottom: 20px;
+}
+.builtPieces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 15px;
+  font-size: 11px;
+  margin: 0 0 24px;
+  color: var(--world-lime);
+}
+.builtPieces span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.replay,
+.inlineLink {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 25px;
+  padding: 7px 0;
+  font-size: 13px;
+  color: var(--world-paper);
+  border: 0;
+  border-bottom: 1px solid #ffffff77;
+  background: none;
+  cursor: pointer;
+}
+.chapterControls {
+  position: absolute;
+  bottom: 0;
+  left: var(--page-pad);
+  right: var(--page-pad);
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  height: 85px;
+  border-top: 1px solid #ffffff30;
+  background: #202522dd;
+  z-index: 5;
+}
+.chapterIndex {
+  display: flex;
+  gap: clamp(10px, 1.7vw, 28px);
+  flex: 1;
+}
+.chapterIndex a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 0;
+  font-size: 10px;
+  color: #b6bdae;
+  white-space: nowrap;
+}
+.chapterIndex a > span {
+  font-size: 10px;
+  opacity: 0.65;
+}
+.chapterIndex a[aria-current] {
+  color: var(--world-lime);
+}
+.chapterIndex a[aria-current]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -7px;
+  height: 3px;
+  background: var(--world-lime);
+}
+.chapterIndex a[data-complete="true"] > span {
+  color: var(--world-lime);
+  opacity: 1;
+}
+.stepControls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.stepControls > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 43px;
+  height: 43px;
+  border: 1px solid #ffffff55;
+  border-radius: 50%;
+  transition: background 180ms;
+}
+.stepControls > a[aria-disabled="true"] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+.stepControls > a:hover {
+  background: #ffffff1a;
+}
+.stepControls .nextChapter {
+  gap: 13px;
+  border-radius: 3px;
+  padding: 0 15px;
+  font-size: 12px;
+  background: var(--world-lime);
+  color: var(--world-ink);
+  font-weight: 650;
+  border-color: transparent;
+}
+.stepControls .nextChapter:hover {
+  background: #e4cfac;
+}
+.mobileChapter {
+  display: none;
+}
+.scrollHint {
+  position: absolute;
+  bottom: 104px;
+  right: 5%;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: #a5ad9e;
+  font-size: 10px;
+}
+.chapterMarker {
+  position: absolute;
+  inset: calc(var(--chapter) * (100svh - var(--header-height))) 0 auto;
+  height: 1px;
+  scroll-margin-top: 0;
+  pointer-events: none;
+}
+/* Documents are placed on the same workbench, with the completed model behind them. */
+.stage[data-document="true"] .scene {
+  transform: translate(15%, -20%) scale(0.72);
+  opacity: 0.32;
+}
+.document {
+  position: absolute;
+  z-index: 2;
+  left: 43%;
+  right: 6%;
+  top: 8%;
+  bottom: 125px;
+  padding: 22px 26px;
+  background: var(--world-paper);
+  color: var(--world-ink);
+  border-radius: 3px;
+  box-shadow:
+    5px 8px 0 #c8c9bc,
+    12px 24px 45px #060b093b;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #82909c transparent;
+  animation: document-arrives 600ms both;
+}
+.document[hidden] {
+  display: none;
+}
+@keyframes document-arrives {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.documentHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #243b342e;
+  padding-bottom: 13px;
+  margin-bottom: 18px;
+  font-size: 9px;
+  font-weight: 720;
+  letter-spacing: 0.09em;
+}
+.projectTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 19px;
+}
+.projectTabs button {
+  background: transparent;
+  border: 1px solid #253d342e;
+  padding: 8px 12px;
+  border-radius: 2px;
+  color: #263735;
+  font-size: 12px;
+  cursor: pointer;
+}
+.projectTabs button[aria-pressed="true"] {
+  background: #4d5c48;
+  color: #fff;
+  border-color: #4d5c48;
+}
+.projectVisual {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.7;
+  background: #e0e4d8;
+}
+.projectVisual img {
+  object-fit: contain;
+}
+.projectVisual > span {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--world-lime);
+}
+.projectCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 20px;
+}
+.projectCaption p {
+  margin: 0 0 6px;
+  font-size: 10px;
+  color: #556057;
+}
+.projectCaption h3 {
+  font-family: var(--font-display-family);
+  font-size: 34px;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  margin: 0;
+}
+.projectCaption > a {
+  padding: 12px;
+}
+.projectChallenge {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 14px 0 0;
+  max-width: 53ch;
+}
+.faqs details {
+  border-bottom: 1px solid #243b342e;
+}
+.faqs summary {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.faqs summary::-webkit-details-marker {
+  display: none;
+}
+.faqs summary svg {
+  flex-shrink: 0;
+  transition: transform 200ms;
+}
+.faqs details[open] summary svg {
+  transform: rotate(45deg);
+}
+.faqs details p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 20px 18px 0;
+  color: #4c584e;
+}
+.documentLink {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  font-size: 12px;
+  padding: 25px 0 10px;
+}
+.contactDocument {
+  padding-bottom: 0;
+}
+.contactDocument :global(.contact-form) {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  opacity: 1 !important;
+  transform: none !important;
+}
+.contactDocument :global(.contact-form label > span) {
+  font-size: 13px;
+}
+.contactDocument :global(.contact-form input[type="text"]),
+.contactDocument :global(.contact-form input[type="email"]) {
+  padding: 8px 3px;
+  font-size: 14px;
+}
+.contactDocument :global(.contact-form textarea) {
+  height: 100px;
+  min-height: 100px;
+  font-size: 13px;
+}
+.contactDocument :global(.form-submit) {
+  min-height: 43px;
+  font-size: 14px;
+}
+.contactDocument :global(.consent-field) {
+  font-size: 11px;
+}
+.contactDocument
+  :global(.contact-form label:not(.consent-field):not(.honeypot)) {
+  margin-bottom: 15px;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 22px var(--page-pad);
+  color: #b6bdae;
+  border-top: 1px solid #ffffff26;
+  font-size: 11px;
+}
+.footer > a:first-child {
+  font-family: var(--font-display-family);
+  font-size: 26px;
+  font-weight: 740;
+  letter-spacing: -0.05em;
+  color: var(--world-paper);
+}
+.footer > span {
+  margin-right: auto;
+}
+.fallback {
+  padding: 80px 6vw;
+}
+.fallback a {
+  display: block;
+  margin: 22px 0;
+  text-decoration: underline;
+}
+.fallback h2 {
+  font-size: 40px;
+}
+.document :is(a, button, input, textarea, summary):focus-visible {
+  outline-color: #4d5c48;
+}
+.experience :is(a, button, select):focus-visible {
+  outline: 3px solid var(--world-lime);
+  outline-offset: 4px;
+}
+.document :is(a, button, summary):focus-visible {
+  outline-color: #4d5c48;
+}
+@media (min-width: 1700px) {
+  .chapterCopy {
+    left: 6%;
+  }
+  .scene {
+    right: 0;
+    width: 74%;
+  }
+  .document {
+    left: 44%;
+    right: 9%;
+  }
+}
+@media (max-width: 1100px) {
+  .chapterCopy {
+    width: 35%;
+  }
+  .chapterCopy h2 {
+    font-size: 4.9vw;
+  }
+  .chapterIndex {
+    gap: 12px;
+  }
+  .chapterIndex a {
+    font-size: 9px;
+  }
+  .stepControls .nextChapter span {
+    display: none;
+  }
+  .stepControls .nextChapter {
+    padding: 0 11px;
+  }
+  .scene {
+    width: 80%;
+    right: -8%;
+  }
+  .document {
+    left: 43%;
+    right: 4%;
+    padding: 19px;
+  }
+  .description {
+    font-size: 15px;
+  }
+  .eyebrow {
+    font-size: 9px;
+  }
+  .cornerLabel {
+    font-size: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .stage {
+    min-height: 600px;
+  }
+  .scene {
+    top: -28px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 46%;
+    min-height: 275px;
+    transform-origin: center 55%;
+  }
+  .cornerLabel {
+    top: 14px;
+    left: 20px;
+    right: auto;
+    font-size: 7px;
+  }
+  .chapterCopy {
+    left: 24px;
+    right: 24px;
+    top: 43%;
+    bottom: 91px;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    padding: 10px 4px 6px 0;
+  }
+  .eyebrow {
+    font-size: 8px;
+    margin-bottom: 15px;
+  }
+  .chapterCopy h2 {
+    font-size: clamp(36px, 10.5vw, 48px);
+    line-height: 0.97;
+    margin-bottom: 16px;
+  }
+  .description {
+    max-width: 41ch;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .change {
+    font-size: 11px;
+    max-width: 39ch;
+  }
+  .enterLink {
+    min-height: 44px;
+    padding: 10px 13px;
+    margin-top: 18px;
+    font-size: 12px;
+    gap: 22px;
+  }
+  .chapterControls {
+    height: 75px;
+    left: 20px;
+    right: 20px;
+    gap: 12px;
+  }
+  .chapterIndex {
+    display: none;
+  }
+  .mobileChapter {
+    display: block;
+    margin-right: auto;
+    min-width: 0;
+  }
+  .mobileChapter > span {
+    display: block;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    color: #b6bdae;
+    margin-bottom: 5px;
+  }
+  .mobileChapter select {
+    width: 150px;
+    background: transparent;
+    color: var(--world-paper);
+    border: 0;
+    padding: 2px 0;
+    font-size: 12px;
+    font-weight: 650;
+  }
+  .mobileChapter option {
+    background: #202522;
+    color: #fff;
+  }
+  .stepControls {
+    gap: 7px;
+  }
+  .stepControls > a {
+    min-width: 42px;
+    height: 42px;
+  }
+  .scrollHint {
+    bottom: 84px;
+    right: 24px;
+    font-size: 8px;
+  }
+  .stage[data-chapter="1"] .chapterCopy {
+    top: 34%;
+  }
+  .stage[data-chapter="1"] .scene {
+    height: 35%;
+    min-height: 220px;
+    top: -10px;
+  }
+  .stage[data-chapter="1"] .chapterCopy h2 {
+    font-size: 33px;
+  }
+  .stage[data-chapter="1"] .description {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  .method {
+    gap: 9px;
+    margin-bottom: 10px;
+  }
+  .method strong {
+    font-size: 12px;
+  }
+  .method p {
+    font-size: 10px;
+    max-width: 37ch;
+  }
+  .method li > span {
+    font-size: 9px;
+  }
+  .stage[data-chapter="1"] .change {
+    display: none;
+  }
+  .builtPieces {
+    font-size: 10px;
+    margin-bottom: 17px;
+  }
+  .replay {
+    margin-top: 15px;
+    font-size: 12px;
+  }
+  .stage[data-document="true"] .scene {
+    height: 31%;
+    min-height: 0;
+    width: 65%;
+    left: auto;
+    right: -12%;
+    top: -20px;
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  .stage[data-document="true"] .chapterCopy {
+    top: 15px;
+    left: 24px;
+    right: 24px;
+    bottom: auto;
+    overflow: visible;
+    padding: 0;
+  }
+  .stage[data-document="true"] .eyebrow {
+    font-size: 7px;
+    margin-bottom: 12px;
+  }
+  .stage[data-document="true"] .chapterCopy h2 {
+    font-size: 34px;
+    margin-bottom: 10px;
+  }
+  .stage[data-document="true"] .description {
+    font-size: 12px;
+    max-width: 31ch;
+    margin: 0;
+  }
+  .stage[data-document="true"] .change,
+  .stage[data-document="true"] .inlineLink {
+    display: none;
+  }
+  .stage[data-document="true"] .cornerLabel {
+    display: none;
+  }
+  .document {
+    left: 22px;
+    right: 24px;
+    top: 207px;
+    bottom: 104px;
+    padding: 15px;
+  }
+  .documentHeader {
+    font-size: 7px;
+    margin-bottom: 13px;
+    padding-bottom: 10px;
+  }
+  .projectTabs {
+    gap: 5px;
+    margin-bottom: 13px;
+  }
+  .projectTabs button {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .projectVisual {
+    aspect-ratio: 1.7;
+  }
+  .projectCaption {
+    margin-top: 14px;
+  }
+  .projectCaption p {
+    font-size: 8px;
+  }
+  .projectCaption h3 {
+    font-size: 27px;
+  }
+  .projectChallenge {
+    font-size: 11px;
+    margin-top: 9px;
+  }
+  .projectVisual > span {
+    height: 32px;
+    width: 32px;
+    bottom: 9px;
+    right: 9px;
+  }
+  .faqs summary {
+    font-size: 12px;
+    padding: 15px 0;
+    gap: 10px;
+  }
+  .faqs details p {
+    font-size: 12px;
+    margin-right: 0;
+  }
+  .documentLink {
+    font-size: 11px;
+    padding-top: 20px;
+  }
+  .contactDocument :global(.form-pair) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .contactDocument :global(.contact-form label > span) {
+    font-size: 12px;
+  }
+  .contactDocument
+    :global(.contact-form label:not(.consent-field):not(.honeypot)) {
+    margin-bottom: 12px;
+  }
+  .contactDocument :global(.consent-field span) {
+    font-size: 10px;
+  }
+  .contactDocument :global(.form-status) {
+    font-size: 12px;
+  }
+  .footer {
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 22px;
+    font-size: 10px;
+  }
+  .footer > span {
+    display: none;
+  }
+}
+@media (max-height: 740px) and (min-width: 761px) {
+  .chapterCopy h2 {
+    font-size: 4.2vw;
+  }
+  .eyebrow {
+    margin-bottom: 18px;
+  }
+  .description {
+    font-size: 14px;
+  }
+  .document {
+    top: 6%;
+    bottom: 116px;
+  }
+  .method {
+    gap: 8px;
+  }
+  .method p {
+    font-size: 11px;
+  }
+  .stage[data-chapter="1"] .chapterCopy h2 {
+    font-size: 3.5vw;
+  }
+}
+@media (max-width: 760px) and (max-height: 750px) {
+  .scene {
+    height: 39%;
+    min-height: 220px;
+  }
+  .chapterCopy {
+    top: 36%;
+  }
+  .chapterCopy h2 {
+    font-size: 35px;
+  }
+  .description {
+    font-size: 12px;
+  }
+  .change {
+    font-size: 10px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+  .enterLink {
+    margin-top: 13px;
+  }
+  .stage[data-document="true"] .chapterCopy h2 {
+    font-size: 29px;
+  }
+  .stage[data-document="true"] .description {
+    font-size: 11px;
+  }
+  .document {
+    top: 181px;
+  }
+  .method {
+    gap: 7px;
+  }
+  .method p {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experience *,
+  .experience *::before,
+  .experience *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .document {
+    transform: none;
+  }
+  .replay {
+    display: none;
+  }
+}
+/* Keep anchor distances and the sticky viewport identical, also in landscape. */
+.stage {
+  min-height: 0;
+}
+.projectVisual {
+  max-height: 35svh;
+}
+@media (max-height: 550px) and (min-width: 761px) {
+  .chapterControls {
+    height: 65px;
+  }
+  .chapterCopy {
+    max-height: calc(100% - 95px);
+  }
+  .chapterCopy h2,
+  .stage[data-chapter="1"] .chapterCopy h2 {
+    font-size: 30px;
+  }
+  .description {
+    font-size: 12px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+    font-size: 8px;
+  }
+  .change {
+    font-size: 10px;
+  }
+  .enterLink {
+    margin-top: 14px;
+    padding: 10px 13px;
+    font-size: 12px;
+  }
+  .cornerLabel,
+  .scrollHint {
+    display: none;
+  }
+  .document {
+    top: 15px;
+    bottom: 88px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :global(html):has(.experience) {
+    scroll-behavior: auto;
+  }
+}
+
+/* Architecture is framed by a real perspective camera, never by scaling the canvas. */
+:global(body):has(.experience) :global(.header-cta) {
+  background: #d4ba8e;
+}
+.stage {
+  background: radial-gradient(
+    ellipse at 75% 42%,
+    #4d554c 0,
+    #303831 35%,
+    #202522 75%
+  );
+}
+.stage::after {
+  z-index: 0;
+  box-shadow: inset 0 -80px 90px -70px #101612;
+}
+.scene,
+.stage[data-chapter] .scene {
+  width: 72%;
+  height: calc(100% - 90px);
+  top: 0;
+  right: -3%;
+  left: auto;
+  transform: none;
+  min-height: 0;
+  opacity: 1;
+  transition: opacity 700ms;
+}
+.stage[data-document="true"] .scene {
+  opacity: 0.22;
+}
+.architecture,
+.canvasHost {
+  position: absolute;
+  inset: 0;
+}
+.canvasHost canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.scenePlaceholder {
+  position: absolute;
+  inset: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #b9bcac;
+  text-align: center;
+  border: 1px solid #ffffff16;
+}
+.scenePlaceholder > span {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+}
+.scenePlaceholder > p {
+  font-size: 21px;
+  font-weight: 400;
+}
+.scenePlaceholder > small {
+  max-width: 27ch;
+  line-height: 1.6;
+}
+.sceneCaption {
+  position: absolute;
+  bottom: 25px;
+  left: 13%;
+  right: 10%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #b5b9a9;
+  font: 9px/1.5 var(--font-body-family);
+  letter-spacing: 0.16em;
+  pointer-events: none;
+}
+.sceneCaption span:first-child {
+  color: #ded4bb;
+}
+.chapterCopy {
+  z-index: 1;
+  width: 34%;
+  transform: translateY(-54%);
+}
+.chapterCopy h2 {
+  font-size: clamp(3.2rem, 4.9vw, 5.8rem);
+  font-variation-settings:
+    "wdth" 90,
+    "wght" 520;
+  font-weight: 520;
+  letter-spacing: -0.055em;
+  line-height: 1.01;
+}
+.titleAccent {
+  color: #d4ba8e;
+}
+.eyebrow {
+  letter-spacing: 0.15em;
+  font-size: 9px;
+  font-weight: 500;
+}
+.description {
+  font-size: clamp(0.93rem, 1.1vw, 1.07rem);
+  line-height: 1.75;
+}
+.change {
+  border-left-width: 1px;
+}
+.enterLink {
+  border-radius: 0;
+  padding: 16px 22px;
+  font-weight: 550;
+}
+.cornerLabel {
+  z-index: 1;
+  letter-spacing: 0.15em;
+  font-weight: 450;
+}
+.chapterControls {
+  background: #202522e8;
+  border-top-color: #d4ba8e30;
+}
+.chapterIndex a[aria-current]::before {
+  height: 1px;
+}
+.stepControls .nextChapter {
+  border-radius: 0;
+  font-weight: 550;
+}
+.document {
+  border-radius: 0;
+  box-shadow: 0 20px 65px #080e0a55;
+  border: 1px solid #c8c7b5;
+}
+.scrollHint {
+  display: none;
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .scene,
+  .stage[data-chapter] .scene {
+    width: 73%;
+    right: -5%;
+  }
+  .sceneCaption {
+    font-size: 7px;
+  }
+  .chapterCopy h2 {
+    font-size: 4.9vw;
+  }
+}
+@media (max-width: 760px) {
+  .scene,
+  .stage[data-chapter] .scene {
+    top: 6px;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 43%;
+  }
+  .sceneCaption {
+    bottom: 8px;
+    left: 24px;
+    right: 24px;
+    font-size: 6px;
+    letter-spacing: 0.12em;
+  }
+  .chapterCopy {
+    width: auto;
+    transform: none;
+    top: 44%;
+  }
+  .chapterCopy h2 {
+    font-size: clamp(35px, 10vw, 46px);
+  }
+  .description {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .eyebrow {
+    font-size: 7px;
+  }
+  .cornerLabel {
+    top: 12px;
+    font-size: 6px;
+  }
+  .stage[data-chapter="1"] .scene {
+    height: 33%;
+  }
+  .stage[data-chapter="1"] .sceneCaption {
+    display: none;
+  }
+  .stage[data-document="true"] .scene {
+    height: 31%;
+    width: 65%;
+    left: auto;
+    right: -12%;
+    top: -20px;
+    opacity: 0.23;
+  }
+  .stage[data-document="true"] .sceneCaption {
+    display: none;
+  }
+  .stage[data-document="true"] .chapterCopy {
+    top: 15px;
+  }
+  .enterLink {
+    padding: 12px 16px;
+  }
+}
+@media (max-width: 760px) and (max-height: 750px) {
+  .scene,
+  .stage[data-chapter] .scene {
+    height: 36%;
+  }
+  .chapterCopy {
+    top: 37%;
+  }
+  .chapterCopy h2 {
+    font-size: 34px;
+  }
+  .stage[data-chapter="1"] .scene {
+    height: 31%;
+  }
+}
+.architecture[data-render-state="fallback"] .canvasHost {
+  display: none;
+}
+/* Chapter links jump to their destination; the camera supplies the transition. */
+:global(html):has(.experience) {
+  scroll-behavior: auto;
+}
+.track {
+  overflow-anchor: none;
+}
+.document,
+.chapterCopy {
+  overscroll-behavior: contain;
+}
+/* Moving a sticky form while focusing it can make Chromium scroll its document.
+   Keep interactive panels stationary: the 3D camera carries the movement. */
+.document {
+  animation: none;
+  transform: none;
+}

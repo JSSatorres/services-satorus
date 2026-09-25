@@ -1,6 +1,6 @@
 ---
 name: Satorus
-description: Una pieza naranja encaja en un recorrido interrumpido y se abre para mostrar la herramienta que permite continuar el trabajo.
+description: Un negocio arquitectónico en 3D se abre en capas; la cámara explica cómo una web, una aplicación y sus conexiones dan orden al trabajo.
 colors:
   tool-blue: "#2948c7"
   tool-blue-dark: "#0e2bd2"
@@ -89,24 +89,27 @@ components:
 
 # Design System: Satorus
 
-## Dirección activa · La pieza que faltaba · 25 de septiembre de 2026
+## Dirección activa · El negocio en despiece · 25 de septiembre de 2026
 
-La home abre con «Tu negocio. La pieza que faltaba.». Una maqueta sobre azul muestra una consulta, el hueco donde se detiene, una pieza naranja que encaja y se despliega, y un presupuesto preparado para revisión humana. Es un ejemplo ilustrativo, no un resultado atribuido a un cliente.
+Una única arquitectura 3D representa el negocio. La cámara se aproxima al edificio, separa cubierta y paredes para entenderlo, se enfrenta a la fachada, gira al interior y descubre las conexiones bajo el suelo. Al terminar, el conjunto vuelve a ensamblarse.
 
-- Cámara fija y scroll nativo en la home. Ningún gesto de rueda, teclado o tacto se intercepta para cambiar de sección.
-- Única secuencia principal: 4,05 segundos, se inicia al ver al menos el 45 % de la figura y solo se repite mediante «Repetir ejemplo».
-- El servidor entrega el ejemplo resuelto. Sin JavaScript o con movimiento reducido, la información y el estado final permanecen visibles. Los desplegables son `details` nativos.
-- GSAP vive únicamente en `MissingPieceScene`, con `useGSAP`, `matchMedia`, observador desconectable y cleanup. No se crean objetos GSAP al repetir la secuencia.
-- El naranja identifica la pieza, el azul sostiene la maqueta y el proceso, y la lima señala el siguiente paso. Bricolage Grotesque y Atkinson Hyperlegible Next mantienen la voz de marca.
-- Home de servidor: servicios en filas desplegables, capturas y contenido del catálogo real, proceso en cuatro pasos, preguntas y formulario existente. Solo maqueta, navegación y formulario necesitan interacción cliente.
-- Proyectos destacados: GoblinTrader, Enrolla2 y Pidoteca. Se conserva su condición de encargo, web o producto según el catálogo; no se añaden cifras ni testimonios.
-- Móvil: una columna, maqueta proporcional y secuencia iniciada al llegar a ella; el proceso pasa a dos columnas y a una en pantallas muy estrechas.
-- Navegación compartida simplificada: anclas nativas, menú con Escape y retorno de foco. Se retiran la activación del modo espacial, el aterrizaje de cámara y las clonaciones de secciones. Lenis permanece solo en páginas interiores.
-- Archivos activos: `components/missing-piece/*`, `app/page.tsx`, `components/site-header.tsx`. Los componentes espaciales anteriores quedan sin montar como referencia histórica.
+### Dirección visual
+- Carbón vegetal `#202522`, luz ambiental `#4d554c`, papel `#f2f1ea`, latón `#d4ba8e`, roble y piedra con textura fotográfica. Vidrio y aluminio con reflejos físicos.
+- Bricolage Grotesque en peso 520 y anchura 90 para titulares; Atkinson para lectura y pequeños rótulos. Tratamiento sobrio, sin personajes, colores de juguete ni tarjetas inclinadas.
+- Firma: despiece arquitectónico de un mismo edificio, con geometría a escala de metros. El movimiento explica cada parte del servicio.
+- Texto HTML a la izquierda y arquitectura a la derecha. En móvil la arquitectura ocupa la parte superior; los documentos conservan scroll interno.
 
-### Verificación de esta versión
+### Comportamiento y arquitectura
+- Three.js se importa bajo demanda; geometría y texturas locales. Mapas fotográficos CC0 de Poly Haven: `oak_veneer_01` y `concrete_wall_001`, créditos en `public/materials/architecture/CREDITS.txt`.
+- Ocho capítulos: negocio, método, web, gestión, automatización, proyectos, dudas y contacto. Enlaces nativos y scroll estable; la cámara hace la transición entre destinos.
+- Render bajo demanda, DPR limitado, sombras, iluminación ambiental de estudio y materiales físicos. Movimiento reducido presenta cada encuadre sin viajar entre ellos. Pérdida de WebGL conserva la navegación y el contenido HTML.
+- Los paneles interactivos permanecen inmóviles: trasladarlos durante el foco puede producir saltos del documento en Chromium.
+- Proyectos reales: GoblinTrader, Enrolla2 y Pidoteca. Formulario existente con borrador persistente al cambiar capítulo. Sin inventar métricas ni testimonios.
+- Archivos activos: `components/business-world/*`, `app/page.tsx`, `lib/journey-progress.ts`. Las versiones anteriores permanecen sin montar como referencia.
+- Las páginas interiores mantienen su diseño. Analytics se monta exclusivamente cuando existe el entorno de Vercel.
 
-Build de producción y lint correctos. Comprobados escritorio (1440 px), tablet (768 px), móvil (390 y 320 px), reproducción completa y repetida, anclas, menú, Escape y foco, validación obligatoria del formulario, movimiento reducido y contenido/desplegables sin JavaScript. No se envían correos reales durante la verificación.
+### Verificación
+Build, lint y tres pruebas de cálculo de capítulo. Comprobaciones en navegador: escritorio, móvil, ocho capítulos, preguntas, persistencia del formulario, envío simulado, navegación a proyecto y regreso. Prueba de regresión en `tests/journey-browser-check.cjs`.
 
 ## Referencia histórica de las versiones anteriores
 
