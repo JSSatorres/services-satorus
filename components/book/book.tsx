@@ -28,6 +28,29 @@ const TIMING = {
   mobile: { settle: [0.4, 0.6], stamp: [0.12, 0.22], pan: [0.26, 0.4], flip: [0.7, 1], rest: 0.64 },
 } as const
 
+/**
+ * En móvil se lee una página cada vez. Punto de reposo de la izquierda de
+ * cada doble página: ya sellada y antes de que la cámara pase a la derecha.
+ */
+const MOBILE_LEFT_REST = 0.24
+
+/**
+ * Puntos de lectura en móvil (portada y cada página). El CSS los convierte en
+ * paradas de scroll obligatorias: un gesto fuerte con el dedo pasa una página,
+ * no varias.
+ */
+const MOBILE_STOPS = [
+  0,
+  ...spreads.flatMap((_, index) => [index + 1 + MOBILE_LEFT_REST, index + 1 + TIMING.mobile.rest]),
+]
+
+/** Página (móvil) que se lee en `u`: 0 portada, luego izquierda y derecha de cada doble página. */
+function mobilePageAt(u: number) {
+  const spread = spreadAt(u)
+  if (spread === 0) return 0
+  return (spread - 1) * 2 + (localAt(u, spread - 1) < 0.33 ? 1 : 2)
+}
+
 function timingFor(mobile: boolean) {
   return mobile ? TIMING.mobile : TIMING.desktop
 }
@@ -93,6 +116,8 @@ export function Book() {
   const leftBoardRef = useRef<HTMLDivElement>(null)
   const mobileRef = useRef(false)
   const [current, setCurrent] = useState(0)
+  /** Página que se lee en móvil (`null` en escritorio, donde se ven las dos). */
+  const [mobilePage, setMobilePage] = useState<number | null>(null)
 
   // Llegando por navegación interna el script previo al pintado no vuelve a
   // correr: se pone la misma marca aquí, antes de pintar.
@@ -101,30 +126,47 @@ export function Book() {
     document.documentElement.dataset.book = "on"
   }, [])
 
-  /** Posición de scroll en la que la doble página `index` (0 = portada) se lee en reposo. */
-  const scrollFor = useCallback((index: number) => {
+  /** Lleva el recorrido a `u` (0 a `UNITS`). `distance`: cuántas páginas se saltan. */
+  const scrollToU = useCallback((u: number, distance: number, immediate = false) => {
     const track = trackRef.current
-    if (!track) return 0
-    const u = index <= 0 ? 0 : Math.min(UNITS, index + timingFor(mobileRef.current).rest)
+    if (!track) return
     const top = track.getBoundingClientRect().top + window.scrollY
-    return top + (u / UNITS) * (track.offsetHeight - window.innerHeight)
+    const y = top + (Math.min(UNITS, Math.max(0, u)) / UNITS) * (track.offsetHeight - window.innerHeight)
+    const lenis = getLenis()
+    if (lenis) {
+      lenis.scrollTo(y, { immediate, duration: 0.9 + Math.min(4, distance) * 0.35 })
+    } else {
+      window.scrollTo({ top: y, behavior: immediate ? "auto" : "smooth" })
+    }
   }, [])
 
+  /** Abre la doble página `index` (0 = portada) en su punto de lectura. */
   const goTo = useCallback(
     (index: number, immediate = false) => {
       const target = Math.max(0, Math.min(spreads.length, index))
-      const y = scrollFor(target)
-      const lenis = getLenis()
-      if (lenis) {
-        lenis.scrollTo(y, {
-          immediate,
-          duration: 0.9 + Math.min(4, Math.abs(target - current)) * 0.35,
-        })
-      } else {
-        window.scrollTo({ top: y, behavior: immediate ? "auto" : "smooth" })
-      }
+      const u = target <= 0 ? 0 : target + timingFor(mobileRef.current).rest
+      scrollToU(u, Math.abs(target - current), immediate)
     },
-    [current, scrollFor],
+    [current, scrollToU],
+  )
+
+  /**
+   * Anterior / siguiente. En escritorio se pasa de doble página en doble
+   * página; en móvil, de página en página, para que la izquierda se lea.
+   */
+  const step = useCallback(
+    (direction: 1 | -1) => {
+      if (mobilePage === null) {
+        goTo(current + direction)
+        return
+      }
+      const target = Math.max(0, Math.min(spreads.length * 2, mobilePage + direction))
+      const spread = Math.ceil(target / 2)
+      const u =
+        target === 0 ? 0 : spread + (target % 2 === 1 ? MOBILE_LEFT_REST : TIMING.mobile.rest)
+      scrollToU(u, 1)
+    },
+    [current, goTo, mobilePage, scrollToU],
   )
 
   useEffect(() => {
@@ -139,6 +181,7 @@ export function Book() {
     let frame = 0
     let lastVisible = ""
     let lastCurrent = -1
+    let lastMobilePage: number | null = -1
 
     const measure = () => {
       mobileRef.current = mobileQuery.matches
@@ -256,6 +299,12 @@ export function Book() {
         if (baseRef.current) baseRef.current.inert = flipped !== flips.length
       }
 
+      const page = mobile ? mobilePageAt(u) : null
+      if (page !== lastMobilePage) {
+        lastMobilePage = page
+        setMobilePage(page)
+      }
+
       const spread = spreadAt(u)
       if (spread !== lastCurrent) {
         lastCurrent = spread
@@ -315,7 +364,7 @@ export function Book() {
       const rect = trackRef.current?.getBoundingClientRect()
       if (!rect || rect.bottom < window.innerHeight * 0.5 || rect.top > 0) return
       event.preventDefault()
-      goTo(current + (event.key === "ArrowRight" ? 1 : -1))
+      step(event.key === "ArrowRight" ? 1 : -1)
     }
 
     document.addEventListener("click", onClick, true)
@@ -324,7 +373,7 @@ export function Book() {
       document.removeEventListener("click", onClick, true)
       window.removeEventListener("keydown", onKeyDown)
     }
-  }, [current, goTo])
+  }, [goTo, step])
 
   // Entrada con `/#historia`: el libro se abre ya por esa página.
   useEffect(() => {
@@ -345,6 +394,10 @@ export function Book() {
       aria-label="El cuaderno de tu negocio"
       style={{ "--units": UNITS } as CSSProperties}
     >
+      {MOBILE_STOPS.map((stop) => (
+        <span className="bk-snap" key={stop} style={{ "--u": stop } as CSSProperties} aria-hidden="true" />
+      ))}
+
       <div className="bk-stage">
         <div className="bk-scene">
           <div className="bk-book" ref={bookRef}>
@@ -416,8 +469,8 @@ export function Book() {
         <div className="bk-controls" ref={controlsRef}>
           <button
             type="button"
-            onClick={() => goTo(current - 1)}
-            disabled={current <= 0}
+            onClick={() => step(-1)}
+            disabled={(mobilePage ?? current) <= 0}
             aria-label="Página anterior"
           >
             <ArrowLeft aria-hidden="true" size={20} />
@@ -430,8 +483,10 @@ export function Book() {
           </p>
           <button
             type="button"
-            onClick={() => goTo(current + 1)}
-            disabled={current >= spreads.length}
+            onClick={() => step(1)}
+            disabled={
+              mobilePage === null ? current >= spreads.length : mobilePage >= spreads.length * 2
+            }
             aria-label="Página siguiente"
           >
             <ArrowRight aria-hidden="true" size={20} />
