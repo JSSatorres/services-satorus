@@ -1,6 +1,6 @@
 ---
 name: Satorus
-description: Una ruta naranja atraviesa una mesa editorial azul y convierte el enredo cotidiano de una pyme en un recorrido claro.
+description: Una pieza naranja encaja en un recorrido interrumpido y se abre para mostrar la herramienta que permite continuar el trabajo.
 colors:
   tool-blue: "#2948c7"
   tool-blue-dark: "#0e2bd2"
@@ -88,6 +88,29 @@ components:
 ---
 
 # Design System: Satorus
+
+## Dirección activa · La pieza que faltaba · 25 de septiembre de 2026
+
+La home abre con «Tu negocio. La pieza que faltaba.». Una maqueta sobre azul muestra una consulta, el hueco donde se detiene, una pieza naranja que encaja y se despliega, y un presupuesto preparado para revisión humana. Es un ejemplo ilustrativo, no un resultado atribuido a un cliente.
+
+- Cámara fija y scroll nativo en la home. Ningún gesto de rueda, teclado o tacto se intercepta para cambiar de sección.
+- Única secuencia principal: 4,05 segundos, se inicia al ver al menos el 45 % de la figura y solo se repite mediante «Repetir ejemplo».
+- El servidor entrega el ejemplo resuelto. Sin JavaScript o con movimiento reducido, la información y el estado final permanecen visibles. Los desplegables son `details` nativos.
+- GSAP vive únicamente en `MissingPieceScene`, con `useGSAP`, `matchMedia`, observador desconectable y cleanup. No se crean objetos GSAP al repetir la secuencia.
+- El naranja identifica la pieza, el azul sostiene la maqueta y el proceso, y la lima señala el siguiente paso. Bricolage Grotesque y Atkinson Hyperlegible Next mantienen la voz de marca.
+- Home de servidor: servicios en filas desplegables, capturas y contenido del catálogo real, proceso en cuatro pasos, preguntas y formulario existente. Solo maqueta, navegación y formulario necesitan interacción cliente.
+- Proyectos destacados: GoblinTrader, Enrolla2 y Pidoteca. Se conserva su condición de encargo, web o producto según el catálogo; no se añaden cifras ni testimonios.
+- Móvil: una columna, maqueta proporcional y secuencia iniciada al llegar a ella; el proceso pasa a dos columnas y a una en pantallas muy estrechas.
+- Navegación compartida simplificada: anclas nativas, menú con Escape y retorno de foco. Se retiran la activación del modo espacial, el aterrizaje de cámara y las clonaciones de secciones. Lenis permanece solo en páginas interiores.
+- Archivos activos: `components/missing-piece/*`, `app/page.tsx`, `components/site-header.tsx`. Los componentes espaciales anteriores quedan sin montar como referencia histórica.
+
+### Verificación de esta versión
+
+Build de producción y lint correctos. Comprobados escritorio (1440 px), tablet (768 px), móvil (390 y 320 px), reproducción completa y repetida, anclas, menú, Escape y foco, validación obligatoria del formulario, movimiento reducido y contenido/desplegables sin JavaScript. No se envían correos reales durante la verificación.
+
+## Referencia histórica de las versiones anteriores
+
+Las especificaciones siguientes describen el taller editorial, las cortinas y la mesa espacial anteriores. La dirección activa y el comportamiento de movimiento vigentes son los indicados arriba.
 
 ## Overview
 

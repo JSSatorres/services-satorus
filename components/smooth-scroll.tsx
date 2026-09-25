@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,7 +17,9 @@ import { setLenis } from "@/lib/lenis";
  * documento, así que `position: fixed`, `sticky` y los pins siguen intactos.
  */
 export function SmoothScroll() {
+  const pathname = usePathname();
   useEffect(() => {
+    if (pathname === "/") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     gsap.registerPlugin(ScrollTrigger);
@@ -72,7 +75,7 @@ export function SmoothScroll() {
       lenis.destroy();
       delete document.documentElement.dataset.lenis;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
