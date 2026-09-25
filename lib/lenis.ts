@@ -26,3 +26,19 @@ export function jumpToScrollTop(top: number) {
 
   window.scrollTo({ top, behavior: "auto" });
 }
+
+/**
+ * Lleva a una sección con el motor de scroll activo, respetando su
+ * `scroll-margin-top` (el hueco de la cabecera fija).
+ */
+export function scrollToSection(section: HTMLElement) {
+  const margin = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(section, { offset: -margin });
+    return;
+  }
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  section.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+}
