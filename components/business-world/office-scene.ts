@@ -274,11 +274,11 @@ export function createOfficeScene(
       },
     });
     businessDesk.pieces.forEach((piece, i) => {
-      const start = i * 0.1;
+      const start = i * 0.06;
       timeline!
         .to(
           piece.position,
-          { y: 0.32, duration: 0.35, ease: "power2.out" },
+          { y: 0.32, duration: 0.18, ease: "power2.out" },
           start,
         )
         .to(
@@ -286,20 +286,20 @@ export function createOfficeScene(
           {
             x: ((i % 3) - 1) * 2.25,
             z: i < 3 ? -0.65 : 1.1,
-            duration: 0.95,
+            duration: 0.42,
             ease: "power2.inOut",
           },
           start,
         )
         .to(
           piece.rotation,
-          { y: 0, duration: 0.9, ease: "power2.inOut" },
+          { y: 0, duration: 0.42, ease: "power2.inOut" },
           start,
         )
         .to(
           piece.position,
-          { y: 0.015 + i * 0.003, duration: 0.4, ease: "power2.inOut" },
-          start + 0.55,
+          { y: 0.015 + i * 0.003, duration: 0.2, ease: "power2.inOut" },
+          start + 0.22,
         );
     });
     timeline.call(
@@ -308,19 +308,20 @@ export function createOfficeScene(
         callbacks.ordered();
       },
       [],
-      1.6,
+      0.75,
     );
-    timeline.to({}, { duration: 1.5 });
+    // Briefly show the ordered desk, then hand off without a long idle pause.
+    timeline.to({}, { duration: 0.15 });
     timeline.to(businessDesk.root.scale, {
       x: 0.78,
       y: 0.78,
       z: 0.78,
-      duration: 0.65,
+      duration: 0.3,
       ease: "power2.in",
     });
     timeline.to(
       businessDesk.root.position,
-      { y: -4.5, duration: 0.65, ease: "power2.in" },
+      { y: -4.5, duration: 0.3, ease: "power2.in" },
       "<",
     );
     timeline.call(() => {
@@ -332,10 +333,10 @@ export function createOfficeScene(
     });
     const view = overview();
     const start = timeline.duration();
-    pose(view.camera, view.target, 1.2, start);
+    pose(view.camera, view.target, 0.55, start);
     timeline.to(
       model.root.position,
-      { y: 0, duration: 1.2, ease: "power2.out" },
+      { y: 0, duration: 0.55, ease: "power2.out" },
       start,
     );
     if (reduced.matches) timeline.progress(1);

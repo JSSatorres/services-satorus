@@ -29,6 +29,27 @@ export function useOfficeInput(
       lastWheel = 0,
       startY = 0,
       startX = 0;
+    let releaseFrame = 0;
+    let idle = 0;
+    let previousFrame = 0;
+    // Measure idle frames rather than wall-clock gaps: compiling/rendering the
+    // first office frame can stall the main thread while wheel inertia continues.
+    const releaseWheel = (time: number) => {
+      idle += Math.min(50, time - previousFrame);
+      previousFrame = time;
+      if (idle >= 160) {
+        heldGesture = false;
+        releaseFrame = 0;
+      } else releaseFrame = requestAnimationFrame(releaseWheel);
+    };
+    const holdWheel = () => {
+      heldGesture = true;
+      idle = 0;
+      if (!releaseFrame) {
+        previousFrame = performance.now();
+        releaseFrame = requestAnimationFrame(releaseWheel);
+      }
+    };
     const canLeave = (direction: 1 | -1) => {
       const { index, phase } = state.current;
       if (phase === "office") return true;
@@ -54,15 +75,15 @@ export function useOfficeInput(
       const now = performance.now();
       const gap = now - lastWheel;
       lastWheel = now;
-      const { phase, arrived } = state.current;
+      const { phase } = state.current;
+      idle = 0;
       if (phase !== "reading" && phase !== "office") {
         event.preventDefault();
         total = 0;
-        heldGesture = true;
+        holdWheel();
         return;
       }
-      if (gap > 160) heldGesture = false;
-      if ((arrived > 0 && now - arrived < 850) || heldGesture) {
+      if (heldGesture) {
         event.preventDefault();
         total = 0;
         return;
@@ -73,10 +94,6 @@ export function useOfficeInput(
         return;
       }
       event.preventDefault();
-      if (now - arrived < 850) {
-        total = 0;
-        return;
-      }
       if (gap > 160 || Math.sign(total) !== direction) total = 0;
       total +=
         event.deltaY *
@@ -85,8 +102,9 @@ export function useOfficeInput(
           : event.deltaMode === 2
             ? element.clientHeight
             : 1);
-      if (Math.abs(total) >= 85) {
+      if (Math.abs(total) >= 60) {
         total = 0;
+        holdWheel();
         advance(direction);
       }
     };
@@ -134,10 +152,9 @@ export function useOfficeInput(
       const dy = startY - event.changedTouches[0].clientY,
         dx = startX - event.changedTouches[0].clientX;
       if (
-        Math.abs(dy) < 75 ||
+        Math.abs(dy) < 36 ||
         Math.abs(dx) > Math.abs(dy) ||
-        editable(event.target) ||
-        performance.now() - state.current.arrived < 850
+        editable(event.target)
       )
         return;
       const direction = dy > 0 ? 1 : -1;
@@ -150,6 +167,7 @@ export function useOfficeInput(
     element.addEventListener("touchmove", touchMove, { passive: false });
     element.addEventListener("touchend", touchEnd, { passive: true });
     return () => {
+      cancelAnimationFrame(releaseFrame);
       element.removeEventListener("wheel", wheel);
       element.removeEventListener("keydown", keyboard);
       element.removeEventListener("touchstart", touchStart);
