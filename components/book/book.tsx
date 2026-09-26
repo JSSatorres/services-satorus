@@ -26,30 +26,37 @@ const TIMING = {
 const LAST_MOBILE_PAGE = spreads.length * 2
 
 /**
- * Paradas en móvil. Cada página tiene dos: al empezar su animación (ya a la
- * vista, sin asentar) y al acabarla (asentada, sellada). Cada gesto, por
- * fuerte que sea, lleva sólo a la parada siguiente: inicio → final → paso de
- * página e inicio de la siguiente → final… Posiciones dentro de cada doble
- * página, según `TIMING.mobile`: la izquierda se asienta y se sella entre
- * 0 y 0,24; la cámara pasa a la derecha hasta 0,4; la derecha se asienta
- * hasta 0,6; la hoja gira de 0,7 a 1.
+ * Paradas en móvil. Cada gesto, por fuerte que sea, lleva sólo a la parada
+ * siguiente. Casi todas las páginas tienen una, al final de su animación
+ * (asentada, sellada): el gesto pasa la página y la anima de una vez. «Tu
+ * lista de problemas» tiene además una al inicio, para leer la lista antes de
+ * que se tache. Posiciones dentro de cada doble página, según `TIMING.mobile`:
+ * la izquierda se asienta y se sella entre 0 y 0,24; la cámara pasa a la
+ * derecha hasta 0,4; la derecha se asienta hasta 0,6; la hoja gira de 0,7 a 1.
  */
 const LEFT_START = 0.005
 const LEFT_END = 0.24
-const RIGHT_START = 0.4
 const RIGHT_END = TIMING.mobile.rest
-const MOBILE_STOPS = [
-  0,
-  ...spreads.flatMap((_, index) =>
-    [LEFT_START, LEFT_END, RIGHT_START, RIGHT_END].map((local) => index + 1 + local),
-  ),
-]
+/** Páginas (1…12) con parada también al inicio de su animación. */
+const PAGES_WITH_START = new Set([3])
+
+type Stop = { u: number; page: number }
+const MOBILE_STOPS: Stop[] = [{ u: 0, page: 0 }]
+for (let page = 1; page <= LAST_MOBILE_PAGE; page += 1) {
+  const spread = Math.ceil(page / 2)
+  const left = page % 2 === 1
+  if (PAGES_WITH_START.has(page) && left) MOBILE_STOPS.push({ u: spread + LEFT_START, page })
+  MOBILE_STOPS.push({ u: spread + (left ? LEFT_END : RIGHT_END), page })
+}
 const LAST_STOP = MOBILE_STOPS.length - 1
 
 /** Página (0 portada, 1…12) a la que pertenece la parada `stop`. */
-const pageOfStop = (stop: number) => Math.ceil(stop / 2)
+const pageOfStop = (stop: number) => MOBILE_STOPS[stop].page
 /** Parada del final de la animación de la página `page`. */
-const endStopOf = (page: number) => Math.max(0, Math.min(LAST_STOP, page * 2))
+const endStopOf = (page: number) => {
+  const target = Math.max(0, Math.min(LAST_MOBILE_PAGE, page))
+  return MOBILE_STOPS.findLastIndex((stop) => stop.page === target)
+}
 
 /** Doble página abierta en `u` (1-based; 0 = portada). */
 function spreadAt(u: number) {
@@ -359,12 +366,12 @@ export function Book() {
     /** Lleva el libro a la parada `stop`, animando lo que hay entre medias. */
     const showStop = (stop: number, immediate = false) => {
       const target = Math.max(0, Math.min(LAST_STOP, stop))
-      const distance = Math.abs(MOBILE_STOPS[target] - deckState.u)
+      const distance = Math.abs(MOBILE_STOPS[target].u - deckState.u)
       deckState.stop = target
       savedStopRef.current = target
       deckTween?.kill()
       deckTween = gsap.to(deckState, {
-        u: MOBILE_STOPS[target],
+        u: MOBILE_STOPS[target].u,
         duration: immediate ? 0 : Math.min(1.8, 0.55 + distance * 1.6),
         ease: "power2.inOut",
         onUpdate: schedule,
@@ -396,10 +403,41 @@ export function Book() {
       delete root.dataset.bookLock
     }
 
+    // Barreras. En iOS la inercia de un gesto fuerte no obedece a
+    // `scrollTo`: la única forma segura de que no se salte el libro es que no
+    // haya nada más allá. Por encima del libro, lo que va después (preguntas,
+    // contacto, pie) no se pinta (`below`) y la página termina en el libro;
+    // por debajo, no se pinta la portada (`above`) y la página empieza en él.
+    // Al quitar o poner algo por encima se recoloca el scroll, sin saltos.
+    // En móvil el scroll se mueve sin Lenis: guarda la altura de la página y
+    // no dejaría pasar de ella cuando la barrera cambia lo que hay debajo.
+    const jump = (y: number) => window.scrollTo({ top: y, behavior: "instant" })
+    let gate: "below" | "above" | null = null
+    const setGate = (next: "below" | "above" | null) => {
+      if (next === gate) return
+      // Lo que desaparece o aparece por encima movería el libro. Algunos
+      // navegadores ya lo compensan solos (anclaje de scroll) y otros no: se
+      // mide dónde está el libro antes y después y se corrige sólo la
+      // diferencia que quede.
+      const before = track.getBoundingClientRect().top
+      gate = next
+      if (next) root.dataset.bookGate = next
+      else delete root.dataset.bookGate
+      const shift = track.getBoundingClientRect().top - before
+      if (Math.abs(shift) > 0.5) jump(window.scrollY + shift)
+      getLenis()?.resize()
+    }
+
+    /** Mientras se anima una salida o un enlace mueve la página: sin barreras ni capturas. */
+    let busyUntil = 0
+    let exitTween: gsap.core.Tween | null = null
+
     /** Fija el libro en pantalla, en la parada `stop`. */
     const enter = (stop: number) => {
+      exitTween?.kill()
+      setGate(null)
       lock()
-      scrollWindowTo(trackTop(), 0, true)
+      jump(trackTop())
       showStop(stop, true)
     }
 
@@ -407,38 +445,56 @@ export function Book() {
     const exit = (direction: 1 | -1) => {
       unlock()
       const top = trackTop()
-      scrollWindowTo(
-        direction === 1 ? top + track.offsetHeight : top - window.innerHeight * 0.9,
-        0.8,
-      )
+      const scroller = { y: window.scrollY }
+      busyUntil = Number.POSITIVE_INFINITY
+      exitTween?.kill()
+      exitTween = gsap.to(scroller, {
+        y: direction === 1 ? top + track.offsetHeight : top - window.innerHeight * 0.9,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onUpdate: () => jump(scroller.y),
+        onComplete: () => {
+          busyUntil = 0
+          onDeckScroll()
+        },
+      })
     }
 
     const onDeckScroll = () => {
       const rect = track.getBoundingClientRect()
       const vh = window.innerHeight
       const visible = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0)) / vh
+      if (performance.now() < busyUntil) return
       if (locked) {
         // La inercia de un gesto rápido sigue moviendo la página después de
         // atraparla: se devuelve a su sitio.
-        if (Math.abs(rect.top) > 1) scrollWindowTo(trackTop(), 0, true)
+        if (Math.abs(rect.top) > 1) jump(trackTop())
         return
       }
-      if (visible < REARM_BELOW) {
-        armed = true
+      if (visible < REARM_BELOW) armed = true
+      if (armed && visible >= CAPTURE_AT) {
+        // Con barrera, el libro queda en el borde de la página: la barrera dice
+        // de dónde se viene (`above`: desde abajo, subiendo).
+        const fromBelow = gate === "above" || (gate === null && rect.top < 0)
+        enter(fromBelow ? LAST_STOP : 0)
         return
       }
-      if (armed && visible >= CAPTURE_AT) enter(rect.top >= 0 ? 0 : LAST_STOP)
+      setGate(rect.top >= 0 ? "below" : "above")
     }
 
     // Un enlace a otra sección (cabecera, «Hablemos de tu negocio») suelta el
     // libro antes de que el enlace mueva la página. Los enlaces a historias
     // del libro los atiende `goTo` sin soltarlo.
     const onLinkClick = (event: MouseEvent) => {
-      if (!locked) return
       const anchor = (event.target as Element | null)?.closest?.("a[href]")
       const id = anchor?.getAttribute("href")?.split("#")[1]
       if (!anchor || spreads.some((spread) => spread.id === id)) return
+      // El enlace lleva a su sitio sin que el libro lo pare por el camino.
       unlock()
+      armed = false
+      exitTween?.kill()
+      setGate(null)
+      busyUntil = performance.now() + 1800
     }
 
     navRef.current = deck
@@ -537,7 +593,9 @@ export function Book() {
       window.cancelAnimationFrame(frame)
       deckTween?.kill()
       navRef.current = null
+      exitTween?.kill()
       unlock()
+      setGate(null)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("scroll", schedule)
       window.removeEventListener("scroll", onDeckScroll)
