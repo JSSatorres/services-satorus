@@ -2076,3 +2076,13 @@ html[data-book="rotate"] .bk-rotate {
     animation: none;
   }
 }
+
+/* Barreras del libro en móvil (ver `setGate` en `components/book/book.tsx`):
+   la página termina o empieza en el libro para que la inercia de un gesto
+   fuerte choque con él. */
+html[data-book-gate="below"] .nb-after,
+html[data-book-gate="below"] .nb-contact,
+html[data-book-gate="below"] .site-footer,
+html[data-book-gate="above"] #contenido > .hero {
+  display: none;
+}
