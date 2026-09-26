@@ -328,3 +328,9 @@ Development integrado: `b406de2`. Las pantallas usan ahora los problemas, módul
 La portada empieza en el día a día del visitante: una mesa física con WhatsApp pendiente, citas cruzadas, presupuestos, llamadas, tickets y seguimiento. Tres etiquetas permiten explorar los casos. El scroll o «Vamos a poner orden» alinea los objetos, cambia sus documentos al estado organizado y revela el estudio. El estudio se explica como el lugar donde entendemos, resolvemos y construimos contigo. Un segundo gesto entra en la primera pantalla. Los enlaces de navegación pueden saltar o interrumpir esta introducción; no hay espera obligatoria.
 
 Paleta, materiales y tipografías continúan la oficina realista. La mesa, el teléfono y los documentos son geometría 3D, con sombras, texturas y movimiento de cámara. La narración y etiquetas permanecen en HTML accesible. La preferencia de movimiento reducido salta al resultado; sin WebGL todo el contenido sigue disponible.
+
+### Libros y recipientes — 26 septiembre 2026
+
+Los libros de las estanterías tienen dos tapas, un bloque de papel con cantos texturados, lomo curvo rotulado, cabezadas y algunos marcapáginas. Se alternan grosores y alturas, con volúmenes apilados y sujetalibros. Los cuadernos de escritorio tienen tapas, hojas, goma y cinta.
+
+Los recipientes de estantería y escritorio utilizan perfiles de revolución cerrados por la base y abiertos por la boca: grosor de pared, labio redondeado e interior real. Las tazas incorporan asa, café y menisco; se alternan con un jarrón de cerámica esmaltada y un vaso de vidrio de base gruesa. Geometrías, materiales y texturas comparten el ciclo de liberación del modelo. Verificación visual durante el vuelo de entrada a proyectos; compilación y lint correctos.

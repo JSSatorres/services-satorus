@@ -376,13 +376,6 @@ export function addConstructionDetails(
       gasket,
     );
     box(interior, [0.38, 0.055, 0.075], [x - 0.86, 0.71, -1.03], paper, 0.01);
-    const sheet = box(
-      interior,
-      [0.27, 0.0015, 0.36],
-      [x - 0.91, 0.944, -0.51],
-      paper,
-    );
-    sheet.rotation.y = 0.14;
     box(interior, [0.14, 0.012, 0.27], [x + 0.99, 0.914, -0.3], metal, 0.01);
   }
   // A hollow ceramic cup and handle instead of a capped cylinder.

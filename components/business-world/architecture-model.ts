@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { createOfficeProps } from "./office-props";
 
 import {
   addTaskChair,
@@ -278,6 +279,8 @@ export function createArchitecture(invalidate: () => void) {
     random,
   };
 
+  const props = createOfficeProps(detailTools);
+
   // A layered stone plinth and recessed service void anchor the architecture.
   box(root, [11.6, 0.22, 7.9], [0, -0.48, 0.35], stone, 0.035);
   box(root, [10.25, 0.2, 6.7], [0, -0.23, 0], metal, 0.025);
@@ -340,18 +343,44 @@ export function createArchitecture(invalidate: () => void) {
   for (const y of [0.45, 1.28, 2.11]) {
     box(backWall, [3.1, 0.055, 0.48], [2.85, y, -2.82], oak, 0.008);
     box(backWall, [2.9, 0.012, 0.025], [2.85, y - 0.035, -2.57], light);
+    const shelfIndex = [0.45, 1.28, 2.11].indexOf(y);
+    let bookX = 1.5;
     for (let j = 0; j < 8; j++) {
-      const mat = j % 3 === 0 ? leather : j % 3 === 1 ? paper : metal;
-      const book = box(
+      const width = 0.045 + ((j * 3 + shelfIndex) % 5) * 0.009;
+      const height = 0.27 + ((j * 7 + shelfIndex * 3) % 5) * 0.019;
+      props.book(
         backWall,
-        [0.09 + random() * 0.035, 0.26 + random() * 0.12, 0.23],
-        [1.55 + j * 0.14, y + 0.2, -2.79],
-        mat,
-        0.005,
+        [bookX + width / 2, y + 0.028, -2.79],
+        j + shelfIndex * 3,
+        width,
+        height,
+        0.22 + (j % 3) * 0.012,
+        j === 7 ? -0.12 : 0,
       );
-      if (j === 7) book.rotation.z = -0.15;
+      bookX += width + 0.007;
     }
-    cylinder(backWall, 0.12, 0.09, 0.28, [3.72, y + 0.17, -2.8], stone);
+    // Low horizontal volumes and a bookend make the shelves feel used, not cloned.
+    for (let j = 0; j < 2; j++) {
+      const volume = props.book(
+        backWall,
+        [2.65, y + 0.028 + j * 0.057 + 0.027, -2.79],
+        shelfIndex + j + 3,
+        0.054,
+        0.31 - j * 0.025,
+        0.225,
+      );
+      volume.rotation.z = -Math.PI / 2;
+      volume.rotation.y = j ? 0.045 : -0.025;
+    }
+    box(backWall, [0.035, 0.005, 0.25], [1.45, y + 0.03, -2.79], metal, 0.002);
+    box(backWall, [0.005, 0.19, 0.25], [1.435, y + 0.125, -2.79], metal, 0.002);
+    props.vessel(
+      backWall,
+      [3.72, y + 0.028, -2.8],
+      shelfIndex === 2 ? "vase" : shelfIndex === 1 ? "glass" : "mug",
+      shelfIndex === 0 ? 1.25 : shelfIndex === 1 ? 1.5 : 1.05,
+      -0.35,
+    );
   }
   // Slim glazing structure, mullions and brushed brass handles.
   for (const x of [-4.92, -2.5, 0, 2.5, 4.92]) {
@@ -484,9 +513,15 @@ export function createArchitecture(invalidate: () => void) {
           0.004,
         );
     box(group, [0.1, 0.036, 0.16], [0.74, 0.928, 0.22], paper, 0.024);
-    box(group, [0.38, 0.03, 0.48], [-0.9, 0.924, 0.03], leather, 0.01);
+    props.notebook(group, [-0.9, 0.904, 0.03]);
     box(group, [0.011, 0.011, 0.28], [-0.78, 0.946, 0.03], brass);
-    cylinder(group, 0.066, 0.05, 0.11, [0.99, 0.96, -0.23], stone);
+    props.vessel(
+      group,
+      [0.99, 0.904, -0.23],
+      "mug",
+      1,
+      sectionIndex === 0 ? -0.5 : 0.4,
+    );
     addTaskChair(group, detailTools);
     contactShadow(interior, x, z + 0.35, 3.9, 2.7, 0.101);
   }
