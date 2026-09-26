@@ -87,11 +87,10 @@ export default function RootLayout({
           {`var root = document.documentElement;
           if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
             delete root.dataset.heroMotion;
-          } else if (
-            window.location.pathname === "/" &&
-            !window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches
-          ) {
-            root.dataset.book = "on";
+          } else if (window.location.pathname === "/") {
+            root.dataset.book = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches
+              ? "rotate"
+              : "on";
           }`}
         </Script>
         <noscript>

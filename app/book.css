@@ -2002,3 +2002,77 @@ html[data-book-lock] body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+/* --------------------------------------------------------------------------
+   Móvil en horizontal: el cuaderno cerrado y la invitación a girarlo
+   -------------------------------------------------------------------------- */
+
+.bk-rotate {
+  display: none;
+}
+
+html[data-book="rotate"] .bk-stage {
+  display: none;
+}
+
+html[data-book="rotate"] .bk-rotate {
+  display: grid;
+  grid-template-columns: auto minmax(0, 26rem);
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 5vw, 3rem);
+  min-height: 100svh;
+  padding: calc(var(--header-height) + 1rem) var(--page-pad) 1.5rem;
+}
+
+.bk-rotate-book {
+  --fs: 4.2px;
+  position: relative;
+  width: 7.5rem;
+  aspect-ratio: 0.72;
+  filter: drop-shadow(0 14px 18px rgba(18, 22, 40, 0.3));
+  animation: bk-rotate-hint 3.2s ease-in-out infinite;
+}
+
+.bk-rotate-book .bk-cover-label {
+  padding: 0.7em 0.5em;
+}
+
+@keyframes bk-rotate-hint {
+  0%,
+  25% {
+    transform: rotate(-90deg);
+  }
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.bk-rotate-copy h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display-family);
+  font-size: clamp(1.6rem, 4.2vw, 2.3rem);
+  font-variation-settings: "wdth" 76, "wght" 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.bk-rotate-copy p {
+  margin: 0;
+  color: var(--graphite-soft);
+}
+
+.bk-rotate-copy .bk-rotate-hint {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-rotate-book {
+    animation: none;
+  }
+}
