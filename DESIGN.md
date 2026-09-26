@@ -334,3 +334,9 @@ Paleta, materiales y tipografías continúan la oficina realista. La mesa, el te
 Los libros de las estanterías tienen dos tapas, un bloque de papel con cantos texturados, lomo curvo rotulado, cabezadas y algunos marcapáginas. Se alternan grosores y alturas, con volúmenes apilados y sujetalibros. Los cuadernos de escritorio tienen tapas, hojas, goma y cinta.
 
 Los recipientes de estantería y escritorio utilizan perfiles de revolución cerrados por la base y abiertos por la boca: grosor de pared, labio redondeado e interior real. Las tazas incorporan asa, café y menisco; se alternan con un jarrón de cerámica esmaltada y un vaso de vidrio de base gruesa. Geometrías, materiales y texturas comparten el ciclo de liberación del modelo. Verificación visual durante el vuelo de entrada a proyectos; compilación y lint correctos.
+
+### Encuadre móvil — 26 septiembre 2026
+
+En vertical, la cámara utiliza un encuadre propio, más cercano y frontal, con distancia calculada a partir de la proporción visible. Se priorizan mesas y objetos sobre encajar toda la peana; los bordes exteriores pueden quedar fuera. La escena reserva espacio para el relato superior y la acción inferior. La mesa introductoria también se acerca. Se eleva la resolución del render móvil hasta DPR 1,75, manteniendo el límite de coste.
+
+Marcadores de 44 px, rótulos y navegación mayores, lectura de 15 px y ejemplos de la aplicación en una columna. Verificado en 320×568, 390×844 y 430×932: oficina abierta/cerrada, las cuatro secciones, vuelo de cámara y ausencia de desbordamiento horizontal. Compilación y lint correctos.

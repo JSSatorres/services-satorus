@@ -187,6 +187,16 @@ export function createOfficeScene(
     };
   }
   function overview() {
+    if (host.clientWidth <= 760 && camera.aspect < 1.5) {
+      // Frame the useful interior at a consistent screen width, not the whole plinth.
+      const distance = 0.84 / camera.aspect;
+      return {
+        camera: new THREE.Vector3(8.8, opened ? 12 : 10, 16).multiplyScalar(
+          distance,
+        ),
+        target: new THREE.Vector3(0, 1.15, 0.15),
+      };
+    }
     const distance =
       camera.aspect < 0.9 ? 1.65 : camera.aspect < 1.3 ? 1.2 : 0.92;
     return {
@@ -234,7 +244,7 @@ export function createOfficeScene(
       );
   }
   function deskView() {
-    const distance = camera.aspect < 0.9 ? 1.7 : camera.aspect < 1.3 ? 1.2 : 1;
+    const distance = camera.aspect < 0.9 ? 1.5 : camera.aspect < 1.3 ? 1.2 : 1;
     return {
       camera: new THREE.Vector3(0.3, 7.8, 8.8).multiplyScalar(distance),
       target: new THREE.Vector3(0, 1.15, 0),
@@ -419,14 +429,11 @@ export function createOfficeScene(
     camera.fov = 37;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, width < 700 ? 1.35 : 1.7),
+      Math.min(window.devicePixelRatio, width < 700 ? 1.75 : 1.7),
     );
     renderer.setSize(width, height);
     composer.setPixelRatio(
-      Math.min(
-        Math.max(window.devicePixelRatio, 1.25),
-        width < 700 ? 1.25 : 1.75,
-      ),
+      Math.min(Math.max(window.devicePixelRatio, 1.25), 1.75),
     );
     composer.setSize(width, height);
     if (organizing || (travelling && lastCallbacks)) {
