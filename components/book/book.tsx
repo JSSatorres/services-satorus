@@ -22,21 +22,34 @@ const TIMING = {
   mobile: { settle: [0.4, 0.6], stamp: [0.12, 0.22], pan: [0.26, 0.4], flip: [0.7, 1], rest: 0.64 },
 } as const
 
-/**
- * En móvil se lee una página cada vez. Punto de reposo de la izquierda de
- * cada doble página: ya sellada y antes de que la cámara pase a la derecha.
- */
-const MOBILE_LEFT_REST = 0.24
-
 /** Última página en móvil: portada (0), y luego izquierda y derecha de cada doble página. */
 const LAST_MOBILE_PAGE = spreads.length * 2
 
-/** Dónde se lee la página `page` en móvil, como posición del recorrido. */
-function mobilePageU(page: number) {
-  if (page <= 0) return 0
-  const spread = Math.ceil(page / 2)
-  return spread + (page % 2 === 1 ? MOBILE_LEFT_REST : TIMING.mobile.rest)
-}
+/**
+ * Paradas en móvil. Cada página tiene dos: al empezar su animación (ya a la
+ * vista, sin asentar) y al acabarla (asentada, sellada). Cada gesto, por
+ * fuerte que sea, lleva sólo a la parada siguiente: inicio → final → paso de
+ * página e inicio de la siguiente → final… Posiciones dentro de cada doble
+ * página, según `TIMING.mobile`: la izquierda se asienta y se sella entre
+ * 0 y 0,24; la cámara pasa a la derecha hasta 0,4; la derecha se asienta
+ * hasta 0,6; la hoja gira de 0,7 a 1.
+ */
+const LEFT_START = 0.005
+const LEFT_END = 0.24
+const RIGHT_START = 0.4
+const RIGHT_END = TIMING.mobile.rest
+const MOBILE_STOPS = [
+  0,
+  ...spreads.flatMap((_, index) =>
+    [LEFT_START, LEFT_END, RIGHT_START, RIGHT_END].map((local) => index + 1 + local),
+  ),
+]
+const LAST_STOP = MOBILE_STOPS.length - 1
+
+/** Página (0 portada, 1…12) a la que pertenece la parada `stop`. */
+const pageOfStop = (stop: number) => Math.ceil(stop / 2)
+/** Parada del final de la animación de la página `page`. */
+const endStopOf = (page: number) => Math.max(0, Math.min(LAST_STOP, page * 2))
 
 /** Doble página abierta en `u` (1-based; 0 = portada). */
 function spreadAt(u: number) {
@@ -63,10 +76,12 @@ const LOOSE = [
  * - `scroll`: escritorio. El scroll abre el libro y pasa las hojas.
  * - `deck`: móvil en vertical. El libro ocupa una pantalla y cada gesto pasa
  *   una página, por rápido que sea: la inercia del dedo no puede saltárselo.
- * - `off`: móvil en horizontal (demasiado bajo para una página) o movimiento
- *   reducido. Dobles páginas planas, una tras otra.
+ * - `rotate`: móvil en horizontal. Con ~390 px de alto una página del libro
+ *   tendría el texto a unos 7 px: se muestra el cuaderno cerrado y se pide
+ *   girar el móvil. Al volver a vertical, el libro sigue donde estaba.
+ * - `off`: movimiento reducido. Dobles páginas planas, una tras otra.
  */
-type Mode = "scroll" | "deck" | "off"
+type Mode = "scroll" | "deck" | "rotate" | "off"
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)"
 /** Móvil tumbado: no cabe una página legible. Mismo criterio en `app/layout.tsx`. */
@@ -75,7 +90,7 @@ const NARROW_QUERY = "(max-width: 900px)"
 
 function currentMode(): Mode {
   if (window.matchMedia(REDUCED_QUERY).matches) return "off"
-  if (window.matchMedia(LANDSCAPE_PHONE_QUERY).matches) return "off"
+  if (window.matchMedia(LANDSCAPE_PHONE_QUERY).matches) return "rotate"
   return window.matchMedia(NARROW_QUERY).matches ? "deck" : "scroll"
 }
 
@@ -148,6 +163,8 @@ export function Book() {
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const leftBoardRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<Navigator | null>(null)
+  /** Última parada leída en móvil: al girar el móvil y volver, se sigue ahí. */
+  const savedStopRef = useRef(0)
   const mode = useSyncExternalStore<Mode>(subscribeMode, currentMode, () => "off")
   const [current, setCurrent] = useState(0)
   /** Página que se lee en móvil (`null` en escritorio, donde se ven las dos). */
@@ -158,11 +175,11 @@ export function Book() {
   // (navegación interna, girar el móvil) antes de pintar.
   useLayoutEffect(() => {
     if (mode === "off") delete document.documentElement.dataset.book
-    else document.documentElement.dataset.book = "on"
+    else document.documentElement.dataset.book = mode === "rotate" ? "rotate" : "on"
   }, [mode])
 
   useEffect(() => {
-    if (mode === "off") return
+    if (mode === "off" || mode === "rotate") return
     const track = trackRef.current
     const book = bookRef.current
     const pages = pagesRef.current
@@ -185,7 +202,7 @@ export function Book() {
     let lastMobilePage: number | null = -1
 
     /** En móvil `u` no sale del scroll: lo anima el paso de página. */
-    const deckState = { u: 0, page: 0 }
+    const deckState = { u: 0, stop: 0 }
     let deckTween: gsap.core.Tween | null = null
 
     const scrollU = () => {
@@ -304,7 +321,7 @@ export function Book() {
         if (baseRef.current) baseRef.current.inert = flipped !== flips.length
       }
 
-      const page = deck ? deckState.page : null
+      const page = deck ? pageOfStop(deckState.stop) : null
       if (page !== lastMobilePage) {
         lastMobilePage = page
         setMobilePage(page)
@@ -339,14 +356,16 @@ export function Book() {
     const trackTop = () => track.getBoundingClientRect().top + window.scrollY
     const root = document.documentElement
 
-    const showPage = (page: number, immediate = false) => {
-      const target = Math.max(0, Math.min(LAST_MOBILE_PAGE, page))
-      const distance = Math.abs(mobilePageU(target) - deckState.u)
-      deckState.page = target
+    /** Lleva el libro a la parada `stop`, animando lo que hay entre medias. */
+    const showStop = (stop: number, immediate = false) => {
+      const target = Math.max(0, Math.min(LAST_STOP, stop))
+      const distance = Math.abs(MOBILE_STOPS[target] - deckState.u)
+      deckState.stop = target
+      savedStopRef.current = target
       deckTween?.kill()
       deckTween = gsap.to(deckState, {
-        u: mobilePageU(target),
-        duration: immediate ? 0 : Math.min(1.8, 0.75 + distance * 0.4),
+        u: MOBILE_STOPS[target],
+        duration: immediate ? 0 : Math.min(1.8, 0.55 + distance * 1.6),
         ease: "power2.inOut",
         onUpdate: schedule,
       })
@@ -354,7 +373,7 @@ export function Book() {
     }
 
     const canStep = (direction: 1 | -1) =>
-      direction === 1 ? deckState.page < LAST_MOBILE_PAGE : deckState.page > 0
+      direction === 1 ? deckState.stop < LAST_STOP : deckState.stop > 0
 
     // El libro atrapa el scroll. En cuanto entra en pantalla —bajando o
     // subiendo, despacio o con un gesto muy rápido— se fija ocupando la
@@ -377,11 +396,11 @@ export function Book() {
       delete root.dataset.bookLock
     }
 
-    /** Fija el libro en pantalla, abierto por `page`. */
-    const enter = (page: number) => {
+    /** Fija el libro en pantalla, en la parada `stop`. */
+    const enter = (stop: number) => {
       lock()
       scrollWindowTo(trackTop(), 0, true)
-      showPage(page, true)
+      showStop(stop, true)
     }
 
     /** Sale del libro hacia arriba (-1, a la portada de la web) o abajo (1). */
@@ -408,7 +427,7 @@ export function Book() {
         armed = true
         return
       }
-      if (armed && visible >= CAPTURE_AT) enter(rect.top >= 0 ? 0 : LAST_MOBILE_PAGE)
+      if (armed && visible >= CAPTURE_AT) enter(rect.top >= 0 ? 0 : LAST_STOP)
     }
 
     // Un enlace a otra sección (cabecera, «Hablemos de tu negocio») suelta el
@@ -424,11 +443,12 @@ export function Book() {
 
     navRef.current = deck
       ? {
-          step: (direction) => showPage(deckState.page + direction),
+          // Las flechas pasan una página entera y la dejan asentada.
+          step: (direction) => showStop(endStopOf(pageOfStop(deckState.stop) + direction)),
           goTo: (index, immediate = false) => {
-            const page = index <= 0 ? 0 : index * 2 - 1
-            if (locked) showPage(page, immediate)
-            else enter(page)
+            const stop = endStopOf(index <= 0 ? 0 : index * 2 - 1)
+            if (locked) showStop(stop, immediate)
+            else enter(stop)
           },
         }
       : {
@@ -448,9 +468,9 @@ export function Book() {
         }
 
     // Con el libro fijado, ningún gesto hace scroll: cada gesto, al soltar,
-    // pasa una página (arriba o izquierda, adelante; abajo o derecha, atrás),
-    // por rápido que sea. Más allá de la primera o la última página, un gesto
-    // vertical sale del libro.
+    // avanza una sola parada (arriba o izquierda, adelante; abajo o derecha,
+    // atrás), por rápido que sea. Más allá de la primera o la última parada,
+    // un gesto vertical sale del libro.
     let touch: { x: number; y: number } | null = null
     const onTouchStart = (event: TouchEvent) => {
       touch =
@@ -470,7 +490,7 @@ export function Book() {
       const horizontal = Math.abs(dx) > Math.abs(dy)
       if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN) return
       const direction: 1 | -1 = (horizontal ? dx : dy) < 0 ? 1 : -1
-      if (canStep(direction)) showPage(deckState.page + direction)
+      if (canStep(direction)) showStop(deckState.stop + direction)
       else if (!horizontal) exit(direction)
     }
 
@@ -483,7 +503,7 @@ export function Book() {
       if (now < wheelLock || Math.abs(event.deltaY) < 4) return
       wheelLock = now + 650
       const direction: 1 | -1 = event.deltaY > 0 ? 1 : -1
-      if (canStep(direction)) showPage(deckState.page + direction)
+      if (canStep(direction)) showStop(deckState.stop + direction)
       else exit(direction)
     }
 
@@ -503,7 +523,12 @@ export function Book() {
       document.addEventListener("touchend", onTouchEnd)
       window.addEventListener("wheel", onWheel, { passive: false })
       document.addEventListener("click", onLinkClick, true)
-      onDeckScroll()
+      // Volviendo de horizontal con el libro en pantalla: se sigue por la
+      // página en la que se estaba.
+      const rect = track.getBoundingClientRect()
+      const visible = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0))
+      if (savedStopRef.current > 0 && visible >= window.innerHeight * CAPTURE_AT) enter(savedStopRef.current)
+      else onDeckScroll()
     } else {
       window.addEventListener("scroll", schedule, { passive: true })
     }
@@ -550,7 +575,7 @@ export function Book() {
 
   // Enlaces `#historia` (cabecera, pestañas) y flechas del teclado.
   useEffect(() => {
-    if (mode === "off") return
+    if (mode === "off" || mode === "rotate") return
 
     const indexOf = (href: string | null) => {
       const id = href?.split("#")[1]
@@ -589,7 +614,7 @@ export function Book() {
 
   // Entrada con `/#historia`: el libro se abre ya por esa página.
   useEffect(() => {
-    if (mode === "off") return
+    if (mode === "off" || mode === "rotate") return
     const id = window.location.hash.slice(1)
     const index = spreads.findIndex((spread) => spread.id === id)
     if (index >= 0) window.requestAnimationFrame(() => navRef.current?.goTo(index + 1, true))
@@ -609,6 +634,18 @@ export function Book() {
       aria-label="El cuaderno de tu negocio"
       style={{ "--units": UNITS } as CSSProperties}
     >
+      {/* Móvil en horizontal: no cabe una página legible. */}
+      <div className="bk-rotate" aria-live="polite">
+        <div className="bk-rotate-book" aria-hidden="true">
+          <BookCover />
+        </div>
+        <div className="bk-rotate-copy">
+          <h2>Gira el móvil para leer el cuaderno</h2>
+          <p>El cuaderno de tu negocio se lee en vertical, página a página.</p>
+          <p className="bk-rotate-hint">O sigue bajando: preguntas y contacto ↓</p>
+        </div>
+      </div>
+
       <div className="bk-stage">
         <div className="bk-scene">
           <div className="bk-book" ref={bookRef}>
