@@ -1985,36 +1985,20 @@ html[data-book="on"] .bk-problems {
 /* --------------------------------------------------------------------------
    Móvil: una página por gesto
 
-   Con el dedo el scroll es nativo y tiene mucha inercia: un gesto fuerte
-   pasaba dos o tres hojas. Cada página tiene una parada obligatoria
-   (`scroll-snap-stop: always`) y cada tramo es más largo. Las paradas sólo
-   existen dentro del libro; fuera, el scroll es libre (`proximity`).
+   En móvil el libro no depende del scroll (la inercia del dedo se saltaba
+   páginas): ocupa una pantalla y, al entrar en ella desde arriba o desde
+   abajo, se fija y bloquea el scroll (`html[data-book-lock]`). Cada gesto
+   pasa una página (`components/book/book.tsx`, modo `deck`).
    -------------------------------------------------------------------------- */
 
-.bk-snap {
-  display: none;
+@media (max-width: 900px) {
+  html[data-book="on"] .bk {
+    height: 100svh;
+  }
 }
 
-@media (max-width: 900px) {
-  html[data-book="on"] {
-    scroll-snap-type: y proximity;
-  }
-
-  html[data-book="on"] .bk {
-    --unit-h: 120svh;
-  }
-
-  /* La parada queda en la posición de lectura: la cabecera fija aparta el
-     ajuste (`scroll-padding-top`), así que se compensa. */
-  html[data-book="on"] .bk-snap {
-    position: absolute;
-    top: calc(var(--u) * var(--unit-h) + var(--header-height));
-    left: 0;
-    display: block;
-    width: 1px;
-    height: 1px;
-    pointer-events: none;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
+html[data-book-lock],
+html[data-book-lock] body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
