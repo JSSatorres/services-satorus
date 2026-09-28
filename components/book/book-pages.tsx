@@ -407,12 +407,15 @@ function Offer({
   title,
   text,
   project,
+  site,
   image,
 }: {
   index: number
   title: string
   text: string
   project: typeof goblin
+  /** Web real del proyecto: el enlace va directo a ella, en otra pestaña. */
+  site?: string
   /**
    * Imagen propia para el libro cuando la de la ficha no es la que mejor lo
    * cuenta. `top`: una captura de página entera, de la que interesa el principio.
@@ -436,7 +439,11 @@ function Offer({
       <div>
         <strong>{title}</strong>
         <p>{text}</p>
-        <a className="bk-link" href={project.href}>
+        <a
+          className="bk-link"
+          href={site ?? project.href}
+          {...(site ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
           Ejemplo: {project.name} <ArrowUpRight size="1.05em" aria-hidden="true" />
         </a>
       </div>
@@ -446,41 +453,49 @@ function Offer({
 
 const offersRight = (
   <RightPage number={10} kicker="Capítulo 3 · Lo que hacemos" title="Lo que hacemos, dicho claro.">
-    <ol className="bk-offers">
-      <Offer
-        index={0}
-        title="Webs que traen clientes"
-        text="Tu escaparate en internet: que te encuentren, entiendan qué ofreces y te escriban."
-        project={enrolla}
-      />
-      <Offer
-        index={1}
-        title="Webs personales que dan confianza"
-        text="Si vendes tu experiencia, una web que explica quién eres, qué ofreces y por qué elegirte."
-        project={angel}
-        image={{
-          src: "/projects/angel-mendoza/site-desktop.png",
-          alt: "Portada de la web de Ángel Mendoza con su foto y su propuesta para clínicas",
-          top: true,
-        }}
-      />
-      <Offer
-        index={2}
-        title="Aplicaciones para tus clientes"
-        text="Para que pidan, reserven o sigan su pedido desde el móvil, sin tener que llamarte."
-        project={pidoteca}
-        image={{
-          src: "/projects/pidoteca/customer-ordering-journey-wide.png",
-          alt: "Dos móviles sobre la mesa de un restaurante con la carta de Pidoteca: un plato añadido al pedido y el pedido listo",
-        }}
-      />
-      <Offer
-        index={3}
-        title="Un programa para llevar todo el negocio"
-        text="Caja, compras, stock, equipo y fichajes en un solo sitio. Lo que en informática llaman ERP, hecho a tu medida."
-        project={goblin}
-      />
-    </ol>
+    <div className="bk-offers-wrap">
+      <ol className="bk-offers">
+        <Offer
+          index={0}
+          title="Webs que traen clientes"
+          text="Tu escaparate en internet: que te encuentren, entiendan qué ofreces y te escriban."
+          project={enrolla}
+          site="https://enrolla2.com/"
+        />
+        <Offer
+          index={1}
+          title="Webs personales que dan confianza"
+          text="Si vendes tu experiencia, una web que explica quién eres, qué ofreces y por qué elegirte."
+          project={angel}
+          site="https://angelmendoza.es/"
+          image={{
+            src: "/projects/angel-mendoza/site-desktop.png",
+            alt: "Portada de la web de Ángel Mendoza con su foto y su propuesta para clínicas",
+            top: true,
+          }}
+        />
+        <Offer
+          index={2}
+          title="Aplicaciones para tus clientes"
+          text="Para que pidan, reserven o sigan su pedido desde el móvil, sin tener que llamarte."
+          project={pidoteca}
+          site="https://pidoteca.com/"
+          image={{
+            src: "/projects/pidoteca/customer-ordering-journey-wide.png",
+            alt: "Dos móviles sobre la mesa de un restaurante con la carta de Pidoteca: un plato añadido al pedido y el pedido listo",
+          }}
+        />
+        <Offer
+          index={3}
+          title="Un programa para llevar todo el negocio"
+          text="Caja, compras, stock, equipo y fichajes en un solo sitio. Lo que en informática llaman ERP, hecho a tu medida."
+          project={goblin}
+        />
+      </ol>
+      <a className="bk-offers-cta" href="/productos">
+        Mirar algunos de los proyectos <ArrowRight size="1.1em" aria-hidden="true" />
+      </a>
+    </div>
   </RightPage>
 )
 
