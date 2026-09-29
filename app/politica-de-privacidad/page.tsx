@@ -30,15 +30,16 @@ export default function PrivacyPage() {
         </Link>
         <article className="legal-article">
           <h1>Política de privacidad</h1>
-          <p className="legal-updated">Última actualización: febrero de 2026</p>
+          <p className="legal-updated">Última actualización: septiembre de 2026</p>
 
           <section>
             <h2>1. Responsable del tratamiento</h2>
             <ul>
               <li><strong>Responsable:</strong> Satorus (Software a Medida)</li>
               <li>
-                <strong>Finalidad:</strong> gestión de solicitudes de contacto y
-                presupuesto.
+                <strong>Finalidad:</strong> atender consultas, solicitudes de
+                contacto y presupuesto, y reservar llamadas solicitadas desde el
+                asistente.
               </li>
               <li><strong>Contacto:</strong> info@satorus.es</li>
             </ul>
@@ -47,8 +48,7 @@ export default function PrivacyPage() {
           <section>
             <h2>2. Datos que recopilamos</h2>
             <p>
-              A través del formulario de contacto recogemos los siguientes datos
-              personales:
+              A través del formulario de contacto recogemos los siguientes datos:
             </p>
             <ul>
               <li>Nombre y apellidos.</li>
@@ -58,6 +58,19 @@ export default function PrivacyPage() {
                 Información sobre el proyecto o necesidad indicada voluntariamente.
               </li>
             </ul>
+            <p>
+              Si utilizas el asistente, tratamos los mensajes que escribes y las
+              últimas intervenciones de esa conversación para poder responderte.
+              No incluyas contraseñas, datos de salud ni información sensible que
+              no sea necesaria para tu consulta.
+            </p>
+            <p>
+              Si dejas una consulta en el chat, recogemos tu nombre, correo,
+              tipo de consulta y mensaje. Si reservas una llamada, recogemos tu
+              nombre, correo, motivo y horario elegido. Para mostrar horarios
+              disponibles consultamos los tramos ocupados del calendario de
+              Satorus, sin mostrarte el contenido de otras citas.
+            </p>
           </section>
 
           <section>
@@ -71,7 +84,21 @@ export default function PrivacyPage() {
               </thead>
               <tbody>
                 <tr>
+                  <td>Responder a los mensajes enviados al asistente con IA.</td>
+                  <td>
+                    Consentimiento manifestado al enviar la consulta tras recibir
+                    la información del propio chat (art. 6.1.a RGPD).
+                  </td>
+                </tr>
+                <tr>
                   <td>Responder a tu solicitud de contacto o presupuesto.</td>
+                  <td>Consentimiento del interesado (art. 6.1.a RGPD).</td>
+                </tr>
+                <tr>
+                  <td>
+                    Comprobar disponibilidad, crear la cita solicitada y enviar
+                    la invitación de Google Calendar con enlace de Meet.
+                  </td>
                   <td>Consentimiento del interesado (art. 6.1.a RGPD).</td>
                 </tr>
                 <tr>
@@ -84,26 +111,50 @@ export default function PrivacyPage() {
                 </tr>
               </tbody>
             </table>
+            <p>
+              Puedes dejar de utilizar el asistente o retirar el consentimiento
+              escribiendo a info@satorus.es. La retirada no afecta a los
+              tratamientos realizados antes de recibirla. El asistente genera
+              respuestas automáticas, pero no toma decisiones con efectos
+              jurídicos sobre ti.
+            </p>
           </section>
 
           <section>
             <h2>4. Conservación de datos</h2>
             <p>
-              Los datos personales se conservarán durante el tiempo necesario para
-              atender tu solicitud y, en su caso, durante la vigencia de la relación
-              contractual, más los plazos legales de prescripción aplicables (con
-              carácter general, 5 años para obligaciones mercantiles y 4 años para
-              obligaciones tributarias).
+              La conversación del asistente se mantiene en la sesión del navegador
+              y se envía al servidor para generar cada respuesta. El servidor no
+              guarda un historial de esas conversaciones ni usa sus mensajes para
+              entrenar el modelo de IA.
+            </p>
+            <p>
+              Las solicitudes de contacto enviadas desde los formularios se
+              conservan mientras sea necesario atenderlas y, en su caso, durante
+              la relación contractual y los plazos legales aplicables. Las citas
+              creadas permanecen en Google Calendar hasta que se cancelan o
+              eliminan conforme a la gestión de la agenda. Puedes pedir la
+              supresión de tus datos mediante el correo de contacto indicado.
             </p>
           </section>
 
           <section>
             <h2>5. Destinatarios</h2>
             <p>
-              No se cederán datos a terceros salvo obligación legal. Los datos
-              podrán ser accedidos por proveedores de servicios tecnológicos
-              (alojamiento web, correo electrónico) que actúan como encargados del
-              tratamiento bajo las garantías contractuales exigidas por el RGPD.
+              Los proveedores de alojamiento web y correo pueden acceder a los
+              datos necesarios para prestar esos servicios. El asistente procesa
+              los mensajes con un modelo Ollama configurado en el servidor del
+              chat; los mensajes generales no se envían a Google Calendar.
+            </p>
+            <p>
+              Si reservas una llamada, comunicamos a Google Calendar el nombre,
+              correo, motivo y horario para crear el evento, añadirte como
+              invitado y generar el enlace de Google Meet. Google tratará esos
+              datos de acuerdo con sus condiciones y su{" "}
+              <a href="https://policies.google.com/privacy" rel="noreferrer">
+                política de privacidad
+              </a>. No utilizamos los datos obtenidos de Google Calendar para
+              publicidad ni para entrenar modelos de IA.
             </p>
           </section>
 

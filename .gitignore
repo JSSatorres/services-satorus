@@ -22,3 +22,5 @@ yarn-error.log*
 
 # generated TypeScript
 *.tsbuildinfo
+
+.vercel

@@ -11,6 +11,7 @@ import { MaskedHeadings } from "@/components/masked-headings";
 import { MotionProvider } from "@/components/motion-provider";
 import { ScrollProgressRail } from "@/components/scroll-progress-rail";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { CompanyChat } from "@/components/company-chat";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
 const socialImage = absoluteUrl("/opengraph-image");
@@ -109,6 +110,7 @@ export default function RootLayout({
         <ScrollProgressRail />
         <MaskedHeadings />
         <MotionProvider>{children}</MotionProvider>
+        <CompanyChat />
         <Analytics />
       </body>
     </html>
