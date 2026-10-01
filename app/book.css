@@ -638,9 +638,24 @@ html[data-book="on"] .bk-tabs {
   }
 
   .bk-controls p {
+    display: grid;
+    align-content: center;
+    width: 4.75rem;
     min-width: 0;
     font-size: 0.78rem;
-    white-space: nowrap;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  .bk-controls-label {
+    display: block;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .bk-controls p {
+    width: 3rem;
   }
 
   .bk-controls-label {
@@ -648,7 +663,7 @@ html[data-book="on"] .bk-tabs {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 330px) {
   /* Conserva el contador para lectores de pantalla sin ensanchar el control. */
   .bk-controls p {
     position: absolute;
