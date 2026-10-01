@@ -3087,6 +3087,11 @@ html[data-hero-motion="prepare"]
 }
 
 @media (max-width: 900px) {
+  /* Deja el lanzador sobre el CTA del hero; el panel abierto vuelve abajo. */
+  empresa-chat[data-satorus-chat="closed"] {
+    bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
+
   :root {
     --header-height: 64px;
 
