@@ -628,6 +628,39 @@ html[data-book="on"] .bk-tabs {
   }
 }
 
+@media (max-width: 750px) {
+  /* El chat ocupa la esquina derecha: las flechas caben en la izquierda. */
+  html[data-book="on"] .bk-controls {
+    left: 0.75rem;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    translate: 0 0;
+  }
+
+  .bk-controls p {
+    min-width: 0;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .bk-controls-label {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Conserva el contador para lectores de pantalla sin ensanchar el control. */
+  .bk-controls p {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Acabado: materiales, grosor y luz
 

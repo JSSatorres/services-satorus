@@ -784,8 +784,8 @@ export function Book() {
           <p aria-live="polite">
             <b>
               {String(position).padStart(2, "0")} / {String(total).padStart(2, "0")}
-            </b>{" "}
-            {label}
+            </b>
+            <span className="bk-controls-label"> {label}</span>
           </p>
           <button
             type="button"
