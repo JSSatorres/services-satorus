@@ -3087,11 +3087,6 @@ html[data-hero-motion="prepare"]
 }
 
 @media (max-width: 900px) {
-  /* Deja el lanzador sobre el CTA del hero; el panel abierto vuelve abajo. */
-  empresa-chat[data-satorus-chat="closed"] {
-    bottom: calc(7.5rem + env(safe-area-inset-bottom));
-  }
-
   :root {
     --header-height: 64px;
 
@@ -3358,6 +3353,7 @@ html[data-hero-motion="prepare"]
 
   .hero-copy {
     width: 100%;
+    transform: translateY(-1.5rem);
   }
 
   .hero-kinetic-scene {
@@ -3408,7 +3404,7 @@ html[data-hero-motion="prepare"]
     position: absolute;
     top: auto;
     right: 0;
-    bottom: calc(1.65rem + var(--hero-tail));
+    bottom: calc(6rem + var(--hero-tail));
     left: 0;
     justify-content: space-between;
     width: min(calc(100% - (2 * var(--page-pad))), 30rem);
@@ -4469,7 +4465,7 @@ html[data-hero-motion="prepare"]
   .hero-cta {
     top: auto;
     right: 0;
-    bottom: calc(1.15rem + var(--hero-tail));
+    bottom: calc(5.25rem + var(--hero-tail));
     left: 0;
     justify-content: space-between;
     gap: 0.75rem;
