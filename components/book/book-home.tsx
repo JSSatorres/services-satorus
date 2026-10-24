@@ -4,6 +4,7 @@ import { Hero } from "@/components/hero"
 import { Book } from "@/components/book/book"
 import { SectionAnchors } from "@/components/book/section-anchors"
 import { faqs } from "@/lib/home-content"
+import { companyPhone } from "@/lib/site"
 
 /**
  * Home: la portada con la mesa de trabajo, el libro (siete historias) que
@@ -56,6 +57,7 @@ export function BookHome() {
             que necesitas.
           </p>
           <a href="mailto:info@satorus.es">info@satorus.es</a>
+          <a href={companyPhone.href}>{companyPhone.display}</a>
         </div>
         <div className="nb-contact-sheet">
           <ContactForm />

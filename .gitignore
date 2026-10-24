@@ -23,4 +23,8 @@ yarn-error.log*
 # generated TypeScript
 *.tsbuildinfo
 
-.vercel
+# playwright mcp (logs y snapshots)
+/.playwright-mcp/
+
+# contenido de redes generado en local
+/media/

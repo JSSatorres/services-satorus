@@ -13,6 +13,7 @@ const links = [
   { href: "/#como-trabajamos", label: "Cómo trabajamos" },
   { href: "/#que-hacemos", label: "Qué hacemos" },
   { href: "/#preguntas", label: "Preguntas" },
+  { href: "/equipo", label: "Equipo" },
 ]
 
 function getSectionId(href: string) {
@@ -186,9 +187,15 @@ export function SiteHeader() {
       </nav>
 
       <div className="header-actions">
-        <Link className="header-secondary-cta" href="/productos">
-          <RollLabel>Mira algunos de nuestros proyectos</RollLabel>
-          <ArrowUpRight aria-hidden="true" size={18} strokeWidth={2.2} />
+        <Link
+          className="header-secondary-cta"
+          href="/productos"
+          aria-label="Ver proyectos de Satorus"
+        >
+          <RollLabel>Ver proyectos</RollLabel>
+          <span className="header-cta-icon" aria-hidden="true">
+            <ArrowUpRight size={16} strokeWidth={2.4} />
+          </span>
         </Link>
 
         <Link
@@ -196,8 +203,10 @@ export function SiteHeader() {
           href="/#contacto"
           onClick={(event) => handleSectionLinkClick(event, "/#contacto")}
         >
-          <RollLabel>Hablemos de tu negocio</RollLabel>
-          <ArrowUpRight aria-hidden="true" size={18} strokeWidth={2.2} />
+          <RollLabel>Contacto</RollLabel>
+          <span className="header-cta-icon" aria-hidden="true">
+            <ArrowUpRight size={16} strokeWidth={2.4} />
+          </span>
         </Link>
       </div>
 

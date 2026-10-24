@@ -222,6 +222,11 @@
   font-weight: 710;
 }
 
+/* Correo y teléfono en la misma línea; si no caben, el teléfono baja. */
+.nb-contact-copy > a:not(:last-child) {
+  margin: 0 1.5rem 0.75rem 0;
+}
+
 /* La hoja del formulario es una página de cuaderno: pautada y con margen. */
 .nb-contact-sheet .contact-form {
   background-color: var(--cool-paper);

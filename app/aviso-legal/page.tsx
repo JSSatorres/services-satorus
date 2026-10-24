@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
+import { companyPhone } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Aviso legal",
@@ -30,7 +31,7 @@ export default function LegalNoticePage() {
         </Link>
         <article className="legal-article">
           <h1>Aviso legal</h1>
-          <p className="legal-updated">Última actualización: febrero de 2026</p>
+          <p className="legal-updated">Última actualización: octubre de 2026</p>
 
           <section>
             <h2>1. Titular del sitio web</h2>
@@ -49,6 +50,10 @@ export default function LegalNoticePage() {
               </li>
               <li><strong>Domicilio:</strong> España</li>
               <li><strong>Correo electrónico:</strong> info@satorus.es</li>
+              <li>
+                <strong>Teléfono:</strong>{" "}
+                <a href={companyPhone.href}>{companyPhone.display}</a>
+              </li>
             </ul>
           </section>
 
@@ -108,8 +113,9 @@ export default function LegalNoticePage() {
             <h2>6. Contacto</h2>
             <p>
               Para cualquier consulta relacionada con el presente Aviso Legal,
-              puede ponerse en contacto mediante el formulario del sitio web o el
-              correo electrónico indicado anteriormente.
+              puede ponerse en contacto mediante el formulario del sitio web, el
+              correo electrónico info@satorus.es o el teléfono{" "}
+              <a href={companyPhone.href}>{companyPhone.display}</a>.
             </p>
           </section>
         </article>
