@@ -5,6 +5,7 @@ import { ArrowDown, RotateCcw } from "lucide-react";
 import {
   animate,
   motion,
+  useInView,
   useMotionValue,
   useTransform,
   type MotionValue,
@@ -30,6 +31,10 @@ type TeamHeroProps = {
 
 export function TeamHero({ onOpen }: TeamHeroProps) {
   const stageRef = useRef<HTMLDivElement>(null);
+  // Las polaroids caen cuando el escenario está a la vista. En escritorio lo
+  // está nada más cargar; en móvil queda bajo el texto y, si cayeran al
+  // cargar, solo se vería el borde de alguna asomando por abajo.
+  const revealed = useInView(stageRef, { once: true, amount: 0.45 });
   const canDrag = useMediaQuery("(min-width: 761px) and (pointer: fine)");
   const [front, setFront] = useState<MemberId | null>(null);
   const [moved, setMoved] = useState(false);
@@ -145,7 +150,7 @@ export function TeamHero({ onOpen }: TeamHeroProps) {
           <motion.path
             d={thread}
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
+            animate={{ pathLength: revealed ? 1 : 0 }}
             transition={{ duration: 1.4, delay: 1.1, ease: [0.65, 0, 0.35, 1] }}
           />
         </svg>
@@ -174,6 +179,7 @@ export function TeamHero({ onOpen }: TeamHeroProps) {
                 setMoved(true);
               }}
               onOpen={() => onOpen(id)}
+              revealed={revealed}
             />
           );
         })}
@@ -208,6 +214,7 @@ type HeroCardProps = {
   stageRef: React.RefObject<HTMLDivElement | null>;
   onGrab: () => void;
   onOpen: () => void;
+  revealed: boolean;
 };
 
 function HeroCard({
@@ -225,6 +232,7 @@ function HeroCard({
   stageRef,
   onGrab,
   onOpen,
+  revealed,
 }: HeroCardProps) {
   const dragged = useRef(false);
 
@@ -266,7 +274,7 @@ function HeroCard({
       <motion.span
         className={styles.heroCardInner}
         initial={{ opacity: 0, y: -160, rotate: place.rotate * -3 }}
-        animate={{ opacity: 1, y: 0, rotate: 0 }}
+        animate={revealed ? { opacity: 1, y: 0, rotate: 0 } : undefined}
         transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.25 + index * 0.18 }}
       >
         <span className={styles.clip} aria-hidden="true" />
