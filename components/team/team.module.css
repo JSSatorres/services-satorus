@@ -681,8 +681,10 @@
   transition: color 260ms ease, transform 200ms var(--ease-out);
 }
 
-.problem:hover {
-  transform: translateX(6px);
+@media (hover: hover) {
+  .problem:hover {
+    transform: translateX(6px);
+  }
 }
 
 .problem[data-active="true"] {
@@ -704,6 +706,12 @@
 .problem[data-active="true"] .problemText::after {
   content: " →";
   color: var(--action-orange);
+}
+
+/* Solo en el acordeón de tableta y móvil. */
+.problemChevron,
+.inlineBoard {
+  display: none;
 }
 
 .board {
@@ -752,8 +760,8 @@
 
 .stationRail {
   position: absolute;
-  top: calc(var(--avatar) / 2);
-  bottom: calc(var(--avatar) / 2);
+  top: var(--rail-top, calc(var(--avatar) / 2));
+  bottom: var(--rail-bottom, calc(var(--avatar) / 2));
   left: calc(var(--avatar) / 2 - 2px);
   width: 4px;
   border-radius: 4px;
@@ -959,8 +967,42 @@
     grid-template-columns: 1fr;
   }
 
+  /* La pizarra lateral se sustituye por la que se despliega bajo cada
+     problema. Debe coincidir con `COMPACT_QUERY` de team-relay.tsx. */
   .board {
-    position: static;
+    display: none;
+  }
+
+  .problem {
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .problem[data-active="true"] .problemText::after {
+    content: none;
+  }
+
+  .problemChevron {
+    position: relative;
+    z-index: 1;
+    display: block;
+    flex: none;
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .problem[data-active="true"] .problemChevron {
+    color: var(--action-orange);
+    transform: rotate(180deg);
+  }
+
+  .inlineBoard {
+    display: block;
+    overflow: hidden;
+  }
+
+  .inlineBoard .boardSheet {
+    margin: 0.3rem 0 1rem;
+    box-shadow: 0 0.3rem 0.6rem rgba(23, 27, 24, 0.08);
   }
 }
 
@@ -1018,6 +1060,23 @@
 
   .stations {
     --avatar: 3.2rem;
+  }
+
+  .inlineBoard .boardSheet {
+    padding: 1.2rem 1.1rem;
+  }
+
+  .stations ol {
+    gap: 1.25rem;
+  }
+
+  .station {
+    gap: 0.85rem;
+  }
+
+  .boardResult {
+    margin-top: 1.4rem;
+    font-size: 0.86rem;
   }
 }
 
