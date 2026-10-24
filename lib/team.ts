@@ -95,6 +95,8 @@ export const team: TeamMember[] = [
       "La experiencia de quien ha dirigido una pyme por dentro",
     ],
     quote: "La tecnología que no se nota en la cuenta de resultados es un gasto, no una inversión.",
+    // Sin LinkedIn por ahora: su enlace lleva al formulario de contacto.
+    link: { href: "/#contacto", label: "Habla con Tony" },
     accent: "lime",
   },
 ];

@@ -200,8 +200,8 @@ export function TeamProfiles({ selected, onSelect }: TeamProfilesProps) {
                 <motion.a
                   className={styles.profileLink}
                   href={member.link.href}
-                  target="_blank"
-                  rel="noreferrer"
+                  target={member.link.href.startsWith("/") ? undefined : "_blank"}
+                  rel={member.link.href.startsWith("/") ? undefined : "noreferrer"}
                   variants={lineVariants}
                 >
                   {member.link.label} <ArrowUpRight aria-hidden="true" size={17} />
