@@ -8,17 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { appProjects, webProjects } from "@/lib/project-catalog";
 import styles from "./catalogo.module.css";
 
-const projectDestinations: Record<string, string> = {
-  pidoteca: "https://pidoteca.com/",
-  sportapp: "https://manage-sport-app.vercel.app/",
-  "angel-mendoza": "https://angelmendoza.es/",
-  enrolla2: "https://enrolla2.com/",
-};
-
-const showcasedProjects = [...appProjects, ...webProjects].map((project) => ({
-  ...project,
-  href: projectDestinations[project.slug] ?? project.href,
-}));
+const showcasedProjects = [...appProjects, ...webProjects];
 
 export const metadata: Metadata = {
   title: "Proyectos: apps y webs",

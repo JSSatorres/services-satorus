@@ -247,13 +247,15 @@ export function HeroKineticLockup() {
   return (
     <div className="hero-copy" ref={rootRef}>
       <h1 id="hero-title" className="sr-only">
-        Satorus.es. Tu negocio puede llegar más lejos.
+        Satorus: software a medida, webs e IA para pymes en Granada. Tu negocio
+        puede llegar más lejos.
       </h1>
       <p className="sr-only">
-        Webs, herramientas e inteligencia artificial para pequeñas y medianas
-        empresas. Te ayudamos a aprovechar la tecnología para captar clientes,
-        atender mejor y reducir el trabajo manual. Diseñamos y ponemos en marcha
-        la solución que encaja con tu negocio.
+        Somos un equipo de ingenieros de software de Granada y Armilla. Creamos
+        páginas web, software a medida y automatizaciones con inteligencia
+        artificial para pequeñas y medianas empresas de Granada y de toda España.
+        Te ayudamos a captar clientes, atender mejor y reducir el trabajo manual,
+        y diseñamos y ponemos en marcha la solución que encaja con tu negocio.
       </p>
 
       <div className="hero-kinetic-scene">

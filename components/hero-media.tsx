@@ -7,13 +7,22 @@ import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-moti
 const heroImageAlt =
   "Mesa vista desde arriba con notas, un móvil y un cable naranja enredado.";
 
+/* En móvil el vídeo 1080p (4,3 MB) era el LCP: allí se sirve una versión 720p de ~0,5 MB. */
+const mobileQuery = "(max-width: 767px)";
+const heroVideoSrc = {
+  desktop: "/videos/satorus-hero-loop.mp4",
+  mobile: "/videos/satorus-hero-loop-mobile.mp4",
+};
+
 export function HeroMedia() {
   const reduceMotion = useHydratedReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [canRenderVideo, setCanRenderVideo] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
+      setIsMobile(window.matchMedia(mobileQuery).matches);
       setCanRenderVideo(!reduceMotion);
     });
 
@@ -21,6 +30,7 @@ export function HeroMedia() {
   }, [reduceMotion]);
 
   const shouldRenderVideo = canRenderVideo && !reduceMotion;
+  const videoSrc = isMobile ? heroVideoSrc.mobile : heroVideoSrc.desktop;
 
   useEffect(() => {
     if (!shouldRenderVideo || !videoRef.current) {
@@ -63,7 +73,17 @@ export function HeroMedia() {
 
   return (
     <div className="hero-media">
-      {shouldRenderVideo ? (
+      {/* La imagen se queda siempre debajo: pinta primero (LCP) y hace de póster
+          hasta que el vídeo, encima y sin póster propio, muestra su primer fotograma. */}
+      <Image
+        src="/images/daily-tangle.png"
+        alt={heroImageAlt}
+        fill
+        preload
+        fetchPriority="high"
+        sizes="100vw"
+      />
+      {shouldRenderVideo && (
         <video
           ref={videoRef}
           autoPlay
@@ -71,19 +91,8 @@ export function HeroMedia() {
           loop
           playsInline
           preload="metadata"
-          // La versión optimizada de next/image: el PNG original pesa 2 MB y
-          // era lo más pesado de la primera carga después del propio vídeo.
-          poster="/_next/image?url=%2Fimages%2Fdaily-tangle.png&w=1920&q=75"
-          src="/videos/satorus-hero-loop.mp4"
+          src={videoSrc}
           aria-hidden="true"
-        />
-      ) : (
-        <Image
-          src="/images/daily-tangle.png"
-          alt={heroImageAlt}
-          fill
-          preload
-          sizes="100vw"
         />
       )}
     </div>

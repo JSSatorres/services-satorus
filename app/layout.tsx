@@ -13,25 +13,27 @@ import { ScrollProgressRail } from "@/components/scroll-progress-rail";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { CompanyChat } from "@/components/company-chat";
 import { absoluteUrl, siteUrl } from "@/lib/site";
+import { jsonLdScript, organizationJsonLd } from "@/lib/structured-data";
 
 const socialImage = absoluteUrl("/opengraph-image");
 const socialImageAlt = "Satorus — Tu negocio puede llegar más lejos";
+const socialDescription =
+  "Software a medida, webs y automatizaciones con IA para pymes, desde Granada.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${siteUrl}/`),
   title: {
-    default: "Satorus | Webs, herramientas e IA para pymes",
+    default: "Software a medida, webs e IA para pymes en Granada | Satorus",
     template: "%s | Satorus",
   },
   description:
-    "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas. Te ayudamos a captar clientes, atender mejor y reducir el trabajo manual.",
+    "Ingenieros de software en Granada y Armilla: webs, software a medida y automatizaciones con IA para pymes de toda España, explicados sin tecnicismos.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Satorus — Tu negocio puede llegar más lejos",
-    description:
-      "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas.",
+    description: socialDescription,
     url: siteUrl,
     siteName: "Satorus",
     locale: "es_ES",
@@ -48,8 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Satorus — Tu negocio puede llegar más lejos",
-    description:
-      "Webs, herramientas e inteligencia artificial para pequeñas y medianas empresas.",
+    description: socialDescription,
     images: [{ url: socialImage, alt: socialImageAlt }],
   },
   robots: {
@@ -62,15 +63,6 @@ export const viewport: Viewport = {
   themeColor: "#f2f1ea",
   colorScheme: "light",
 };
-
-const directionContract = `<!--
-THESIS: El trabajo cotidiano entra enredado y sale claro; se rechaza la portada SaaS de hero centrado y mosaico de tarjetas.
-OWN-WORLD: Azul herramienta, naranja impulso, lima de etiqueta, grafito y papel frío; escenas materiales, recortes y una ruta continua.
-STORY: El visitante reconoce su atasco, entiende que no necesita hablar tecnología y cuenta qué le frena.
-FIRST VIEWPORT: Promesa grande sobre papel frío, mesa diagonal protagonista y CTA naranja integrado en la ruta.
-FORM: Taller en movimiento, opción B aprobada, semilla b92b95d0.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
--->`;
 
 /* Sin JavaScript nadie retira `data-hero-motion` ni arranca GSAP: el hero se muestra entero. */
 const heroMotionFallback = `html[data-hero-motion="prepare"] .hero-kinetic-brand,
@@ -97,11 +89,9 @@ export default function RootLayout({
         <noscript>
           <style>{heroMotionFallback}</style>
         </noscript>
-        <div
-          hidden
-          aria-hidden="true"
-          data-direction-contract="b92b95d0"
-          dangerouslySetInnerHTML={{ __html: directionContract }}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={jsonLdScript(organizationJsonLd)}
         />
         <a className="skip-link" href="#contenido">
           Saltar al contenido

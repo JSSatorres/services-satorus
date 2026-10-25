@@ -5,6 +5,16 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  // Páginas de proyecto retiradas por ahora (solo queda GoblinTrader): temporales
+  // por si vuelven; sus tarjetas enlazan ya a la web de cada proyecto.
+  async redirects() {
+    return [
+      "/productos/pidoteca",
+      "/productos/sportapp",
+      "/proyectos/angel-mendoza",
+      "/proyectos/enrolla2",
+    ].map((source) => ({ source, destination: "/productos", permanent: false }));
+  },
   async headers() {
     return [
       {

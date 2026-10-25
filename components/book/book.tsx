@@ -698,7 +698,7 @@ export function Book() {
           <BookCover />
         </div>
         <div className="bk-rotate-copy">
-          <h2>Gira el móvil para leer el cuaderno</h2>
+          <p className="bk-rotate-title">Gira el móvil para leer el cuaderno</p>
           <p>El cuaderno de tu negocio se lee en vertical, página a página.</p>
           <p className="bk-rotate-hint">O sigue bajando: preguntas y contacto ↓</p>
         </div>

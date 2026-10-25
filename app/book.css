@@ -2130,8 +2130,10 @@ html[data-book="rotate"] .bk-rotate {
   }
 }
 
-.bk-rotate-copy h2 {
+/* Aviso de interfaz, no un encabezado del contenido: es un <p> con aspecto de título. */
+.bk-rotate-copy .bk-rotate-title {
   margin: 0 0 0.5rem;
+  color: inherit;
   font-family: var(--font-display-family);
   font-size: clamp(1.6rem, 4.2vw, 2.3rem);
   font-variation-settings: "wdth" 76, "wght" 800;

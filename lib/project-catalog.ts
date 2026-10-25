@@ -73,7 +73,7 @@ export const appProjects: ProjectCatalogItem[] = [
     challenge: "Conectar la carta y los pedidos con el trabajo de sala y cocina.",
     improvement: "La carta y los pedidos dejan de ir por un lado mientras sala y cocina van por otro.",
     reason: "Un mismo recorrido permite seguir el turno sin volver a juntar papeles y mensajes.",
-    href: "/productos/pidoteca",
+    href: "https://pidoteca.com/",
     image: "/projects/pidoteca/overview.png",
     imageAlt: "Landing y panel de gestión de Pidoteca",
     details: [
@@ -115,7 +115,7 @@ export const appProjects: ProjectCatalogItem[] = [
     challenge: "Seguir la semana de un club entre sedes y equipos.",
     improvement: "La semana del club se puede consultar sin perseguir sesiones y documentos por separado.",
     reason: "Reunir la información por equipos y sedes facilita preparar el trabajo cotidiano.",
-    href: "/productos/sportapp",
+    href: "https://manage-sport-app.vercel.app/",
     image: "/projects/sportapp/club-manager-relieved.webp",
     imageAlt: "Responsable de un club deportivo sonríe mientras organiza la semana en una tablet junto al campo",
     details: [
@@ -138,7 +138,7 @@ export const webProjects: ProjectCatalogItem[] = [
     challenge: "Explicar la propuesta de Ángel a quienes trabajan en una clínica.",
     improvement: "La experiencia de Ángel se entiende como una propuesta concreta para clínicas.",
     reason: "Ordenamos especialización, servicios y contacto para que quien llega sepa si encaja y cómo hablar con él.",
-    href: "/proyectos/angel-mendoza",
+    href: "https://angelmendoza.es/",
     image: "/projects/angel-mendoza/site-desktop.png",
     imageAlt: "Página web de Ángel Mendoza vista en escritorio",
     details: [
@@ -160,7 +160,7 @@ export const webProjects: ProjectCatalogItem[] = [
     challenge: "Mostrar los rolls y facilitar que quien llega pueda elegir y encargar.",
     improvement: "Los rolls despiertan el apetito, pero la web también ayuda a elegir y encargar.",
     reason: "Producto, carta, obrador y local forman un recorrido claro en vez de competir por atención.",
-    href: "/proyectos/enrolla2",
+    href: "https://enrolla2.com/",
     image: "/projects/enrolla2/galeria-rolls-centrada.png",
     mobileImage: "/projects/enrolla2/galeria-rolls-movil.png",
     imageAlt: "Galería verde de Enrolla2 con fotos de cinnamon rolls dispuestas en abanico",
