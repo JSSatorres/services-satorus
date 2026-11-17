@@ -7,11 +7,14 @@ import "@fontsource-variable/caveat";
 import "./globals.css";
 import "./book.css";
 import "./home-sections.css";
+import "./home-v4.css";
+import "./home-hero.css";
+import "./home-flow.css";
 import { MaskedHeadings } from "@/components/masked-headings";
 import { MotionProvider } from "@/components/motion-provider";
-import { ScrollProgressRail } from "@/components/scroll-progress-rail";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { CompanyChat } from "@/components/company-chat";
+import { AnalyticsEvents } from "@/components/analytics-events";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 import { jsonLdScript, organizationJsonLd } from "@/lib/structured-data";
 
@@ -76,6 +79,9 @@ export default function RootLayout({
   return (
     <html lang="es" data-hero-motion="prepare" suppressHydrationWarning>
       <body id="top">
+        <noscript>
+          <style>{`.ns-side,.ns-paren,.ns-chip,.ns-after{opacity:1!important;visibility:visible!important}.ns-paren{--open:1!important}`}</style>
+        </noscript>
         <Script id="prepare-hero-motion" strategy="beforeInteractive">
           {`var root = document.documentElement;
           if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -97,11 +103,11 @@ export default function RootLayout({
           Saltar al contenido
         </a>
         <SmoothScroll />
-        <ScrollProgressRail />
         <MaskedHeadings />
         <MotionProvider>{children}</MotionProvider>
         <CompanyChat />
         <Analytics />
+        <AnalyticsEvents />
       </body>
     </html>
   );

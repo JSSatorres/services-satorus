@@ -50,6 +50,11 @@
   --accent-ink: #101411;
   --stage-bg: #fbe9ee;
 }
+.section [data-accent="gold"] {
+  --accent: #b59a68;
+  --accent-ink: #15130f;
+  --stage-bg: #f5efe4;
+}
 
 /* Cabecera de sección */
 
@@ -629,3 +634,631 @@
 /* Proyecto destacado: los módulos que abarca, a la vista antes del enlace. */
 .highlights { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
 .highlights li { padding: .38rem .7rem; border: 1px solid var(--accent); border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, #fffefa); color: var(--bench-graphite); font-size: .8rem; font-weight: 720; }
+
+/* ------------------------------------------------------------------
+   Webs dentro de un portátil en 3D (sólo CSS).
+   La escena es un contenedor de tamaño: el portátil se dimensiona con
+   cqw/cqh para caber igual en el marco lateral (6:5) y en el móvil (16:9).
+   ------------------------------------------------------------------ */
+
+.primaryVisual[data-device="laptop"] {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.laptopScene {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  container-type: size;
+  perspective: 1500px;
+  perspective-origin: 50% 30%;
+}
+
+.laptopFloat {
+  transform-style: preserve-3d;
+}
+
+.laptop {
+  --rx: 20deg;
+  --ry: -22deg;
+  --glare-x: 50%;
+  position: relative;
+  width: min(60cqw, 92cqh);
+  transform-style: preserve-3d;
+  transform: translate(6%, -16%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(1.5deg);
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tapa: marco negro, cámara y la pantalla con la captura. */
+.laptopLid {
+  position: relative;
+  aspect-ratio: 16 / 10.4;
+  padding: 3.2% 3% 4.6%;
+  background: linear-gradient(160deg, #2a2d30, #111315 60%);
+  border: 1px solid #3b3f43;
+  border-radius: 4.5% 4.5% 1.6% 1.6% / 7% 7% 2.4% 2.4%;
+  box-shadow:
+    inset 0 0 0 2px #050607,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transform-origin: 50% 100%;
+  transform: rotateX(-4deg);
+  transform-style: preserve-3d;
+}
+
+/* Logo apenas visible en la barbilla de la tapa. */
+.laptopLid::after {
+  position: absolute;
+  bottom: 1.5%;
+  left: 50%;
+  width: 9%;
+  height: 1.2%;
+  content: "";
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  translate: -50% 0;
+}
+
+.laptopCamera {
+  position: absolute;
+  top: 1.3%;
+  left: 50%;
+  width: 0.9%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 35% 35%, #4a5a6a, #0b0d0f 70%);
+  border-radius: 50%;
+  translate: -50% 0;
+}
+
+.laptopScreen {
+  position: relative;
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  border-radius: 0.35rem;
+}
+
+.laptopScreen .frameMedia {
+  flex: 1;
+  height: 100%;
+}
+
+/* Reflejo diagonal que se desplaza con el ratón. */
+.laptopGlare {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent calc(var(--glare-x) - 28%),
+    rgba(255, 255, 255, 0.16) calc(var(--glare-x) - 6%),
+    rgba(255, 255, 255, 0.04) calc(var(--glare-x) + 8%),
+    transparent calc(var(--glare-x) + 22%)
+  );
+  pointer-events: none;
+  transition: background 600ms ease;
+  mix-blend-mode: screen;
+}
+
+/* Base: teclado y trackpad, tumbada hacia el espectador. */
+.laptopBase {
+  position: absolute;
+  top: 100%;
+  left: -1.5%;
+  width: 103%;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(180deg, #2a2d31 0%, #1b1d20 60%, #131416 100%);
+  border-radius: 1.2% 1.2% 4% 4% / 2% 2% 6% 6%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -6px 10px rgba(0, 0, 0, 0.35);
+  transform-origin: 50% 0;
+  transform: rotateX(70deg);
+}
+
+/* Bisagra. */
+.laptopBase::before {
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 2.2%;
+  content: "";
+  background: linear-gradient(#050607, #2b2e32);
+  border-radius: 0 0 6px 6px;
+}
+
+/* Canto frontal (grosor de la base). */
+.laptopBase::after {
+  position: absolute;
+  top: 100%;
+  left: 1%;
+  right: 1%;
+  height: 4.5%;
+  content: "";
+  background: linear-gradient(#26292d, #0b0c0d);
+  border-radius: 0 0 40% 40% / 0 0 100% 100%;
+  transform-origin: 50% 0;
+  transform: rotateX(-90deg);
+}
+
+/* Teclas de verdad (rejilla de elementos): nítidas y quietas en 3D. */
+.laptopKeys {
+  position: absolute;
+  top: 8%;
+  left: 9%;
+  right: 9%;
+  height: 48%;
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 3.5% 0.9%;
+  padding: 1.2%;
+  background: #0a0b0c;
+  border-radius: 4px;
+  /* Retroiluminación con el color del proyecto, apenas visible. */
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent, #e56748) 35%, transparent);
+}
+
+.laptopKeys i {
+  background: linear-gradient(180deg, #3a3e43, #2b2e32);
+  border-radius: 12%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 3px color-mix(in srgb, var(--accent, #e56748) 40%, transparent);
+}
+
+.laptopKeys .laptopSpace {
+  grid-column: span 7;
+}
+
+.laptopPad {
+  position: absolute;
+  top: 61%;
+  left: 34%;
+  width: 32%;
+  height: 30%;
+  background: linear-gradient(180deg, #2e3236, #23262a);
+  border-radius: 6%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Sombra en el «suelo». */
+.laptopShadow {
+  position: absolute;
+  top: 104%;
+  left: -2%;
+  width: 104%;
+  height: 22%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(23, 27, 24, 0.32), transparent 70%);
+  filter: blur(10px);
+  transform: translateZ(-40px) rotateX(70deg);
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+
+@keyframes laptopFloat {
+  0%, 100% { transform: translateY(0) rotateZ(0deg); }
+  50% { transform: translateY(-1.6%) rotateZ(-0.6deg); }
+}
+
+@media (max-width: 860px) {
+  .laptopScene {
+    height: 100%;
+  }
+
+  .laptop {
+    width: min(54cqw, 84cqh);
+    --rx: 18deg;
+    --ry: -18deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .laptopFloat {
+    animation: none;
+  }
+
+  .laptop {
+    transition: none;
+  }
+}
+
+/* Apps: en escritorio su presentación de siempre; en móvil, el portátil. */
+.appDesktopVisual {
+  display: contents;
+}
+
+.appMobileLaptop {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .appDesktopVisual {
+    display: none;
+  }
+
+  .appDesktopVisual[data-keep-mobile] {
+    display: contents;
+  }
+
+  .appMobileLaptop {
+    display: flex;
+    flex: 1;
+    height: 100%;
+  }
+
+  /* Sin tarjeta alrededor: el portátil va directo sobre el fondo y a todo
+     lo ancho. El marco sigue tapando lo de detrás con el color del fondo. */
+  .frame,
+  .stage[data-motion] .frame,
+  .stage[data-motion] .frame:last-child {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .frame,
+  .stage[data-motion="stack"] .frames {
+    aspect-ratio: 5 / 4;
+  }
+
+  .primaryVisual,
+  .primaryVisual[data-device] {
+    overflow: visible;
+    background: transparent;
+  }
+
+  .stage[data-motion="stack"] .visuals {
+    padding-bottom: 0.4rem;
+  }
+
+  /* Más de frente y centrado: manda la pantalla. */
+  .laptop {
+    width: min(86cqw, 120cqh);
+    --rx: 9deg;
+    --ry: -7deg;
+    transform: translate(0, -9%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.4deg);
+  }
+}
+
+/* Móvil: el portátil ocupa un tercio de la pantalla y puede sobresalir. */
+@media (max-width: 860px) {
+  .frame,
+  .stage[data-motion="stack"] .frames {
+    aspect-ratio: auto;
+    height: 33svh;
+    min-height: 13rem;
+  }
+
+  .frame,
+  .stage[data-motion] .frame {
+    overflow: visible;
+  }
+
+  .laptop {
+    width: min(78cqw, 112cqh);
+    transform: translate(0, -8%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.4deg);
+  }
+}
+
+/* Escritorio: las webs como en móvil. Sin tarjeta, sin miniaturas y con el
+   portátil grande y más de frente ocupando todo el hueco. */
+@media (min-width: 861px) {
+  .frame[data-kind="web"],
+  .stage[data-motion] .frame[data-kind="web"] {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Sin sombra de bloque: las capas están apiladas y la de una tarjeta de
+     abajo se vería como un recuadro alrededor del portátil de arriba. */
+  .stage[data-motion] .frame:last-child {
+    box-shadow: none;
+  }
+
+  .frame[data-kind="web"] .visualEnsemble {
+    grid-template-rows: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .frame[data-kind="web"] .detailRow {
+    display: none;
+  }
+
+  /* Cabe entero (tapa + base en perspectiva ≈ 1 ancho de alto) y centrado:
+     la tapa sube lo que mide media base. */
+  .frame[data-kind="web"] .laptop {
+    --rx: 12deg;
+    --ry: -12deg;
+    width: min(60cqw, 82cqh);
+    transform: translate(9%, -12%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.8deg);
+  }
+
+  /* Base más tumbada: ocupa menos y la pantalla manda. */
+  .frame[data-kind="web"] .laptopBase,
+  .frame[data-kind="web"] .laptopShadow {
+    transform: rotateX(80deg);
+  }
+}
+
+/* ==================================================================
+   Un solo portátil para todos los proyectos + fotos flotando alrededor
+   como dispositivos (tablet en horizontal, móvil en vertical).
+   ================================================================== */
+
+.laptopHolder {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.pidoMobileScene {
+  display: none;
+}
+
+/* La escena de Pidoteca dentro de la pantalla del portátil (escritorio). */
+.screenScene {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.screenScene > * {
+  height: 100%;
+}
+
+/* Dentro del portátil, la captura siempre llena la pantalla. */
+.laptopScreen .frameMedia img {
+  object-fit: cover !important;
+  padding: 0 !important;
+}
+
+.floats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.floatCard {
+  --d: 18px;
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  width: 27cqw;
+  padding: 0.55cqw;
+  background: #111315;
+  border: 1px solid #34383c;
+  border-radius: 1.4cqw;
+  box-shadow: 0 1.6cqw 3.4cqw rgba(23, 27, 24, 0.28);
+  translate: calc(var(--px, 0) * var(--d) * 2) calc(var(--py, 0) * var(--d) * 2);
+  transition: translate 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tablet: pantalla 4:3 con marco negro y pie de foto debajo. */
+.floatMedia,
+.floatCustom {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #f4f4f1;
+  border-radius: 0.8cqw;
+}
+
+.floatMedia img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.floatMedia[data-focus="middle"] img { object-position: center 80%; }
+.floatMedia[data-focus="lower"] img { object-position: center 65%; }
+
+.floatCustom {
+  display: grid;
+  place-items: center;
+  padding: 0.6cqw;
+  background: #fffefa;
+}
+
+.floatCard figcaption {
+  padding: 0.55cqw 0.3cqw 0.1cqw;
+  color: #f2f1ea;
+  font-size: clamp(0.62rem, 1.15cqw, 0.8rem);
+  font-weight: 720;
+  line-height: 1.2;
+}
+
+/* Móvil: vertical, marco más grueso y redondeado, con su isla. */
+.floatCard[data-portrait] {
+  width: 12.5cqw;
+  padding: 0.5cqw;
+  border-radius: 2.2cqw;
+}
+
+.floatCard[data-portrait] .floatMedia {
+  aspect-ratio: 9 / 19;
+  border-radius: 1.7cqw;
+  background: #fff;
+}
+
+.floatCard[data-portrait] .floatMedia img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.floatCard[data-portrait]::before {
+  position: absolute;
+  top: 1.1cqw;
+  left: 50%;
+  z-index: 2;
+  width: 32%;
+  height: 0.9cqw;
+  content: "";
+  background: #111315;
+  border-radius: 999px;
+  translate: -50% 0;
+}
+
+/* Posiciones: alrededor del portátil, sin taparle la pantalla. */
+.floatCard[data-slot="1"] {
+  --d: 26px;
+  left: 0;
+  bottom: 4%;
+  rotate: -6deg;
+}
+
+.floatCard[data-slot="2"] {
+  --d: -22px;
+  right: 0;
+  top: 3%;
+  rotate: 5deg;
+}
+
+.floatCard[data-slot="3"] {
+  --d: 34px;
+  right: 2%;
+  bottom: 2%;
+  rotate: 4deg;
+}
+
+.floatCard[data-slot="1"][data-portrait] { left: 2%; bottom: 6%; }
+.floatCard[data-slot="2"][data-portrait] { right: 6%; top: 5%; }
+
+@media (min-width: 861px) {
+  /* Todos los proyectos sin tarjeta, con el portátil centrado y grande. */
+  .frame,
+  .stage[data-motion] .frame {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .visualEnsemble {
+    grid-template-rows: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .detailRow {
+    display: none;
+  }
+
+  .primaryVisual,
+  .primaryVisual[data-device] {
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .frame .laptop {
+    --rx: 12deg;
+    --ry: -12deg;
+    width: min(60cqw, 82cqh);
+    transform: translate(9%, -12%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.8deg);
+  }
+
+  .frame .laptopBase,
+  .frame .laptopShadow {
+    transform: rotateX(80deg);
+  }
+}
+
+@media (max-width: 860px) {
+  .floats {
+    display: none;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatCard {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Escritorio: portátil arriba y los dispositivos en fila debajo, todo
+   dentro del hueco (nada se sale ni se corta).
+   ------------------------------------------------------------------ */
+@media (min-width: 861px) {
+  .laptopScene {
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: center;
+    row-gap: 1cqh;
+    padding: 3cqh 0 2cqh;
+  }
+
+  .frame[data-kind] .laptop {
+    width: min(66cqw, 70cqh);
+    transform: translate(0, -8%) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.6deg);
+  }
+
+  /* Teclado a la vista: base menos tumbada que antes. */
+  .frame[data-kind] .laptopBase,
+  .frame[data-kind] .laptopShadow {
+    transform: rotateX(70deg);
+  }
+
+  .floats {
+    position: static;
+    inset: auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2.4cqw;
+    width: 100%;
+    padding: 0 3cqw;
+  }
+
+  .floatCard,
+  .floatCard[data-slot] {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 27cqw;
+    max-width: 18rem;
+  }
+
+  .floatCard[data-slot="1"] { rotate: -2.5deg; }
+  .floatCard[data-slot="2"] { rotate: 2deg; }
+  .floatCard[data-slot="3"] { rotate: -1.5deg; }
+
+  /* El móvil, con la misma altura que las tablets de su fila. */
+  .floatCard[data-portrait],
+  .floatCard[data-slot][data-portrait] {
+    width: 10.6cqw;
+    max-width: 7.2rem;
+  }
+
+  /* Un poco menos de vaivén con el ratón, para que no rocen el borde. */
+  .floatCard {
+    translate: calc(var(--px, 0) * var(--d) * 1.2) calc(var(--py, 0) * var(--d) * 0.8);
+  }
+}
+
+/* Pidoteca dentro del portátil (móvil): el teléfono de la escena es muy
+   pequeño, así que su pantalla se pinta al doble y se reduce a la mitad para
+   que textos y botones tengan proporciones de un móvil de verdad. */
+@media (max-width: 860px) {
+  .laptop .laptopScreen .screenScene [class*="phoneScreen"] {
+    width: 210%;
+    height: 210%;
+    transform: scale(0.476);
+    transform-origin: top left;
+  }
+
+  /* La isla del teléfono, a escala del teléfono pequeño. */
+  .laptop .laptopScreen .screenScene :has(> [class*="phoneScreen"]) > span {
+    top: 5px;
+    width: 20px;
+    height: 3px;
+  }
+}

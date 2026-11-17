@@ -1,21 +1,39 @@
 import { ContactForm } from "@/components/contact-form"
 import { SiteFooter } from "@/components/site-footer"
-import { Hero } from "@/components/hero"
-import { Book } from "@/components/book/book"
+import { HomeHero } from "@/components/home/home-hero"
+import { DeskBand, NextStepSection, OffersSection } from "@/components/home/home-sections"
+import { ProcessSection } from "@/components/home/process-section"
+import { NoiseSection } from "@/components/home/noise-section"
+import { HubSection } from "@/components/home/hub-section"
+import { AppDemoSection } from "@/components/home/app-demo-section"
+import { FixedBand, FloatingWords } from "@/components/home/fixed-band"
+import { ScrollRefresh } from "@/components/home/stack-motion"
+import { IntroLoader } from "@/components/home/intro-loader"
+// El cuaderno (`@/components/book/book`) está fuera del home por ahora; se
+// guarda para reutilizarlo en otra página.
 import { SectionAnchors } from "@/components/book/section-anchors"
 import { faqs } from "@/lib/home-content"
 import { companyPhone } from "@/lib/site"
 
 /**
- * Home: la portada con la mesa de trabajo, el libro (siete historias) que
- * entra al bajar y, detrás, las dudas y la página en blanco para escribirnos.
+ * Home: la portada con la demo del asistente, el cuaderno con el antes y el
+ * después, cómo trabajamos, qué hacemos, el siguiente paso, las dudas y la
+ * página en blanco para escribirnos. Todo se lee con el scroll normal.
  */
 export function BookHome() {
   return (
     <>
+      <IntroLoader />
+      <ScrollRefresh />
       <SectionAnchors />
-      <Hero />
-      <Book />
+      <NoiseSection />
+      <HubSection />
+      <AppDemoSection />
+      <HomeHero first={false} />
+      <DeskBand />
+      <ProcessSection />
+      <OffersSection />
+      <NextStepSection />
 
       <div className="nb-after">
         <section className="nb-chapter" id="preguntas" aria-labelledby="preguntas-title">
@@ -44,6 +62,11 @@ export function BookHome() {
           </div>
         </section>
       </div>
+
+      <FixedBand className="fw--outro" tone="ink" poster="/images/clear-flow.png" startAt={7}>
+        <FloatingWords className="fw-words" words={["Menos", "lío.", "Más", "negocio."]} />
+        <p className="hs-band-text">Lo que te quita tiempo, déjanoslo a nosotros.</p>
+      </FixedBand>
 
       <section className="nb-contact" id="contacto" aria-labelledby="contacto-title">
         <div className="nb-contact-copy">

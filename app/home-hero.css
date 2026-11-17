@@ -1,0 +1,1209 @@
+/* ==========================================================================
+   Portada: el mismo momento de un negocio en dos móviles
+   (`components/home/home-hero.tsx`, guion en `lib/hero-scenes.ts`).
+
+   `.dh-*` es la portada y los teléfonos; `.ap-*` son las pantallas que imitan
+   apps reales (chats, correo, notas, llamadas, presupuesto, avisos). Dentro
+   del teléfono se usa la letra del sistema para que parezca un móvil de verdad.
+   ========================================================================== */
+
+.dh {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(60% 70% at 78% 40%, rgba(120, 150, 255, 0.45), transparent 70%),
+    radial-gradient(40% 50% at 8% 100%, rgba(229, 103, 72, 0.35), transparent 70%),
+    linear-gradient(160deg, #2f50d6 0%, #2441b8 55%, #1a2f8f 100%);
+  isolation: isolate;
+  scroll-margin-top: var(--header-height);
+}
+
+/* Fina retícula de puntos: da textura al campo azul sin competir. */
+.dh::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(90deg, #000, transparent 70%);
+  pointer-events: none;
+}
+
+.dh[data-first] {
+  padding-top: var(--header-height);
+}
+
+.dh-in {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: 2rem clamp(2rem, 4vw, 4rem);
+  max-width: calc(84rem + 2 * var(--page-pad));
+  min-height: min(calc(100svh - var(--header-height)), 52rem);
+  margin-inline: auto;
+  padding: clamp(1.75rem, 4.5vh, 3.5rem) var(--page-pad);
+}
+
+/* ----------------------------------------------------------------- Texto */
+
+.dh h1,
+.dh-copy > h2 {
+  margin: 0;
+  font-family: var(--font-display-family);
+  font-size: clamp(2.7rem, 5vw, 5.4rem);
+  font-variation-settings: "wght" 800;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+}
+
+.dh-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.dh-line > span {
+  display: block;
+  animation: dh-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dh-line:nth-child(2) > span {
+  color: var(--label-lime);
+  animation-delay: 90ms;
+}
+
+@keyframes dh-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+.dh-lead {
+  max-width: 42ch;
+  margin: 1.4rem 0 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  line-height: 1.45;
+  animation: dh-fade 800ms 300ms both;
+}
+
+.dh-actions {
+  margin-top: clamp(1.25rem, 3vh, 2rem);
+  animation: dh-fade 800ms 400ms both;
+}
+
+@keyframes dh-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Pestañas de escena, con la barra de progreso de cada una */
+
+.dh-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  animation: dh-fade 800ms 500ms both;
+}
+
+.dh-tabs button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.5rem 0.2rem 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 760;
+  text-align: left;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.dh-tabs button[aria-selected="true"],
+.dh-tabs button:hover {
+  color: #fff;
+}
+
+.dh-tabs button:focus-visible {
+  outline: 3px solid var(--label-lime);
+  outline-offset: 2px;
+}
+
+.dh-tab-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.72rem;
+}
+
+.dh-tabs button[aria-selected="true"] .dh-tab-num {
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border-color: var(--label-lime);
+}
+
+.dh-tab-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.dh-tab-bar span {
+  display: block;
+  height: 100%;
+  background: var(--label-lime);
+  transition: width 100ms linear;
+}
+
+/* -------------------------------------------------------------- Teléfonos */
+
+.dh-stage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  animation: dh-fade 1000ms 200ms both;
+}
+
+.dh-switch {
+  display: none;
+}
+
+.dh-col {
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 290px;
+  margin: 0;
+}
+
+.dh-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.dh-col[data-side="good"] .dh-label {
+  color: var(--bench-graphite);
+  background: var(--label-lime);
+  border-color: var(--label-lime);
+}
+
+.dh-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: #d8432b;
+  border-radius: 50%;
+  animation: dh-blink 1.4s ease-in-out infinite;
+}
+
+.dh-col[data-side="good"] .dh-dot {
+  background: #1f9d5b;
+  animation: none;
+}
+
+@keyframes dh-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.dh-phone {
+  width: 100%;
+  height: clamp(480px, calc(100svh - var(--header-height) - 11rem), 590px);
+  padding: 9px;
+  background: linear-gradient(150deg, #2c2e32, #0d0e10);
+  border-radius: 42px;
+  box-shadow:
+    inset 0 0 0 1.5px #4a4c50,
+    0 34px 70px -22px rgba(5, 10, 40, 0.65);
+}
+
+.dh-col[data-side="bad"] .dh-phone {
+  transform: rotate(-1.5deg);
+}
+
+.dh-col[data-side="good"] .dh-phone {
+  transform: rotate(1.5deg);
+}
+
+.dh-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  color: #111;
+  background: #fff;
+  border-radius: 34px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+
+.dh-status {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 22px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dh-island {
+  width: 82px;
+  height: 24px;
+  background: #000;
+  border-radius: 14px;
+}
+
+.dh-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.6em;
+  margin: 0;
+  color: var(--graphite-soft);
+  font-size: 0.9rem;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+}
+
+.dh-result[data-done] {
+  opacity: 1;
+  transform: none;
+}
+
+.dh-col[data-side="bad"] .dh-result {
+  color: #ffc2b4;
+}
+
+.dh-col[data-side="good"] .dh-result {
+  color: var(--label-lime);
+}
+
+/* -------------------------------------------------------------- Pantallas */
+
+.ap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ap-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 14px 10px;
+  border-bottom: 1px solid #ececec;
+}
+
+.ap-bar b {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ap-count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eee;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ap-count--alert {
+  color: #fff;
+  background: #d8432b;
+}
+
+.ap-count--chat {
+  color: #fff;
+  background: #25a35a;
+}
+
+.ap-count--ok {
+  color: #127a43;
+  background: #dcf3e5;
+}
+
+.ap-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: #fff;
+  background: #9aa3ad;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.is-new {
+  animation: ap-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ap-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Lista de chats (sin Satorus) */
+
+.ap-chatlist,
+.ap-mails,
+.ap-todo,
+.ap-calllog {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.ap-chatlist li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.ap-chat-main,
+.ap-mail-main {
+  min-width: 0;
+}
+
+.ap-chat-main b,
+.ap-mail-main b {
+  display: block;
+  font-size: 13.5px;
+}
+
+.ap-chat-main small {
+  display: block;
+  overflow: hidden;
+  color: #667;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-chatlist li.is-new .ap-chat-main small {
+  color: #111;
+  font-weight: 600;
+}
+
+.ap-chat-side {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+}
+
+.ap-chat-side em,
+.ap-mails em,
+.ap-calllog em {
+  color: #8a8f96;
+  font-size: 10.5px;
+  font-style: normal;
+}
+
+.ap-chatlist li.is-new .ap-chat-side em {
+  color: #25a35a;
+  font-weight: 700;
+}
+
+.ap-chat-side i {
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  color: #fff;
+  background: #25a35a;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 800;
+  animation: ap-pop 240ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes ap-pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+/* Bandeja de correo (sin Satorus) */
+
+.ap-bar--mail b {
+  font-size: 16px;
+}
+
+.ap-mails li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 9px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.ap-avatar--mail {
+  width: 34px;
+  height: 34px;
+  background: #0f6cbd;
+  font-size: 11.5px;
+}
+
+.ap-mails li.is-unread {
+  box-shadow: inset 3px 0 0 #0f6cbd;
+}
+
+.ap-mail-main strong,
+.ap-mail-main small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-mail-main strong {
+  color: #0f6cbd;
+  font-size: 12px;
+}
+
+.ap-mail-main small {
+  color: #6b7178;
+  font-size: 11.5px;
+}
+
+/* Notificaciones que tapan la pantalla (sin Satorus) */
+
+.ap-banners {
+  position: absolute;
+  z-index: 5;
+  top: 2px;
+  right: 8px;
+  left: 8px;
+  display: grid;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.ap-banner {
+  display: grid;
+  gap: 1px;
+  padding: 9px 12px;
+  color: #111;
+  background: rgba(245, 245, 247, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  animation: ap-drop 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  backdrop-filter: blur(16px);
+}
+
+.ap-banner[data-tone="alert"] {
+  box-shadow:
+    inset 3px 0 0 #d8432b,
+    0 10px 24px -10px rgba(0, 0, 0, 0.45);
+}
+
+.ap-banner-app {
+  color: #6b7178;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ap-banner b {
+  font-size: 12.5px;
+}
+
+@keyframes ap-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.96);
+  }
+}
+
+/* Notas de presupuestos por hacer (sin Satorus) */
+
+.ap-notes {
+  background: #fffbea;
+}
+
+.ap-bar--notes {
+  margin-top: 172px;
+  border-bottom-color: #f0e6b8;
+}
+
+.ap-bar--notes b {
+  font-size: 16px;
+}
+
+.ap-todo li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3ebc6;
+  font-size: 13px;
+}
+
+.ap-todo small {
+  display: block;
+  color: #b33a24;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ap-check {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 1.5px solid #c7b878;
+  border-radius: 50%;
+}
+
+.ap-scrawl {
+  margin: 14px 16px;
+  color: #b33a24;
+  font-family: "Caveat Variable", "Segoe Print", cursive;
+  font-size: 22px;
+  font-weight: 700;
+  transform: rotate(-3deg);
+}
+
+/* Llamadas perdidas (sin Satorus) */
+
+.ap-bar--calls {
+  margin-top: 172px;
+}
+
+.ap-calllog li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f1f1;
+  color: #8a8f96;
+}
+
+.ap-calllog b {
+  display: block;
+  color: #111;
+  font-size: 13.5px;
+}
+
+.ap-calllog b.is-missed {
+  color: #d8432b;
+}
+
+.ap-calllog small {
+  display: block;
+  color: #6b7178;
+  font-size: 11.5px;
+}
+
+.ap-calllog li.is-new svg {
+  color: #d8432b;
+}
+
+/* Conversación (con Satorus) */
+
+.ap-bar--convo {
+  justify-content: flex-start;
+  gap: 10px;
+  background: #f6f6f6;
+}
+
+.ap-bar--convo .ap-avatar {
+  width: 32px;
+  height: 32px;
+  background: #e56748;
+}
+
+.ap-bar--convo b {
+  display: block;
+  font-size: 14px;
+}
+
+.ap-bar--convo small {
+  display: block;
+  color: #25a35a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ap-log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  padding: 10px 10px 14px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.ap-log::-webkit-scrollbar {
+  display: none;
+}
+
+.ap-convo .ap-log {
+  background: #efeae2;
+}
+
+.ap-day {
+  align-self: center;
+  margin: 0 0 4px;
+  padding: 2px 9px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 6px;
+  color: #555;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.ap-msg {
+  flex: none;
+  max-width: 84%;
+  margin: 0;
+  padding: 7px 9px;
+  border-radius: 10px;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+  font-size: 12.5px;
+  animation: ap-bubble 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ap-msg--client {
+  align-self: flex-start;
+  background: #fff;
+  border-top-left-radius: 3px;
+}
+
+.ap-msg--bot {
+  align-self: flex-end;
+  background: #d9fdd3;
+  border-top-right-radius: 3px;
+}
+
+.ap-msg small {
+  display: block;
+  margin-top: 3px;
+  color: #3c8a54;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: right;
+}
+
+@keyframes ap-bubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+.ap-typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.ap-typing i {
+  width: 6px;
+  height: 6px;
+  background: #6f8f78;
+  border-radius: 50%;
+  animation: ap-dot 0.8s ease-in-out infinite;
+}
+
+.ap-typing i:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.ap-typing i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes ap-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+.ap-ordercard {
+  display: grid;
+  gap: 2px;
+  min-width: 70%;
+}
+
+.ap-ordercard b {
+  font-size: 13px;
+}
+
+.ap-ordercard span {
+  color: #43514a;
+  font-size: 11.5px;
+}
+
+.ap-ordercard em {
+  margin-top: 6px;
+  padding: 6px;
+  color: #fff;
+  background: #1f9d5b;
+  border-radius: 7px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ap-sys {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  align-self: center;
+  gap: 5px;
+  margin: 4px 0 0;
+  padding: 4px 10px;
+  color: #127a43;
+  background: #dcf3e5;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  animation: ap-bubble 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Hilo de correo (con Satorus) */
+
+.ap-thread .ap-log {
+  gap: 8px;
+  background: #f4f6f9;
+}
+
+.ap-mailcard {
+  display: grid;
+  flex: none;
+  gap: 3px;
+  padding: 10px 11px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  animation: ap-bubble 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ap-mailcard b {
+  font-size: 12px;
+}
+
+.ap-mailcard strong {
+  color: #0f6cbd;
+  font-size: 11.5px;
+}
+
+.ap-mailcard p {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+.ap-mailcard--out {
+  box-shadow:
+    inset 3px 0 0 #1f9d5b,
+    0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.ap-mailcard--out b {
+  color: #127a43;
+}
+
+.ap-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  margin-top: 5px;
+  padding: 4px 8px;
+  background: #eef3fb;
+  border-radius: 6px;
+  color: #0f6cbd;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ap-drafting {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0;
+  color: #5b6168;
+  font-size: 11.5px;
+  font-style: italic;
+}
+
+.ap-spin {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #c5cad1;
+  border-top-color: #1f9d5b;
+  border-radius: 50%;
+  animation: ap-spin 800ms linear infinite;
+}
+
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Presupuesto que se rellena solo (con Satorus) */
+
+.ap-quote {
+  background: #f4f6f9;
+}
+
+.ap-bar--quote {
+  justify-content: flex-start;
+  background: #fff;
+}
+
+.ap-bar--quote b {
+  font-size: 14px;
+}
+
+.ap-doc {
+  margin: 10px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.ap-doc-head {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #d8dce1;
+  font-size: 11px;
+}
+
+.ap-doc-head span {
+  color: #6b7178;
+}
+
+.ap-doc dl {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.ap-doc dt {
+  color: #6b7178;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ap-doc dd {
+  margin: 0;
+  font-size: 12px;
+}
+
+.ap-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid #e6e8eb;
+}
+
+.ap-total b {
+  font-size: 18px;
+}
+
+.ap-steps {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+/* Avisos en la pantalla de bloqueo (con Satorus) */
+
+.ap-feed {
+  margin-top: -38px;
+  padding-top: 46px;
+  color: #fff;
+  background: linear-gradient(180deg, #31407e, #141a3a);
+}
+
+.ap-lockdate,
+.ap-lockclock {
+  margin: 0;
+  text-align: center;
+}
+
+.ap-lockdate {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.ap-lockclock {
+  font-family: var(--font-display-family);
+  font-size: 56px;
+  font-variation-settings: "wght" 700;
+  line-height: 1;
+}
+
+.ap-feedlist {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 0 8px;
+}
+
+.ap-note {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 1px 8px;
+  padding: 9px 11px;
+  color: #111;
+  background: rgba(250, 250, 252, 0.88);
+  border-radius: 16px;
+  backdrop-filter: blur(18px);
+}
+
+.ap-note.is-new {
+  animation: ap-drop 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ap-note-ic {
+  grid-row: span 3;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+.ap-note-app {
+  color: #6b7178;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ap-note em {
+  color: #8a8f96;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.ap-note b,
+.ap-note-text {
+  grid-column: 2 / -1;
+}
+
+.ap-note b {
+  font-size: 12.5px;
+}
+
+.ap-note-text {
+  font-size: 11.5px;
+}
+
+/* ------------------------------------------------------- Pantallas medianas */
+
+@media (max-width: 1100px) {
+  .dh-in {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .dh-stage {
+    width: 100%;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+}
+
+/* Móvil del visitante: sólo cabe un teléfono. Interruptor «Sin / Con
+   Satorus» que pasa solo a mitad de escena. */
+@media (max-width: 640px) {
+  /* Pestañas, interruptor y teléfono caben juntos en una pantalla: el alto
+     del teléfono sale del alto real del visor (lo que sobra tras la barra,
+     las pestañas, el interruptor y el resultado), y el ancho, de su alto. */
+  .dh {
+    --ph: clamp(380px, calc(100svh - var(--header-height) - 12.5rem), 540px);
+  }
+
+  .dh-in {
+    row-gap: 1.1rem;
+    padding-block: 2rem 1.5rem;
+  }
+
+  .dh-tabs {
+    gap: 0.3rem;
+    margin-top: 1.6rem;
+  }
+
+  .dh-tabs button {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0.2rem 0 0.6rem;
+    font-size: 0.74rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .dh-tab-num {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.68rem;
+  }
+
+  .dh-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .dh-switch {
+    display: inline-flex;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+  }
+
+  .dh-switch button {
+    min-height: 40px;
+    padding: 0 1.1rem;
+    color: var(--bench-graphite);
+    background: none;
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+
+  .dh-switch button[aria-pressed="true"] {
+    color: #fff;
+    background: #b33a24;
+  }
+
+  .dh-switch button:not([aria-pressed="true"]) {
+    color: #fff;
+  }
+
+  .dh-stage[data-side="good"] .dh-switch button[aria-pressed="true"] {
+    color: var(--bench-graphite);
+    background: var(--label-lime);
+  }
+
+  .dh-col {
+    max-width: min(330px, calc(var(--ph) * 0.62));
+  }
+
+  .dh-result {
+    min-height: 2.4em;
+    font-size: 0.82rem;
+  }
+
+  .dh-stage[data-side="bad"] .dh-col[data-side="good"],
+  .dh-stage[data-side="good"] .dh-col[data-side="bad"] {
+    display: none;
+  }
+
+  .dh-col .dh-label {
+    display: none;
+  }
+
+  .dh-phone {
+    height: var(--ph);
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-line > span,
+  .dh-lead,
+  .dh-actions,
+  .dh-tabs,
+  .dh-stage,
+  .dh-dot,
+  .is-new,
+  .ap-msg,
+  .ap-sys,
+  .ap-banner,
+  .ap-mailcard,
+  .ap-chat-side i,
+  .ap-typing i,
+  .ap-spin {
+    animation: none;
+  }
+}

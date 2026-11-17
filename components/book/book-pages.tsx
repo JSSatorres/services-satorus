@@ -289,7 +289,7 @@ function AppCard({
 }
 
 const appRight = (
-  <RightPage number={4} kicker="Capítulo 1 · Lo que construimos" title="Tu lista, convertida en una app.">
+  <RightPage number={4} kicker="Lo que construimos" title="Tu lista, convertida en una app.">
     <div className="bk-app">
       <div className="bk-app-bar" aria-hidden="true">
         <span />

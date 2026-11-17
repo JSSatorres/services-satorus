@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { ArrowRight, LoaderCircle, Mail } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
@@ -68,6 +69,7 @@ export function ContactForm() {
       }
 
       form.reset();
+      track("contacto_formulario");
       setStatus({
         kind: "success",
         message:

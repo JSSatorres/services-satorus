@@ -33,9 +33,28 @@ function canHandleSectionLink(event: MouseEvent<HTMLAnchorElement>) {
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const headerRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+
+  // Al bajar, la barra se encoge a una cápsula flotante (por CSS; en móvil, salvo con el menú abierto).
+  useEffect(() => {
+    let frame = 0
+    const update = () => {
+      frame = 0
+      setScrolled(window.scrollY > 48)
+    }
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [])
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", open)
@@ -153,6 +172,7 @@ export function SiteHeader() {
   return (
     <header
       className="site-header"
+      data-scrolled={scrolled}
       ref={headerRef}
       onKeyDown={handleMenuKeyDown}
     >

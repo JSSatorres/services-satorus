@@ -16,13 +16,14 @@ export type Spread = {
   tab: string
 }
 
+/**
+ * El cuaderno del home enseña sólo el antes y el después. El proceso, los
+ * servicios y el cierre son secciones normales de la página
+ * (`components/home/home-sections.tsx`).
+ */
 export const spreads: Spread[] = [
-  { id: "tu-mesa", tab: "El lío" },
-  { id: "tu-app", tab: "Tu app" },
-  { id: "como-trabajamos", tab: "Pasos 1 y 2" },
-  { id: "pasos-3-y-4", tab: "Pasos 3 y 4" },
-  { id: "que-hacemos", tab: "Qué hacemos" },
-  { id: "tu-siguiente-paso", tab: "Súbete" },
+  { id: "tu-mesa", tab: "Tu mesa hoy" },
+  { id: "tu-app", tab: "Con Satorus" },
 ]
 
 /** Doble página 1: chats sin contestar en el móvil. */

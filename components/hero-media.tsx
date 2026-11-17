@@ -7,10 +7,11 @@ import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-moti
 const heroImageAlt =
   "Mesa vista desde arriba con notas, un móvil y un cable naranja enredado.";
 
-/* En móvil el vídeo 1080p (4,3 MB) era el LCP: allí se sirve una versión 720p de ~0,5 MB. */
+/* El vídeo va velado detrás del titular: basta la versión 720p de ~0,5 MB en
+   todas las pantallas. La de 1080p (4,3 MB) ya no se sirve. */
 const mobileQuery = "(max-width: 767px)";
 const heroVideoSrc = {
-  desktop: "/videos/satorus-hero-loop.mp4",
+  desktop: "/videos/satorus-hero-loop-mobile.mp4",
   mobile: "/videos/satorus-hero-loop-mobile.mp4",
 };
 

@@ -4,11 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, typ
 import gsap from "gsap"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { BookCover, leftPages, rightPages } from "@/components/book/book-pages"
-import { getLenis } from "@/lib/lenis"
-import { BOOK_SPREAD_EVENT, spreads } from "@/lib/book-content"
-
-/** Tramos del recorrido: abrir el libro (1) y una unidad por doble página. */
-const UNITS = spreads.length + 1
+import { spreads } from "@/lib/book-content"
 
 /**
  * Cuándo pasa cada cosa dentro de la unidad de una doble página.
@@ -18,44 +14,30 @@ const UNITS = spreads.length + 1
  * hoja, la cámara vuelve a la izquierda siguiendo al papel.
  */
 const TIMING = {
-  desktop: { settle: [0.02, 0.42], stamp: [0.4, 0.52], pan: [0, 0], flip: [0.64, 1], rest: 0.55 },
-  mobile: { settle: [0.4, 0.6], stamp: [0.12, 0.22], pan: [0.26, 0.4], flip: [0.7, 1], rest: 0.64 },
+  wide: { settle: [0.02, 0.42], stamp: [0.4, 0.52], pan: [0, 0], flip: [0.64, 1], rest: 0.55 },
+  narrow: { settle: [0.4, 0.6], stamp: [0.12, 0.22], pan: [0.26, 0.4], flip: [0.7, 1], rest: 0.64 },
 } as const
 
-/** Última página en móvil: portada (0), y luego izquierda y derecha de cada doble página. */
-const LAST_MOBILE_PAGE = spreads.length * 2
+/** Dónde descansa la página izquierda en móvil, ya asentada y sellada. */
+const LEFT_END = 0.24
 
 /**
- * Paradas en móvil. Cada gesto, por fuerte que sea, lleva sólo a la parada
- * siguiente. Casi todas las páginas tienen una, al final de su animación
- * (asentada, sellada): el gesto pasa la página y la anima de una vez. «Tu
- * lista de problemas» tiene además una al inicio, para leer la lista antes de
- * que se tache. Posiciones dentro de cada doble página, según `TIMING.mobile`:
- * la izquierda se asienta y se sella entre 0 y 0,24; la cámara pasa a la
- * derecha hasta 0,4; la derecha se asienta hasta 0,6; la hoja gira de 0,7 a 1.
+ * Paradas: los únicos puntos en los que el cuaderno se queda quieto. `page`
+ * es lo que cuenta el contador: dobles páginas en escritorio, páginas en
+ * móvil (0 = portada).
  */
-const LEFT_START = 0.005
-const LEFT_END = 0.24
-const RIGHT_END = TIMING.mobile.rest
-/** Páginas (1…12) con parada también al inicio de su animación. */
-const PAGES_WITH_START = new Set([3])
-
 type Stop = { u: number; page: number }
-const MOBILE_STOPS: Stop[] = [{ u: 0, page: 0 }]
-for (let page = 1; page <= LAST_MOBILE_PAGE; page += 1) {
+
+const WIDE_STOPS: Stop[] = [
+  { u: 0, page: 0 },
+  ...spreads.map((_, index) => ({ u: index + 1 + TIMING.wide.rest, page: index + 1 })),
+]
+
+const NARROW_STOPS: Stop[] = [{ u: 0, page: 0 }]
+for (let page = 1; page <= spreads.length * 2; page += 1) {
   const spread = Math.ceil(page / 2)
   const left = page % 2 === 1
-  if (PAGES_WITH_START.has(page) && left) MOBILE_STOPS.push({ u: spread + LEFT_START, page })
-  MOBILE_STOPS.push({ u: spread + (left ? LEFT_END : RIGHT_END), page })
-}
-const LAST_STOP = MOBILE_STOPS.length - 1
-
-/** Página (0 portada, 1…12) a la que pertenece la parada `stop`. */
-const pageOfStop = (stop: number) => MOBILE_STOPS[stop].page
-/** Parada del final de la animación de la página `page`. */
-const endStopOf = (page: number) => {
-  const target = Math.max(0, Math.min(LAST_MOBILE_PAGE, page))
-  return MOBILE_STOPS.findLastIndex((stop) => stop.page === target)
+  NARROW_STOPS.push({ u: spread + (left ? LEFT_END : TIMING.narrow.rest), page })
 }
 
 /** Doble página abierta en `u` (1-based; 0 = portada). */
@@ -79,16 +61,16 @@ const LOOSE = [
 ] as const
 
 /**
- * Cómo se lee el libro:
- * - `scroll`: escritorio. El scroll abre el libro y pasa las hojas.
- * - `deck`: móvil en vertical. El libro ocupa una pantalla y cada gesto pasa
- *   una página, por rápido que sea: la inercia del dedo no puede saltárselo.
- * - `rotate`: móvil en horizontal. Con ~390 px de alto una página del libro
- *   tendría el texto a unos 7 px: se muestra el cuaderno cerrado y se pide
- *   girar el móvil. Al volver a vertical, el libro sigue donde estaba.
- * - `off`: movimiento reducido. Dobles páginas planas, una tras otra.
+ * Cómo se lee el cuaderno:
+ * - `wide`: escritorio. Se ven las dos páginas; un toque pasa la doble página.
+ * - `narrow`: móvil en vertical. Se ve una página; un toque pasa una página.
+ * - `rotate`: móvil en horizontal. Con ~390 px de alto una página tendría el
+ *   texto a unos 7 px: se muestra el cuaderno cerrado y se pide girar el móvil.
+ * - `off`: movimiento reducido. Páginas planas, una tras otra.
+ *
+ * En ningún modo el cuaderno toca el scroll de la página.
  */
-type Mode = "scroll" | "deck" | "rotate" | "off"
+type Mode = "wide" | "narrow" | "rotate" | "off"
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)"
 /** Móvil tumbado: no cabe una página legible. Mismo criterio en `app/layout.tsx`. */
@@ -98,7 +80,7 @@ const NARROW_QUERY = "(max-width: 900px)"
 function currentMode(): Mode {
   if (window.matchMedia(REDUCED_QUERY).matches) return "off"
   if (window.matchMedia(LANDSCAPE_PHONE_QUERY).matches) return "rotate"
-  return window.matchMedia(NARROW_QUERY).matches ? "deck" : "scroll"
+  return window.matchMedia(NARROW_QUERY).matches ? "narrow" : "wide"
 }
 
 /** El modo cambia con la pantalla (girar el móvil, reducir movimiento). */
@@ -110,8 +92,8 @@ function subscribeMode(onChange: () => void) {
   return () => queries.forEach((query) => query.removeEventListener("change", onChange))
 }
 
-/** Cuánto hay que mover el dedo para pasar una página. */
-const SWIPE_MIN = 36
+/** Cuánto hay que mover el dedo de lado para pasar una página. */
+const SWIPE_MIN = 48
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 const smooth = ([from, to]: readonly [number, number], value: number) => {
@@ -129,53 +111,44 @@ function isEditable(target: EventTarget | null) {
   )
 }
 
-/** Lleva la ventana a `y`, con el motor de scroll activo si lo hay. */
-function scrollWindowTo(y: number, duration: number, immediate = false) {
-  const lenis = getLenis()
-  if (lenis) {
-    lenis.scrollTo(y, { immediate, duration })
-  } else {
-    window.scrollTo({ top: y, behavior: immediate ? "auto" : "smooth" })
-  }
-}
-
 type Navigator = {
-  /** Anterior / siguiente: doble página en escritorio, página en móvil. */
+  /** Parada anterior / siguiente. */
   step: (direction: 1 | -1) => void
-  /** Abre la doble página `index` (0 = portada). */
+  /** Va a la parada `stop`. */
+  show: (stop: number) => void
+  /** Abre la doble página `index` (1-based; 0 = portada). */
   goTo: (index: number, immediate?: boolean) => void
 }
 
 /**
- * El home como libro. Al principio está cerrado sobre la mesa, en
- * perspectiva y lleno de papeles que asoman. Se abre y pasa las hojas: en
- * cada doble página la derecha se asienta en orden, la izquierda queda
- * sellada como «arreglado por Satorus», un papel suelto se guarda y sale una
- * pestaña en el canto. Al final el libro está limpio y con sus pestañas.
+ * El cuaderno del home: el antes («Así está tu mesa hoy») y el después («Tu
+ * lista, convertida en una app») de un negocio.
  *
- * Todo el estado sale de una sola cifra (`u`, de 0 a `UNITS`): en escritorio
- * la da el scroll; en móvil, la página a la que se ha llegado con el dedo.
- * Avanzar y retroceder son el mismo cálculo. Sin `html[data-book="on"]` el
- * libro se pinta como una sucesión de dobles páginas planas.
+ * Entra cerrado y se abre solo cuando llega a la pantalla. A partir de ahí lo
+ * maneja el visitante: un botón, un toque en la hoja, deslizar de lado o las
+ * flechas del teclado pasan la página, y la animación se reproduce a su ritmo.
+ * El scroll de la página no interviene: se puede seguir bajando en cualquier
+ * momento.
+ *
+ * Todo el estado sale de una sola cifra (`u`): 0 cerrado, 1 abierto por la
+ * primera doble página, 2 por la segunda. Sin `html[data-book="on"]` el
+ * cuaderno se pinta como páginas planas, ya pasadas a limpio.
  */
 export function Book() {
   const trackRef = useRef<HTMLElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const bookRef = useRef<HTMLDivElement>(null)
   const pagesRef = useRef<HTMLDivElement>(null)
-  const introRef = useRef<HTMLParagraphElement>(null)
-  const controlsRef = useRef<HTMLDivElement>(null)
   const leafRefs = useRef<(HTMLDivElement | null)[]>([])
   const baseRef = useRef<HTMLDivElement>(null)
   const looseRefs = useRef<(HTMLSpanElement | null)[]>([])
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const leftBoardRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<Navigator | null>(null)
-  /** Última parada leída en móvil: al girar el móvil y volver, se sigue ahí. */
-  const savedStopRef = useRef(0)
+  /** Doble página leída: al girar el móvil y volver, se sigue por ella. */
+  const savedSpreadRef = useRef(0)
   const mode = useSyncExternalStore<Mode>(subscribeMode, currentMode, () => "off")
-  const [current, setCurrent] = useState(0)
-  /** Página que se lee en móvil (`null` en escritorio, donde se ven las dos). */
-  const [mobilePage, setMobilePage] = useState<number | null>(null)
+  const [stop, setStop] = useState(0)
 
   // La marca en `<html>` activa el CSS del libro. El script previo al pintado
   // de `app/layout.tsx` la pone en la primera carga; aquí se mantiene al día
@@ -188,38 +161,35 @@ export function Book() {
   useEffect(() => {
     if (mode === "off" || mode === "rotate") return
     const track = trackRef.current
+    const stage = stageRef.current
     const book = bookRef.current
     const pages = pagesRef.current
-    if (!track || !book || !pages) return
+    if (!track || !stage || !book || !pages) return
 
     const leftBoard = leftBoardRef.current
-    const hintNode = introRef.current
-    const controlsNode = controlsRef.current
     const baseNode = baseRef.current
     const leaves = [...leafRefs.current]
     const loose = [...looseRefs.current]
     const tabs = [...tabRefs.current]
 
-    const deck = mode === "deck"
-    const timing = deck ? TIMING.mobile : TIMING.desktop
+    const narrow = mode === "narrow"
+    const timing = narrow ? TIMING.narrow : TIMING.wide
+    const stops = narrow ? NARROW_STOPS : WIDE_STOPS
+    const lastStop = stops.length - 1
+    /** Primera parada de la doble página `index` (1-based). */
+    const stopOfSpread = (index: number) =>
+      index <= 0 ? 0 : Math.min(lastStop, narrow ? index * 2 - 1 : index)
+
     let pageWidth = pages.offsetWidth / 2
     let frame = 0
     let lastVisible = ""
-    let lastCurrent = -1
-    let lastMobilePage: number | null = -1
 
-    /** En móvil `u` no sale del scroll: lo anima el paso de página. */
-    const deckState = { u: 0, stop: 0 }
-    let deckTween: gsap.core.Tween | null = null
-
-    const scrollU = () => {
-      const range = track.offsetHeight - window.innerHeight
-      return clamp01(-track.getBoundingClientRect().top / Math.max(1, range)) * UNITS
-    }
+    const state = { u: 0, stop: 0 }
+    let tween: gsap.core.Tween | null = null
 
     const render = () => {
       frame = 0
-      const u = deck ? deckState.u : scrollU()
+      const u = state.u
 
       // Abrir el libro, en dos tiempos. Primero el libro cerrado, centrado,
       // se desliza a su sitio (la portada pasa a ocupar la mitad derecha) y
@@ -240,7 +210,7 @@ export function Book() {
       spreads.forEach((_, index) => {
         const local = localAt(u, index)
         settles.push(smooth(timing.settle, local))
-        leftSettles.push(deck ? smooth([0.02, 0.2], local) : settles[index])
+        leftSettles.push(narrow ? smooth([0.02, 0.2], local) : settles[index])
         stamps.push(smooth(timing.stamp, local))
         if (index < spreads.length - 1) flips.push(smooth(timing.flip, local))
       })
@@ -281,7 +251,7 @@ export function Book() {
       // Cámara: qué parte del libro queda centrada. Cerrado, la portada
       // (media anchura del libro) ocupa el centro de la escena.
       let offset: number
-      if (deck) {
+      if (narrow) {
         let viewRight: number
         if (u < 1) {
           viewRight = 1 - cover
@@ -295,24 +265,13 @@ export function Book() {
         offset = lerp(-pageWidth / 2, 0, slide)
       }
       const bump = flips.slice(1).reduce((sum, flip) => sum + Math.sin(Math.PI * flip), 0)
-      const tilt = lerp(lerp(deck ? 30 : 36, deck ? 30 : 24, slide), deck ? 4 : 7, open) + bump * 4
+      const tilt = lerp(lerp(narrow ? 30 : 36, narrow ? 30 : 24, slide), narrow ? 4 : 7, open) + bump * 4
       const turn = lerp(lerp(-9, -4, slide), 0, open)
-      const scale = lerp(deck ? 0.82 : 0.98, 1, open)
+      const scale = lerp(narrow ? 0.82 : 0.98, 1, open)
       // El desplazamiento se mide en páginas a tamaño real; el libro cerrado
       // está a escala, así que la cámara se mueve lo mismo de escalado.
       offset *= scale
       book.style.transform = `translate3d(${offset.toFixed(1)}px, 0, 0) rotateX(${tilt.toFixed(2)}deg) rotateZ(${turn.toFixed(2)}deg) scale(${scale.toFixed(3)})`
-
-      const hint = introRef.current
-      if (hint) hint.style.opacity = (1 - smooth([0, 0.15], u)).toFixed(3)
-      const controls = controlsRef.current
-      // En móvil los botones están siempre: desde la portada, «siguiente» abre
-      // el libro. En escritorio aparecen al abrirlo con el scroll.
-      if (controls) {
-        const shown = deck ? 1 : open
-        controls.style.opacity = shown.toFixed(3)
-        controls.style.visibility = shown <= 0 ? "hidden" : "visible"
-      }
 
       // Sólo las dos caras abiertas admiten foco: el resto está debajo.
       const flipped = flips.filter((flip) => flip >= 0.5).length
@@ -327,240 +286,71 @@ export function Book() {
         })
         if (baseRef.current) baseRef.current.inert = flipped !== flips.length
       }
-
-      const page = deck ? pageOfStop(deckState.stop) : null
-      if (page !== lastMobilePage) {
-        lastMobilePage = page
-        setMobilePage(page)
-      }
-
-      const spread = spreadAt(u)
-      if (spread !== lastCurrent) {
-        lastCurrent = spread
-        setCurrent(spread)
-        window.dispatchEvent(
-          new CustomEvent(BOOK_SPREAD_EVENT, {
-            detail: spread === 0 ? null : spreads[spread - 1].id,
-          }),
-        )
-      }
     }
 
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(render)
     }
 
-    /* --- Escritorio: el scroll manda ----------------------------------- */
-
-    /** Posición de la ventana para leer en `u`. */
-    const scrollYFor = (u: number) => {
-      const top = track.getBoundingClientRect().top + window.scrollY
-      return top + (Math.min(UNITS, Math.max(0, u)) / UNITS) * (track.offsetHeight - window.innerHeight)
-    }
-
-    /* --- Móvil: cada gesto, una página --------------------------------- */
-
-    const trackTop = () => track.getBoundingClientRect().top + window.scrollY
-    const root = document.documentElement
-
-    /** Lleva el libro a la parada `stop`, animando lo que hay entre medias. */
-    const showStop = (stop: number, immediate = false) => {
-      const target = Math.max(0, Math.min(LAST_STOP, stop))
-      const distance = Math.abs(MOBILE_STOPS[target].u - deckState.u)
-      deckState.stop = target
-      savedStopRef.current = target
-      deckTween?.kill()
-      deckTween = gsap.to(deckState, {
-        u: MOBILE_STOPS[target].u,
-        duration: immediate ? 0 : Math.min(1.8, 0.55 + distance * 1.6),
+    /** Lleva el cuaderno a la parada `target`, animando lo que hay entre medias. */
+    const show = (target: number, immediate = false) => {
+      const next = Math.max(0, Math.min(lastStop, target))
+      const distance = Math.abs(stops[next].u - state.u)
+      state.stop = next
+      savedSpreadRef.current = spreadAt(stops[next].u)
+      setStop(next)
+      tween?.kill()
+      tween = gsap.to(state, {
+        u: stops[next].u,
+        duration: immediate ? 0 : Math.min(2, 0.6 + distance * 1.5),
         ease: "power2.inOut",
         onUpdate: schedule,
       })
       schedule()
     }
 
-    const canStep = (direction: 1 | -1) =>
-      direction === 1 ? deckState.stop < LAST_STOP : deckState.stop > 0
-
-    // El libro atrapa el scroll. En cuanto entra en pantalla —bajando o
-    // subiendo, despacio o con un gesto muy rápido— se fija ocupando la
-    // pantalla y el scroll queda bloqueado: sólo se lee pasando páginas. Desde
-    // arriba empieza en la portada; desde abajo, en la última página. Se sale
-    // deslizando más allá de la primera o de la última página.
-    let locked = false
-    /** Listo para atrapar: se rearma cuando el libro casi ha salido de pantalla. */
-    let armed = true
-    const CAPTURE_AT = 0.35
-    const REARM_BELOW = 0.2
-
-    const lock = () => {
-      locked = true
-      armed = false
-      root.dataset.bookLock = ""
-    }
-    const unlock = () => {
-      locked = false
-      delete root.dataset.bookLock
+    navRef.current = {
+      step: (direction) => show(state.stop + direction),
+      show: (target) => show(target),
+      goTo: (index, immediate = false) => show(stopOfSpread(index), immediate),
     }
 
-    // Barreras. En iOS la inercia de un gesto fuerte no obedece a
-    // `scrollTo`: la única forma segura de que no se salte el libro es que no
-    // haya nada más allá. Por encima del libro, lo que va después (preguntas,
-    // contacto, pie) no se pinta (`below`) y la página termina en el libro;
-    // por debajo, no se pinta la portada (`above`) y la página empieza en él.
-    // Al quitar o poner algo por encima se recoloca el scroll, sin saltos.
-    // En móvil el scroll se mueve sin Lenis: guarda la altura de la página y
-    // no dejaría pasar de ella cuando la barrera cambia lo que hay debajo.
-    const jump = (y: number) => window.scrollTo({ top: y, behavior: "instant" })
-    let gate: "below" | "above" | null = null
-    const setGate = (next: "below" | "above" | null) => {
-      if (next === gate) return
-      // Lo que desaparece o aparece por encima movería el libro. Algunos
-      // navegadores ya lo compensan solos (anclaje de scroll) y otros no: se
-      // mide dónde está el libro antes y después y se corrige sólo la
-      // diferencia que quede.
-      const before = track.getBoundingClientRect().top
-      gate = next
-      if (next) root.dataset.bookGate = next
-      else delete root.dataset.bookGate
-      const shift = track.getBoundingClientRect().top - before
-      if (Math.abs(shift) > 0.5) jump(window.scrollY + shift)
-      getLenis()?.resize()
+    // Se abre solo, una vez, cuando el cuaderno ya ocupa buena parte de la
+    // pantalla. Después manda el visitante.
+    let opened = false
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (opened || !entry.isIntersecting) return
+        opened = true
+        observer.disconnect()
+        if (state.stop === 0) show(1)
+      },
+      { threshold: 0.55 },
+    )
+
+    // Tocar la hoja pasa la página (los enlaces y botones siguen siendo suyos).
+    const onBookClick = (event: MouseEvent) => {
+      if ((event.target as Element | null)?.closest?.("a, button")) return
+      if (window.getSelection()?.toString()) return
+      if (state.stop < lastStop) show(state.stop + 1)
     }
 
-    /** Mientras se anima una salida o un enlace mueve la página: sin barreras ni capturas. */
-    let busyUntil = 0
-    let exitTween: gsap.core.Tween | null = null
-
-    /** Fija el libro en pantalla, en la parada `stop`. */
-    const enter = (stop: number) => {
-      exitTween?.kill()
-      setGate(null)
-      lock()
-      jump(trackTop())
-      showStop(stop, true)
-    }
-
-    /** Sale del libro hacia arriba (-1, a la portada de la web) o abajo (1). */
-    const exit = (direction: 1 | -1) => {
-      unlock()
-      const top = trackTop()
-      const scroller = { y: window.scrollY }
-      busyUntil = Number.POSITIVE_INFINITY
-      exitTween?.kill()
-      exitTween = gsap.to(scroller, {
-        y: direction === 1 ? top + track.offsetHeight : top - window.innerHeight * 0.9,
-        duration: 0.8,
-        ease: "power2.inOut",
-        onUpdate: () => jump(scroller.y),
-        onComplete: () => {
-          busyUntil = 0
-          onDeckScroll()
-        },
-      })
-    }
-
-    const onDeckScroll = () => {
-      const rect = track.getBoundingClientRect()
-      const vh = window.innerHeight
-      const visible = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0)) / vh
-      if (performance.now() < busyUntil) return
-      if (locked) {
-        // La inercia de un gesto rápido sigue moviendo la página después de
-        // atraparla: se devuelve a su sitio.
-        if (Math.abs(rect.top) > 1) jump(trackTop())
-        return
-      }
-      if (visible < REARM_BELOW) armed = true
-      if (armed && visible >= CAPTURE_AT) {
-        // Con barrera, el libro queda en el borde de la página: la barrera dice
-        // de dónde se viene (`above`: desde abajo, subiendo).
-        const fromBelow = gate === "above" || (gate === null && rect.top < 0)
-        enter(fromBelow ? LAST_STOP : 0)
-        return
-      }
-      setGate(rect.top >= 0 ? "below" : "above")
-    }
-
-    // Un enlace a otra sección (cabecera, «Hablemos de tu negocio») suelta el
-    // libro antes de que el enlace mueva la página. Los enlaces a historias
-    // del libro los atiende `goTo` sin soltarlo.
-    const onLinkClick = (event: MouseEvent) => {
-      const anchor = (event.target as Element | null)?.closest?.("a[href]")
-      const id = anchor?.getAttribute("href")?.split("#")[1]
-      if (!anchor || spreads.some((spread) => spread.id === id)) return
-      // El enlace lleva a su sitio sin que el libro lo pare por el camino.
-      unlock()
-      armed = false
-      exitTween?.kill()
-      setGate(null)
-      busyUntil = performance.now() + 1800
-    }
-
-    navRef.current = deck
-      ? {
-          // Las flechas pasan una página entera y la dejan asentada.
-          step: (direction) => showStop(endStopOf(pageOfStop(deckState.stop) + direction)),
-          goTo: (index, immediate = false) => {
-            const stop = endStopOf(index <= 0 ? 0 : index * 2 - 1)
-            if (locked) showStop(stop, immediate)
-            else enter(stop)
-          },
-        }
-      : {
-          step: (direction) => {
-            const target = Math.max(0, Math.min(spreads.length, spreadAt(scrollU()) + direction))
-            scrollWindowTo(scrollYFor(target <= 0 ? 0 : target + timing.rest), 1.25)
-          },
-          goTo: (index, immediate = false) => {
-            const target = Math.max(0, Math.min(spreads.length, index))
-            const distance = Math.abs(target - spreadAt(scrollU()))
-            scrollWindowTo(
-              scrollYFor(target <= 0 ? 0 : target + timing.rest),
-              0.9 + Math.min(4, distance) * 0.35,
-              immediate,
-            )
-          },
-        }
-
-    // Con el libro fijado, ningún gesto hace scroll: cada gesto, al soltar,
-    // avanza una sola parada (arriba o izquierda, adelante; abajo o derecha,
-    // atrás), por rápido que sea. Más allá de la primera o la última parada,
-    // un gesto vertical sale del libro.
+    // Deslizar de lado también. El gesto vertical es del scroll de la página.
     let touch: { x: number; y: number } | null = null
     const onTouchStart = (event: TouchEvent) => {
       touch =
-        locked && event.touches.length === 1
+        event.touches.length === 1
           ? { x: event.touches[0].clientX, y: event.touches[0].clientY }
           : null
     }
-    const onTouchMove = (event: TouchEvent) => {
-      if (locked && event.cancelable) event.preventDefault()
-    }
     const onTouchEnd = (event: TouchEvent) => {
-      if (!locked || !touch) return
+      if (!touch) return
       const end = event.changedTouches[0]
       const dx = end.clientX - touch.x
       const dy = end.clientY - touch.y
       touch = null
-      const horizontal = Math.abs(dx) > Math.abs(dy)
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN) return
-      const direction: 1 | -1 = (horizontal ? dx : dy) < 0 ? 1 : -1
-      if (canStep(direction)) showStop(deckState.stop + direction)
-      else if (!horizontal) exit(direction)
-    }
-
-    // Rueda (ventana estrecha con ratón): el mismo trato, una página por gesto.
-    let wheelLock = 0
-    const onWheel = (event: WheelEvent) => {
-      if (!locked) return
-      event.preventDefault()
-      const now = performance.now()
-      if (now < wheelLock || Math.abs(event.deltaY) < 4) return
-      wheelLock = now + 650
-      const direction: 1 | -1 = event.deltaY > 0 ? 1 : -1
-      if (canStep(direction)) showStop(deckState.stop + direction)
-      else exit(direction)
+      if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy) * 1.5) return
+      show(state.stop + (dx < 0 ? 1 : -1))
     }
 
     const onResize = () => {
@@ -568,52 +358,37 @@ export function Book() {
       schedule()
     }
 
-    render()
-    window.addEventListener("resize", onResize)
-    if (deck) {
-      // Lenis no debe suavizar la rueda sobre el libro: la gestiona el libro.
-      track.dataset.lenisPrevent = ""
-      window.addEventListener("scroll", onDeckScroll, { passive: true })
-      document.addEventListener("touchstart", onTouchStart, { passive: true })
-      document.addEventListener("touchmove", onTouchMove, { passive: false })
-      document.addEventListener("touchend", onTouchEnd)
-      window.addEventListener("wheel", onWheel, { passive: false })
-      document.addEventListener("click", onLinkClick, true)
-      // Volviendo de horizontal con el libro en pantalla: se sigue por la
-      // página en la que se estaba.
-      const rect = track.getBoundingClientRect()
-      const visible = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0))
-      if (savedStopRef.current > 0 && visible >= window.innerHeight * CAPTURE_AT) enter(savedStopRef.current)
-      else onDeckScroll()
+    // Entrada con `/#tu-app`, o vuelta de horizontal: abierto por su página.
+    const hashIndex = spreads.findIndex((spread) => spread.id === window.location.hash.slice(1))
+    const startSpread = hashIndex >= 0 ? hashIndex + 1 : savedSpreadRef.current
+    if (startSpread > 0) {
+      opened = true
+      show(stopOfSpread(startSpread), true)
     } else {
-      window.addEventListener("scroll", schedule, { passive: true })
+      render()
+      observer.observe(stage)
     }
+
+    window.addEventListener("resize", onResize)
+    book.addEventListener("click", onBookClick)
+    book.addEventListener("touchstart", onTouchStart, { passive: true })
+    book.addEventListener("touchend", onTouchEnd, { passive: true })
 
     return () => {
       window.cancelAnimationFrame(frame)
-      deckTween?.kill()
+      tween?.kill()
+      observer.disconnect()
       navRef.current = null
-      exitTween?.kill()
-      unlock()
-      setGate(null)
       window.removeEventListener("resize", onResize)
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("scroll", onDeckScroll)
-      document.removeEventListener("touchstart", onTouchStart)
-      document.removeEventListener("touchmove", onTouchMove)
-      document.removeEventListener("touchend", onTouchEnd)
-      window.removeEventListener("wheel", onWheel)
-      document.removeEventListener("click", onLinkClick, true)
-      delete track.dataset.lenisPrevent
+      book.removeEventListener("click", onBookClick)
+      book.removeEventListener("touchstart", onTouchStart)
+      book.removeEventListener("touchend", onTouchEnd)
 
       // Al cambiar de modo (girar el móvil) no puede quedar nada del anterior:
       // el libro plano no lleva giros, transformaciones ni caras inertes.
       book.style.removeProperty("transform")
       pages.style.removeProperty("--open")
       leftBoard?.style.removeProperty("opacity")
-      hintNode?.style.removeProperty("opacity")
-      controlsNode?.style.removeProperty("opacity")
-      controlsNode?.style.removeProperty("visibility")
       leaves.forEach((leaf) => {
         leaf?.removeAttribute("style")
         leaf?.querySelectorAll<HTMLElement>(".bk-face").forEach((face) => {
@@ -627,71 +402,55 @@ export function Book() {
       }
       loose.forEach((paper) => paper?.style.removeProperty("--t"))
       tabs.forEach((tab) => tab?.style.removeProperty("--t"))
-      setMobilePage(null)
+      setStop(0)
     }
   }, [mode])
 
-  // Enlaces `#historia` (cabecera, pestañas) y flechas del teclado.
+  // Flechas del teclado, con el cuaderno en pantalla.
   useEffect(() => {
     if (mode === "off" || mode === "rotate") return
-
-    const indexOf = (href: string | null) => {
-      const id = href?.split("#")[1]
-      const index = spreads.findIndex((spread) => spread.id === id)
-      return index < 0 ? -1 : index + 1
-    }
-
-    const onClick = (event: MouseEvent) => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-      const anchor = (event.target as Element | null)?.closest?.("a[href*='#']")
-      const href = anchor?.getAttribute("href") ?? null
-      if (!href || !(href.startsWith("#") || href.startsWith("/#"))) return
-      const index = indexOf(href)
-      if (index < 0) return
-      event.preventDefault()
-      window.history.pushState(null, "", `#${spreads[index - 1].id}`)
-      navRef.current?.goTo(index)
-    }
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return
       if (isEditable(event.target)) return
-      const rect = trackRef.current?.getBoundingClientRect()
+      const rect = stageRef.current?.getBoundingClientRect()
       if (!rect || rect.bottom < window.innerHeight * 0.5 || rect.top > window.innerHeight * 0.5) return
       event.preventDefault()
       navRef.current?.step(event.key === "ArrowRight" ? 1 : -1)
     }
 
-    document.addEventListener("click", onClick, true)
     window.addEventListener("keydown", onKeyDown)
-    return () => {
-      document.removeEventListener("click", onClick, true)
-      window.removeEventListener("keydown", onKeyDown)
-    }
+    return () => window.removeEventListener("keydown", onKeyDown)
   }, [mode])
 
-  // Entrada con `/#historia`: el libro se abre ya por esa página.
-  useEffect(() => {
-    if (mode === "off" || mode === "rotate") return
-    const id = window.location.hash.slice(1)
-    const index = spreads.findIndex((spread) => spread.id === id)
-    if (index >= 0) window.requestAnimationFrame(() => navRef.current?.goTo(index + 1, true))
-  }, [mode])
+  const narrow = mode === "narrow"
+  const stops = narrow ? NARROW_STOPS : WIDE_STOPS
+  const lastStop = stops.length - 1
+  const safeStop = Math.min(stop, lastStop)
+  const page = stops[safeStop].page
+  const total = stops[lastStop].page
+  const spreadShown = spreadAt(stops[safeStop].u)
+  const atEnd = safeStop >= lastStop
 
-  // En móvil se cuenta por páginas (se pasa de una en una); en escritorio,
-  // por dobles páginas.
-  const position = mobilePage ?? current
-  const total = mobilePage === null ? spreads.length : LAST_MOBILE_PAGE
-  const spreadShown = mobilePage === null ? current : Math.ceil(mobilePage / 2)
-  const label = spreadShown === 0 ? "Portada" : spreads[spreadShown - 1].tab
+  let nextLabel = "Pasar página"
+  if (safeStop === 0) nextLabel = "Abrir el cuaderno"
+  else if (atEnd) nextLabel = "Volver a empezar"
+  else if (spreadAt(stops[safeStop + 1].u) > spreadShown) nextLabel = "Ver cómo queda"
 
   return (
-    <section
-      className="bk"
-      ref={trackRef}
-      aria-label="El cuaderno de tu negocio"
-      style={{ "--units": UNITS } as CSSProperties}
-    >
+    <section className="bk bk--tap" ref={trackRef} aria-labelledby="cuaderno-title">
+      <header className="bk-head">
+        <div>
+          <p className="hs-kicker">
+            <span>El cuaderno de tu negocio</span>
+          </p>
+          <h2 className="hs-title" id="cuaderno-title">
+            Del lío de hoy a una herramienta hecha para ti.
+          </h2>
+        </div>
+        <p className="hs-lead">Toca la hoja o el botón naranja para pasar la página y ver cómo queda.</p>
+      </header>
+
       {/* Móvil en horizontal: no cabe una página legible. */}
       <div className="bk-rotate" aria-live="polite">
         <div className="bk-rotate-book" aria-hidden="true">
@@ -700,11 +459,11 @@ export function Book() {
         <div className="bk-rotate-copy">
           <p className="bk-rotate-title">Gira el móvil para leer el cuaderno</p>
           <p>El cuaderno de tu negocio se lee en vertical, página a página.</p>
-          <p className="bk-rotate-hint">O sigue bajando: preguntas y contacto ↓</p>
+          <p className="bk-rotate-hint">O sigue bajando: cómo trabajamos y contacto ↓</p>
         </div>
       </div>
 
-      <div className="bk-stage">
+      <div className="bk-stage" ref={stageRef}>
         <div className="bk-scene">
           <div className="bk-book" ref={bookRef}>
             <div className="bk-board bk-board--right" aria-hidden="true" />
@@ -724,17 +483,22 @@ export function Book() {
                 />
               ))}
 
-              <nav className="bk-tabs" aria-label="Historias del cuaderno">
+              <nav className="bk-tabs" aria-label="Páginas del cuaderno">
                 {spreads.map((spread, index) => (
                   <a
                     key={spread.id}
                     href={`#${spread.id}`}
                     data-tone={index % 3}
-                    aria-current={current === index + 1 ? "page" : undefined}
+                    aria-current={spreadShown === index + 1 ? "page" : undefined}
                     ref={(element) => {
                       tabRefs.current[index] = element
                     }}
                     style={{ top: `${6 + index * 15}%` } as CSSProperties}
+                    onClick={(event) => {
+                      if (!navRef.current) return
+                      event.preventDefault()
+                      navRef.current.goTo(index + 1)
+                    }}
                   >
                     {spread.tab}
                   </a>
@@ -767,32 +531,27 @@ export function Book() {
           </div>
         </div>
 
-        <p className="bk-hint" ref={introRef} aria-hidden="true">
-          {mode === "deck" ? "Desliza para abrirlo" : "Baja para abrirlo"}
-          <span>{mode === "deck" ? "↑" : "↓"}</span>
-        </p>
-
-        <div className="bk-controls" ref={controlsRef}>
+        <div className="bk-controls">
           <button
             type="button"
             onClick={() => navRef.current?.step(-1)}
-            disabled={position <= 0}
+            disabled={safeStop <= 0}
             aria-label="Página anterior"
           >
             <ArrowLeft aria-hidden="true" size={20} />
           </button>
           <p aria-live="polite">
-            <b>
-              {String(position).padStart(2, "0")} / {String(total).padStart(2, "0")}
-            </b>
-            <span className="bk-controls-label"> {label}</span>
+            <b>{page === 0 ? "Portada" : `${page} / ${total}`}</b>
+            {spreadShown > 0 ? (
+              <span className="bk-controls-label"> {spreads[spreadShown - 1].tab}</span>
+            ) : null}
           </p>
           <button
             type="button"
-            onClick={() => navRef.current?.step(1)}
-            disabled={position >= total}
-            aria-label="Página siguiente"
+            className="bk-next"
+            onClick={() => (atEnd ? navRef.current?.show(1) : navRef.current?.step(1))}
           >
+            {nextLabel}
             <ArrowRight aria-hidden="true" size={20} />
           </button>
         </div>

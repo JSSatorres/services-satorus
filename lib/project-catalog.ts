@@ -24,7 +24,7 @@ export type ProjectCatalogItem = {
   imageAlt: string;
   imageFit?: "contain";
   details: ProjectVisualDetail[];
-  accent: "blue" | "orange" | "lime" | "cyan" | "rose" | "green";
+  accent: "blue" | "orange" | "lime" | "cyan" | "rose" | "green" | "gold";
   /** Módulos que se enseñan como chips bajo el relato: marcan un proyecto destacado. */
   highlights?: string[];
   /** La captura es vertical (móvil): se muestra entera sobre su color, sin recortar. */
@@ -116,13 +116,37 @@ export const appProjects: ProjectCatalogItem[] = [
     improvement: "La semana del club se puede consultar sin perseguir sesiones y documentos por separado.",
     reason: "Reunir la información por equipos y sedes facilita preparar el trabajo cotidiano.",
     href: "https://manage-sport-app.vercel.app/",
-    image: "/projects/sportapp/club-manager-relieved.webp",
-    imageAlt: "Responsable de un club deportivo sonríe mientras organiza la semana en una tablet junto al campo",
+    image: "/projects/sportapp/panel-2026.webp",
+    imageAlt: "Panel de rendimiento de SportApp con las sesiones de la semana por equipo, la asistencia y los documentos recientes del club",
     details: [
-      { image: "/projects/sportapp/nueva-sesion.png", alt: "Formulario de SportApp para planificar una nueva sesión de entrenamiento", label: "Sesiones en un mismo lugar" },
-      { image: "/projects/sportapp/documentos.png", alt: "Listado de documentos de SportApp asociado a las sedes y equipos", label: "Documentos por sede y equipo" },
+      { image: "/projects/sportapp/sesion-pizarra-2026.webp", alt: "Sesión de entrenamiento en SportApp: bloques con sus minutos y la pizarra con la jugada en la pista", label: "Cada sesión, con su pizarra" },
+      { image: "/projects/sportapp/panel-movil-2026.webp", alt: "Panel de SportApp en el móvil con la semana y las sesiones del día", label: "También en el móvil", portrait: true },
     ],
     accent: "orange",
+  },
+  {
+    slug: "oleoden-portal",
+    kind: "app",
+    name: "Portal Oleoden",
+    eyebrow: "Encargo a medida · Laboratorio dental",
+    status: "Proyecto para cliente",
+    client: { name: "Oleoden", url: "https://www.oleoden.com/", domain: "oleoden.com" },
+    summary:
+      "Junto a su web, Oleoden necesitaba algo más: que cada clínica pudiera seguir sus trabajos sin tener que llamar. Le construimos un portal privado donde la clínica pide, adjunta archivos y ve en qué punto está cada caso, a cualquier hora.",
+    storyLabels: ["Lo que nos pidió", "Lo que construimos", "Por qué a medida"],
+    challenge: "Dar a las clínicas visibilidad de cada trabajo sin perder el trato cercano del teléfono.",
+    improvement: "Un portal propio con pedidos, estados en tiempo real, escaneos y fotos del caso, historial y facturas, en escritorio y en móvil.",
+    reason: "Un laboratorio de alta estética no encaja en un software genérico: el portal sigue su forma de trabajar, del pedido al envío.",
+    href: "https://www.oleoden.com/#portal",
+    image: "/projects/oleoden-portal/portal-v2-desktop.webp",
+    mobileImage: "/projects/oleoden-portal/portal-mobile.webp",
+    imageAlt: "Portal de clínicas de Oleoden en escritorio, con la lista de pedidos y el detalle de un caso, junto a un móvil con la misma lista",
+    details: [
+      { image: "/projects/oleoden-portal/seguimiento-pedido.webp", alt: "Detalle de un pedido en el portal de Oleoden con su progreso, fecha de entrega e importe", label: "Cada caso, paso a paso" },
+      { image: "/projects/oleoden-portal/formulario-pedido.webp", alt: "Formulario de nuevo pedido del portal de clínicas de Oleoden", label: "Pedidos en un minuto" },
+    ],
+    accent: "gold",
+    highlights: ["Pedidos online", "Estado en tiempo real", "Escaneos y fotos", "Historial del caso", "Facturas", "Versión móvil"],
   },
 ];
 
@@ -170,7 +194,29 @@ export const webProjects: ProjectCatalogItem[] = [
       { image: "/projects/enrolla2/opiniones-desktop.png", alt: "Opiniones de clientes de Enrolla2 publicadas en Google", label: "Opiniones en Google" },
     ],
     accent: "rose",
-    domain: "enrolla2.es · Valencia",
+    domain: "enrolla2.com · Valencia",
+  },
+  {
+    slug: "oleoden",
+    kind: "web",
+    name: "Oleoden",
+    eyebrow: "Laboratorio dental · Granada",
+    status: "Web corporativa",
+    summary:
+      "Una web a la altura de lo que fabrica: prótesis dental fija de alta estética presentada con calma, detalle y un camino directo para que la clínica pida información.",
+    challenge: "Que una clínica perciba la calidad del laboratorio antes de enviarle su primer caso.",
+    improvement: "Servicios, valores y el acceso al portal de clínicas se recorren como una sola historia, con el mismo cuidado que cada pieza.",
+    reason: "En alta estética el detalle lo es todo: fotografía de producto, tipografía fina y dorado sobrio para que la web transmita oficio, no catálogo.",
+    href: "https://www.oleoden.com/",
+    image: "/projects/oleoden/hero-desktop.webp",
+    imageAlt: "Portada de la web de Oleoden con coronas dentales sobre fondo oscuro y el titular «Prótesis dental fija de alta estética»",
+    details: [
+      { image: "/projects/oleoden/hero-mobile.webp", alt: "Web de Oleoden vista en móvil", label: "También en móvil", portrait: true },
+      { image: "/projects/oleoden/servicios.webp", alt: "Sección de servicios de Oleoden con fotografías de carillas, coronas e implantes", label: "Servicios con fotografía propia" },
+      { image: "/projects/oleoden/mapa-envios.webp", alt: "Mapa en relieve de España con Granada marcada, de la sección de envíos de Oleoden", label: "Envíos a toda España" },
+    ],
+    accent: "gold",
+    domain: "oleoden.com · Granada",
   },
 ];
 

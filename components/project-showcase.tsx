@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Boxes, Globe2 } from "lucide-react";
@@ -77,6 +77,118 @@ function LectorLanguagePairs() {
         <span className={styles.languagePlus} aria-hidden="true">+</span>
         <span className={styles.languageChoice}><i className={styles.flagMexico} aria-hidden="true" /><span><strong>Español</strong><small>México</small></span></span>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Portátil en 3D, sólo con CSS: tapa con marco, cámara y reflejo, y base con
+ * teclado (teclas de verdad, quietas y nítidas) y trackpad tumbada en
+ * perspectiva, girado en oblicuo. Se inclina hacia el ratón y el reflejo de la
+ * pantalla le sigue; no flota, para que el teclado no tiemble al redibujarse.
+ * La captura va dentro de la pantalla (los hijos), así que la deriva y el
+ * relevo de la vitrina siguen funcionando igual.
+ */
+function LaptopScene({ children, extras }: { children: ReactNode; extras?: ReactNode }) {
+  const laptopRef = useRef<HTMLDivElement>(null);
+
+  const onMove = (event: PointerEvent<HTMLDivElement>) => {
+    const laptop = laptopRef.current;
+    if (!laptop || event.pointerType === "touch") return;
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - box.left) / box.width - 0.5;
+    const y = (event.clientY - box.top) / box.height - 0.5;
+    laptop.style.setProperty("--ry", `${-12 + x * 14}deg`);
+    laptop.style.setProperty("--rx", `${12 - y * 8}deg`);
+    laptop.style.setProperty("--glare-x", `${50 + x * 60}%`);
+    event.currentTarget.style.setProperty("--px", x.toFixed(3));
+    event.currentTarget.style.setProperty("--py", y.toFixed(3));
+  };
+  const onLeave = (event: PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.style.removeProperty("--px");
+    event.currentTarget.style.removeProperty("--py");
+    const laptop = laptopRef.current;
+    if (!laptop) return;
+    laptop.style.removeProperty("--ry");
+    laptop.style.removeProperty("--rx");
+    laptop.style.removeProperty("--glare-x");
+  };
+
+  return (
+    <div className={styles.laptopScene} onPointerMove={onMove} onPointerLeave={onLeave}>
+      <div className={styles.laptopFloat}>
+        <div className={styles.laptop} ref={laptopRef}>
+          <div className={styles.laptopLid}>
+            <span className={styles.laptopCamera} aria-hidden="true" />
+            <div className={styles.laptopScreen}>
+              {children}
+              <span className={styles.laptopGlare} aria-hidden="true" />
+            </div>
+          </div>
+          <div className={styles.laptopBase} aria-hidden="true">
+            <span className={styles.laptopKeys}>
+              {Array.from({ length: 52 }, (_, index) => (
+                <i key={index} />
+              ))}
+              <i />
+              <i />
+              <i />
+              <i className={styles.laptopSpace} />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className={styles.laptopPad} />
+          </div>
+          <span className={styles.laptopShadow} aria-hidden="true" />
+        </div>
+      </div>
+      {extras}
+    </div>
+  );
+}
+
+/**
+ * Las fotos pequeñas de cada proyecto, flotando alrededor del portátil (sólo
+ * escritorio): las verticales en un marco de móvil, las horizontales como
+ * tarjetas con su pie. Cada una a su profundidad, así que con el ratón se
+ * desplazan a distinto ritmo que el portátil.
+ */
+function FloatingDetails({ project }: { project: ProjectCatalogItem }) {
+  if (project.slug === "lector-bilingue") {
+    return (
+      <div className={styles.floats} aria-label={`Detalles de ${project.name}`}>
+        <figure className={styles.floatCard} data-slot="1">
+          <div className={styles.floatCustom}>
+            <LectorScreenCollage />
+          </div>
+          <figcaption>Biblioteca · Lectura · Traducción</figcaption>
+        </figure>
+        <figure className={styles.floatCard} data-slot="2">
+          <div className={styles.floatCustom}>
+            <LectorLanguagePairs />
+          </div>
+          <figcaption>Idiomas en pareja</figcaption>
+        </figure>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.floats} aria-label={`Detalles de ${project.name}`}>
+      {project.details.slice(0, 3).map((detail, index) => (
+        <figure
+          key={detail.image}
+          className={styles.floatCard}
+          data-slot={index + 1}
+          data-portrait={detail.portrait || undefined}
+        >
+          <div className={styles.floatMedia} data-focus={detail.focus}>
+            <Image src={detail.image} alt={detail.alt} fill sizes="14rem" />
+          </div>
+          {detail.portrait ? null : <figcaption>{detail.label}</figcaption>}
+        </figure>
+      ))}
     </div>
   );
 }
@@ -162,7 +274,11 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
           const driftOf = (index: number) =>
             side && frameBoxes[index]?.dataset.fit !== "contain" && frameBoxes[index]?.dataset.imageFit !== "contain" ? DRIFT : 0;
 
-          gsap.set(clips, { clipPath: "inset(0px)" });
+          // En móvil el recorte deja margen a los lados y por abajo: el portátil
+          // sobresale de su hueco como un objeto de verdad, sin cortarse.
+          const clipRest = side ? "inset(0% 0% 0% 0%)" : "inset(0% -14% -18% -14%)";
+          const clipGone = side ? "inset(0% 0% 100% 0%)" : "inset(0% -14% 100% -14%)";
+          gsap.set(clips, { clipPath: clipRest });
           images.forEach((image, index) => {
             if (image) gsap.set(image, {
               scale: driftOf(index) ? MEDIA_SCALE : 1,
@@ -220,7 +336,7 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 .to(
                   clip,
                   {
-                    clipPath: "inset(0px 0px 100%)",
+                    clipPath: clipGone,
                     duration: SWAP,
                     ease: "power2.inOut",
                   },
@@ -365,69 +481,32 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                 className={styles.frame}
                 data-accent={project.accent}
                 data-project={project.slug}
+                data-kind={project.kind}
                 data-fit={project.portrait ? "contain" : undefined}
                 data-image-fit={project.imageFit}
                 style={{ "--order": index, zIndex: items.length - index } as CSSProperties}
               >
                 <div className={styles.frameClip}>
                   <div className={styles.visualEnsemble}>
-                    <div className={styles.primaryVisual}>
-                      {project.kind === "web" && (
-                        <div className={styles.browserBar} aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
-                          <span>{project.domain}</span>
-                        </div>
-                      )}
-                      {project.slug === "pidoteca" ? (
-                        <PidotecaJourneyScene compact />
-                      ) : (
-                        <div className={styles.frameMedia}>
-                          <Image
-                            src={project.image}
-                            alt={project.imageAlt}
-                            fill
-                            sizes="(max-width: 860px) 100vw, 42rem"
-                            className={project.mobileImage ? styles.desktopImage : undefined}
-                          />
-                          {project.mobileImage && (
-                            <Image
-                              src={project.mobileImage}
-                              alt={project.imageAlt}
-                              fill
-                              sizes="(max-width: 860px) 100vw, 42rem"
-                              className={styles.mobileImage}
-                            />
+                    <div className={styles.primaryVisual} data-device="laptop">
+                      <div className={styles.laptopHolder}>
+                        <LaptopScene extras={<FloatingDetails project={project} />}>
+                          {project.slug === "pidoteca" ? (
+                            <div className={styles.screenScene}>
+                              <PidotecaJourneyScene compact />
+                            </div>
+                          ) : (
+                            <div className={styles.frameMedia}>
+                              <Image
+                                src={project.image}
+                                alt={project.imageAlt}
+                                fill
+                                sizes="(max-width: 860px) 90vw, 34rem"
+                              />
+                            </div>
                           )}
-                        </div>
-                      )}
-                    </div>
-                    <div className={styles.detailRow} data-count={project.details.length}>
-                      {project.slug === "lector-bilingue" ? (
-                        <>
-                          <div className={styles.detailShot}>
-                            <LectorScreenCollage />
-                            <span className={styles.detailCaption}>Biblioteca · Lectura · Traducción</span>
-                          </div>
-                          <div className={styles.detailShot}>
-                            <LectorLanguagePairs />
-                            <span className={styles.detailCaption}>Idiomas en pareja</span>
-                          </div>
-                        </>
-                      ) : project.details.map((detail) => (
-                        <div className={styles.detailShot} key={detail.image}>
-                          <div className={styles.detailMedia} data-fit={detail.portrait ? "contain" : undefined} data-focus={detail.focus}>
-                            <Image
-                              src={detail.image}
-                              alt={detail.alt}
-                              fill
-                              sizes="(max-width: 860px) 80vw, 19rem"
-                            />
-                          </div>
-                          <span className={styles.detailCaption}>{detail.label}</span>
-                        </div>
-                      ))}
+                        </LaptopScene>
+                      </div>
                     </div>
                   </div>
                 </div>

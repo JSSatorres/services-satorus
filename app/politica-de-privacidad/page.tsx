@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         </Link>
         <article className="legal-article">
           <h1>Política de privacidad</h1>
-          <p className="legal-updated">Última actualización: octubre de 2026</p>
+          <p className="legal-updated">Última actualización: noviembre de 2026</p>
 
           <section>
             <h2>1. Responsable del tratamiento</h2>
@@ -208,6 +208,12 @@ export default function PrivacyPage() {
               necesarias para el funcionamiento del sitio. No se utilizan cookies
               de rastreo, analítica o publicidad de terceros que requieran
               consentimiento.
+            </p>
+            <p>
+              Para saber cuántas visitas recibe la web y qué enlaces de contacto
+              se usan, empleamos Vercel Web Analytics. Esta herramienta no
+              utiliza cookies y solo ofrece datos agregados, que no permiten
+              identificar a ninguna persona.
             </p>
           </section>
         </article>
