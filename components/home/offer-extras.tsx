@@ -8,6 +8,7 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-motion"
+import { playSound } from "@/lib/sound/engine"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -188,6 +189,9 @@ export function ProjectsCta({ href = "/productos" }: { href?: string }) {
   const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (reduce || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
     event.preventDefault()
+    // Sonido: el velo naranja se abre con aire y llega con un golpe suave.
+    playSound("whoosh")
+    window.setTimeout(() => playSound("snap", { volume: 0.7 }), 520)
     const veil = document.createElement("div")
     veil.className = "pc-veil"
     veil.style.setProperty("--x", `${event.clientX}px`)

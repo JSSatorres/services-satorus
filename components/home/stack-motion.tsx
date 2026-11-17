@@ -4,6 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
+import { playScrolled } from "@/lib/sound/gsap"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -34,7 +35,15 @@ export function OfferStack({ children, className }: { children: ReactNode; class
               scale: 0.94 + index * 0.012,
               "--dim": 0.1,
               ease: "none",
-              scrollTrigger: { trigger: next, start: "top 85%", end: "top 25%", scrub: true },
+              scrollTrigger: {
+                trigger: next,
+                start: "top 85%",
+                end: "top 25%",
+                scrub: true,
+                // Sonido: carta que cae sobre el mazo al llegar la siguiente.
+                onEnter: (self) => playScrolled("card", self.direction),
+                onLeaveBack: (self) => playScrolled("card", self.direction),
+              },
             },
           )
         })

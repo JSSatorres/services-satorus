@@ -3,6 +3,7 @@
 import { track } from "@vercel/analytics";
 import { ArrowRight, LoaderCircle, Mail } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { playSound } from "@/lib/sound/engine";
 
 type FormStatus =
   | { kind: "idle" }
@@ -70,6 +71,7 @@ export function ContactForm() {
 
       form.reset();
       track("contacto_formulario");
+      playSound("notify", { note: 5 });
       setStatus({
         kind: "success",
         message:

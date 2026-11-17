@@ -10,6 +10,7 @@ import { useGSAP } from "@gsap/react";
 import type { ProjectCatalogItem } from "@/lib/project-catalog";
 import { PidotecaJourneyScene } from "@/components/pidoteca-journey-scene";
 import styles from "./project-showcase.module.css";
+import { cue } from "@/lib/sound/gsap";
 
 type ProjectShowcaseProps = {
   id: string;
@@ -342,6 +343,8 @@ export function ProjectShowcase({ id, eyebrow, title, lead, items }: ProjectShow
                   },
                   HOLD,
                 );
+            // Sonido: una pasada de aire en cada relevo de proyecto.
+            cue(swap, HOLD + 0.04, "swap");
             const currentImage = images[index];
             const nextImage = images[index + 1];
             if (currentImage) swap.to(currentImage, { yPercent: -driftOf(index), duration: STEP }, 0);

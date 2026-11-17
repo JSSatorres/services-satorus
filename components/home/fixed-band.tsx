@@ -5,6 +5,8 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { BackdropVideo } from "@/components/home/backdrop-video"
+import { playScrolled } from "@/lib/sound/gsap"
+import { playSound } from "@/lib/sound/engine"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -42,7 +44,14 @@ export function FixedBand({
             autoAlpha: 1,
             filter: "blur(0px)",
             ease: "power2.out",
-            scrollTrigger: { trigger: root.current, start: "top 85%", end: "top 5%", scrub: 0.6 },
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top 85%",
+              end: "top 5%",
+              scrub: 0.6,
+              // Sonido: el texto entra con un soplo de aire.
+              onEnter: (self) => playScrolled("whoosh", self.direction, { volume: 0.55 }),
+            },
           },
         )
         gsap.to(q(".fw-copy-in"), {
@@ -80,7 +89,21 @@ export function FloatingWords({ words, className }: { words: string[]; className
     () => {
       const mm = gsap.matchMedia()
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>(".fl-word", root.current).forEach((word, index) => {
+        const words = gsap.utils.toArray<HTMLElement>(".fl-word", root.current)
+        // Sonido: al llegar, una campana por palabra, en escalera.
+        const timers: number[] = []
+        ScrollTrigger.create({
+          trigger: root.current,
+          start: "top 60%",
+          onEnter: () => {
+            words.forEach((_, index) => {
+              timers.push(
+                window.setTimeout(() => playSound("chime", { note: [5, 7, 9, 12][index % 4], volume: 0.65 }), index * 240),
+              )
+            })
+          },
+        })
+        words.forEach((word, index) => {
           const amount = window.innerWidth < 900 ? 0.6 : 1
           const depth = [1, -0.6, 1.4, -1.1, 0.7, -1.3][index % 6] * amount
           gsap.fromTo(
@@ -94,6 +117,7 @@ export function FloatingWords({ words, className }: { words: string[]; className
             },
           )
         })
+        return () => timers.forEach((timer) => window.clearTimeout(timer))
       })
       return () => mm.revert()
     },

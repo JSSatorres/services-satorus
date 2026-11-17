@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react"
 import { BrandLogo } from "@/components/brand-logo"
 import { RollLabel } from "@/components/roll-label"
+import { SoundToggle } from "@/components/sound/sound-toggle"
 import { BOOK_SPREAD_EVENT } from "@/lib/book-content"
 import { scrollToSection } from "@/lib/lenis"
 
@@ -207,6 +208,8 @@ export function SiteHeader() {
       </nav>
 
       <div className="header-actions">
+        <SoundToggle />
+
         <Link
           className="header-secondary-cta"
           href="/productos"

@@ -1,4 +1,5 @@
 import type Lenis from "lenis";
+import { hushSound, releaseHush } from "@/lib/sound/engine";
 
 let instance: Lenis | null = null;
 
@@ -34,8 +35,10 @@ export function jumpToScrollTop(top: number) {
 export function scrollToSection(section: HTMLElement) {
   const margin = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
   const lenis = getLenis();
+  // El salto cruza varias secciones de golpe: sin silencio sonarían todas a la vez.
+  hushSound(4000);
   if (lenis) {
-    lenis.scrollTo(section, { offset: -margin });
+    lenis.scrollTo(section, { offset: -margin, onComplete: releaseHush });
     return;
   }
 

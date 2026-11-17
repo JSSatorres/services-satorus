@@ -15,6 +15,7 @@ import { MotionProvider } from "@/components/motion-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { CompanyChat } from "@/components/company-chat";
 import { AnalyticsEvents } from "@/components/analytics-events";
+import { SoundEffects } from "@/components/sound/sound-effects";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 import { jsonLdScript, organizationJsonLd } from "@/lib/structured-data";
 
@@ -103,6 +104,7 @@ export default function RootLayout({
           Saltar al contenido
         </a>
         <SmoothScroll />
+        <SoundEffects />
         <MaskedHeadings />
         <MotionProvider>{children}</MotionProvider>
         <CompanyChat />

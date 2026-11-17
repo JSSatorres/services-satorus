@@ -5663,3 +5663,112 @@ html[data-hero-motion="prepare"]
     transition: none;
   }
 }
+
+/* ------------------------------------------------------- Altavoz (sonido) */
+
+.sound-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--bench-graphite);
+  background: transparent;
+  border: 1px solid var(--bench-graphite);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sound-toggle:hover {
+  background: var(--label-lime);
+}
+
+.sound-toggle:active {
+  transform: scale(0.92);
+}
+
+.sound-toggle:focus-visible {
+  outline: 2px solid var(--action-orange);
+  outline-offset: 3px;
+}
+
+.sound-toggle[data-on] {
+  color: var(--cool-paper);
+  background: var(--bench-graphite);
+}
+
+.sound-toggle[data-on] svg {
+  opacity: 0;
+}
+
+/* Encendido: tres barritas de ecualizador en vez del icono. */
+.sound-toggle-bars {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.sound-toggle[data-on] .sound-toggle-bars {
+  display: flex;
+}
+
+.sound-toggle-bars i {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--label-lime);
+  transform-origin: center;
+  animation: sound-bar 1s ease-in-out infinite;
+}
+
+.sound-toggle-bars i:nth-child(2) {
+  animation-delay: -0.35s;
+}
+
+.sound-toggle-bars i:nth-child(3) {
+  animation-delay: -0.7s;
+}
+
+@keyframes sound-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* En móvil la caja de acciones vuelve, pero sólo con el altavoz. */
+@media (max-width: 900px) {
+  .site-header {
+    grid-template-columns: 1fr auto auto;
+    column-gap: 0.45rem;
+  }
+
+  .header-actions {
+    display: flex;
+  }
+
+  .header-actions > :not(.sound-toggle) {
+    display: none;
+  }
+
+  .sound-toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  body:not(.menu-open) .site-header[data-scrolled="true"] .sound-toggle {
+    width: 42px;
+    height: 42px;
+  }
+}

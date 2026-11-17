@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { ArrowRight } from "lucide-react"
 import { BackdropVideo } from "@/components/home/backdrop-video"
+import { cue, recentStart } from "@/lib/sound/gsap"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -146,6 +147,9 @@ export function NoiseSection() {
           .set(q(".ns-veil"), { autoAlpha: 1 }, 0.8)
           .set(q(".ns-video"), { filter: "blur(10px)" }, 0.8)
           .to(q(".ns-burst"), { autoAlpha: 0, duration: 0.2, ease: "power1.inOut" }, 0.85)
+        // Sonido: el aire al empezar a acercarse y el golpe al cruzar el punto.
+        cue(intro, 0.06, "whoosh", { volume: 0.6 })
+        cue(intro, 0.74, "boom")
 
         // El vídeo del fondo se acerca despacio mientras dura la sección.
         gsap.fromTo(
@@ -185,7 +189,13 @@ export function NoiseSection() {
         tl.to(q(".ns-side"), { autoAlpha: 1, y: 0, stagger: 0.15, duration: 0.5 })
           .to(q(".ns-paren"), { "--open": 1, autoAlpha: 1, duration: 0.6, ease: "power3.inOut" }, "<0.2")
           .to(chipEls, { autoAlpha: 1, scale: 1, y: 0, duration: 0.35, stagger: 0.18, ease: "back.out(2)" }, "<0.3")
-          .to({}, { duration: 0.6 })
+        // Sonido: el paréntesis se abre con aire y cada etiqueta nace con una
+        // burbuja una nota más aguda que la anterior.
+        const chipsAt = recentStart(tl)
+        cue(tl, chipsAt - 0.3, "whoosh", { volume: 0.45 })
+        chipEls.forEach((_, index) => cue(tl, chipsAt + index * 0.18 + 0.06, "pop", { note: 2 + (index % 9), volume: 0.75 }))
+
+        tl.to({}, { duration: 0.6 })
           // Todo se aspira hacia el centro: la sección siguiente lo ordena.
           .to(chipEls, {
             x: (_, el: HTMLElement) => {
@@ -206,6 +216,12 @@ export function NoiseSection() {
           .to(q(".ns-paren"), { "--open": 0, duration: 0.4, ease: "power3.inOut" }, "<0.3")
           .to(q(".ns-side"), { autoAlpha: 0, y: -30, duration: 0.4 }, "<")
           .to(q(".ns-after"), { autoAlpha: 1, y: 0, duration: 0.4 }, "<0.2")
+        // Sonido: todo se aspira hacia el centro y «¿Te suena?» llega con una
+        // campana. (Los `cue` van al final: un `call` cambiaría el «<» de lo
+        // que viene detrás.)
+        const afterAt = recentStart(tl)
+        cue(tl, afterAt - 0.4, "suck")
+        cue(tl, afterAt + 0.15, "chime", { note: 7, volume: 0.8 })
 
         return () => window.removeEventListener("pointermove", onPointer)
       })

@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { CalendarDays, FileText, MessageCircle, PhoneCall, Receipt, Users, type LucideIcon } from "lucide-react"
 import { problemList, type AppModule } from "@/lib/book-content"
+import { cue } from "@/lib/sound/gsap"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -132,6 +133,15 @@ export function HubSection() {
           // 3. La órbita gira un poco mientras se termina de leer.
           .to(q(".hub-orbit"), { rotate: mobile ? 10 : 20, duration: 1, ease: "none" })
           .to(tiles, { rotate: mobile ? -10 : -20, duration: 1, ease: "none" }, "<")
+
+        // Sonido (al final para no mover los «<» de arriba): aire al juntarse,
+        // «clac» cuando aparece la S, una burbuja por ficha al salir en órbita
+        // y una campana con el titular.
+        const [, gather, , core, , , , orbitOut, headB] = tl.getChildren(false, true, true)
+        cue(tl, gather.startTime() + 0.1, "whoosh", { volume: 0.7 })
+        cue(tl, core.startTime() + 0.12, "snap")
+        tiles.forEach((_, index) => cue(tl, orbitOut.startTime() + index * 0.05 + 0.08, "pop", { note: 5 + index, volume: 0.6 }))
+        cue(tl, headB.startTime() + 0.2, "chime", { note: 9, volume: 0.6 })
 
         // La sección acaba de cambiar de alto: el resto de triggers debe volver a medir.
         const frame = requestAnimationFrame(() => ScrollTrigger.refresh())

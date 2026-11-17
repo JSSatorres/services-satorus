@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { processSteps } from "@/lib/home-content"
 import { processDetails } from "@/lib/book-content"
+import { playScrolled } from "@/lib/sound/gsap"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -37,6 +38,8 @@ export function ProcessSection() {
         const q = gsap.utils.selector(root)
         root.current?.setAttribute("data-anim", "on")
         const last = processSteps.length - 1
+        // Paso que suena: un «tic» de rueda cada vez que otra carta llega al centro.
+        let heard = -1
 
         gsap.set(q(".pw-card"), { rotate: (i) => i * STEP_DEG })
         // La rueda gira hasta dejar el paso 4 centrado un pantallazo antes del
@@ -72,7 +75,10 @@ export function ProcessSection() {
               invalidateOnRefresh: true,
               onUpdate: (self) => {
                 const raw = (self.progress * (last * STEP_DEG + 14) - 14) / STEP_DEG
-                setActive(Math.max(0, Math.min(last, Math.round(raw))))
+                const step = Math.max(0, Math.min(last, Math.round(raw)))
+                if (heard !== -1 && step !== heard) playScrolled("tick", self.direction, { note: step * 2 })
+                heard = step
+                setActive(step)
               },
             },
           },

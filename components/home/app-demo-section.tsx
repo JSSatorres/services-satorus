@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react"
 import { BUSINESS } from "@/lib/hero-scenes"
+import { cue, recentStart } from "@/lib/sound/gsap"
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -84,7 +85,13 @@ export function AppDemoSection() {
             "-=0.4",
           )
           .to(q(".ad-toast"), { autoAlpha: 1, x: 0, y: 0, scale: 1, duration: 0.35, stagger: 0.45, ease: "back.out(1.6)" }, "<")
-          .to({}, { duration: 0.5 })
+        // Sonido: el panel sube y crece; cada aviso, su doble nota.
+        const toastsAt = recentStart(tl)
+        tl.to({}, { duration: 0.5 })
+        cue(tl, 0.05, "rise")
+        q(".ad-toast").forEach((_: Element, index: number) =>
+          cue(tl, toastsAt + index * 0.45 + 0.05, "notify", { note: [7, 5, 3, 8][index % 4], volume: 0.8 }),
+        )
       })
       return () => mm.revert()
     },
