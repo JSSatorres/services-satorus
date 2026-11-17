@@ -4,10 +4,11 @@
  * (re mayor pentatónica, timbres suaves de madera y cristal).
  *
  * Reglas:
- * - Apagado por defecto. Sólo suena si la persona lo activa (botón del
- *   header); su elección se guarda en `localStorage`.
- * - El navegador no deja sonar nada antes de un clic o una tecla: el
- *   `AudioContext` se crea y se desbloquea en el primer gesto.
+ * - Activado por defecto. Quien no lo quiera lo silencia con el altavoz del
+ *   header; esa elección se guarda en `localStorage`.
+ * - El navegador no deja sonar nada antes de un clic, un toque o una tecla:
+ *   el `AudioContext` se crea y se desbloquea en el primer gesto, y desde
+ *   ahí ya suena todo.
  * - Nunca con movimiento reducido, ni con la pestaña oculta.
  * - Cada sonido tiene su propio freno (no se repite más rápido que su
  *   intervalo) y hay un tope global, así un scroll muy rápido no suena a
@@ -88,9 +89,10 @@ function load() {
   if (loaded || typeof window === "undefined") return
   loaded = true
   try {
-    enabled = window.localStorage.getItem(STORAGE_KEY) === "on" && !reducedMotion()
+    // Activado por defecto: sólo se apaga si la persona lo silenció con el altavoz.
+    enabled = window.localStorage.getItem(STORAGE_KEY) !== "off" && !reducedMotion()
   } catch {
-    enabled = false
+    enabled = !reducedMotion()
   }
 }
 

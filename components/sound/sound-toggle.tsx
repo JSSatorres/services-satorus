@@ -6,11 +6,12 @@ import { isSoundEnabled, playSound, setSoundEnabled, subscribeSound } from "@/li
 import { useHydratedReducedMotion } from "@/components/use-hydrated-reduced-motion"
 
 /**
- * Altavoz del header. El sonido empieza apagado; este clic es el gesto que el
- * navegador exige para poder sonar. Con movimiento reducido no se ofrece.
+ * Altavoz del header. El sonido viene activado; aquí se silencia (y se vuelve
+ * a activar). Con movimiento reducido no se ofrece.
  */
 export function SoundToggle() {
-  const on = useSyncExternalStore(subscribeSound, isSoundEnabled, () => false)
+  // En el servidor se pinta encendido, que es lo normal (activado por defecto).
+  const on = useSyncExternalStore(subscribeSound, isSoundEnabled, () => true)
   const reduce = useHydratedReducedMotion()
   if (reduce) return null
 
