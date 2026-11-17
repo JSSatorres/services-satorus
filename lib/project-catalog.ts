@@ -6,6 +6,8 @@ export type ProjectVisualDetail = {
   label: string;
   portrait?: boolean;
   focus?: "middle" | "lower";
+  /** Captura panorámica: se enseña entera, a todo lo ancho de la tablet, sin recortar los lados. */
+  wide?: boolean;
 };
 
 export type ProjectCatalogItem = {
@@ -142,8 +144,8 @@ export const appProjects: ProjectCatalogItem[] = [
     mobileImage: "/projects/oleoden-portal/portal-mobile.webp",
     imageAlt: "Portal de clínicas de Oleoden en escritorio, con la lista de pedidos y el detalle de un caso, junto a un móvil con la misma lista",
     details: [
-      { image: "/projects/oleoden-portal/seguimiento-pedido.webp", alt: "Detalle de un pedido en el portal de Oleoden con su progreso, fecha de entrega e importe", label: "Cada caso, paso a paso" },
-      { image: "/projects/oleoden-portal/formulario-pedido.webp", alt: "Formulario de nuevo pedido del portal de clínicas de Oleoden", label: "Pedidos en un minuto" },
+      { image: "/projects/oleoden-portal/seguimiento-pedido.webp", alt: "Detalle de un pedido en el portal de Oleoden con su progreso, fecha de entrega e importe", label: "Cada caso, paso a paso", wide: true },
+      { image: "/projects/oleoden-portal/formulario-pedido.webp", alt: "Formulario de nuevo pedido del portal de clínicas de Oleoden", label: "Pedidos en un minuto", wide: true },
     ],
     accent: "gold",
     highlights: ["Pedidos online", "Estado en tiempo real", "Escaneos y fotos", "Historial del caso", "Facturas", "Versión móvil"],

@@ -1062,12 +1062,108 @@
 .floatMedia[data-focus="middle"] img { object-position: center 80%; }
 .floatMedia[data-focus="lower"] img { object-position: center 65%; }
 
+/* Capturas panorámicas (unas 2,4:1): enteras a lo ancho, pegadas abajo, sobre
+   el mismo crema de la app para que no se note el borde. Arriba, una barra de
+   la app hace de cabecera y llena el hueco que deja la proporción. */
+.floatMedia[data-wide] {
+  aspect-ratio: 16 / 10;
+  background: #fbf9f5;
+}
+
+.floatMedia[data-wide] img {
+  top: auto !important;
+  height: auto !important;
+  aspect-ratio: 2.4 / 1;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.floatMedia[data-wide]::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 17%;
+  content: "";
+  border-bottom: 1px solid #ece7dc;
+  background:
+    radial-gradient(circle, #b8955e 0 38%, transparent 42%) 4.5% 50% / 7% 46% no-repeat,
+    linear-gradient(#2b2a27, #2b2a27) 12% 50% / 18% 14% no-repeat,
+    linear-gradient(#ddd6c8, #ddd6c8) 78% 50% / 12% 22% no-repeat,
+    linear-gradient(#b8955e, #b8955e) 95% 50% / 9% 30% no-repeat,
+    #fffefb;
+}
+
 .floatCustom {
   display: grid;
   place-items: center;
   padding: 0.6cqw;
   background: #fffefa;
 }
+
+/* Escenas propias del lector: todo se mide contra la pantalla de la tablet
+   (cqw/cqh de .floatCustom), así encajan igual a cualquier ancho de tarjeta. */
+.floatCustom:has(> .lectorScreens, > .lectorLanguages) {
+  display: flex;
+  padding: 0;
+  container-type: size;
+}
+
+.floatCustom > .lectorScreens,
+.floatCustom > .lectorLanguages {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.floatCustom > .lectorScreens {
+  gap: 3cqw;
+  padding: 7cqh 3cqw 0;
+}
+
+.floatCustom .lectorPhone {
+  height: 78%;
+  padding: 1.2cqw 1.2cqw 0;
+  border-width: 0.8cqw;
+  border-radius: 5cqw 5cqw 0 0;
+}
+
+.floatCustom .lectorPhone:nth-child(2) { height: 93%; }
+
+.floatCustom .lectorPhone img {
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 3.6cqw 3.6cqw 0 0;
+}
+
+.floatCustom > .lectorLanguages {
+  gap: 4.5cqh;
+  padding: 6cqh 5cqw;
+}
+
+.floatCustom .lectorLanguagesHeading {
+  gap: 2cqw;
+  font-size: 4.1cqw;
+  letter-spacing: .05em;
+}
+
+.floatCustom .lectorLanguagesHeading svg { width: 5cqw; height: 5cqw; }
+
+.floatCustom .languagePair { gap: 2cqw; }
+
+.floatCustom .languageChoice {
+  gap: 2.2cqw;
+  padding: 2.4cqw 2.4cqw;
+  border-radius: 2.6cqw;
+}
+
+.floatCustom .languageChoice i {
+  width: 8.5cqw;
+  height: 5.8cqw;
+  border-radius: .8cqw;
+}
+
+.floatCustom .languageChoice strong { font-size: 4.4cqw; }
+.floatCustom .languageChoice small { font-size: 3.4cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.floatCustom .languagePlus { font-size: 6cqw; }
 
 .floatCard figcaption {
   padding: 0.55cqw 0.3cqw 0.1cqw;

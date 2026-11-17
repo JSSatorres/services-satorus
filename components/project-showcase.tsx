@@ -183,7 +183,7 @@ function FloatingDetails({ project }: { project: ProjectCatalogItem }) {
           data-slot={index + 1}
           data-portrait={detail.portrait || undefined}
         >
-          <div className={styles.floatMedia} data-focus={detail.focus}>
+          <div className={styles.floatMedia} data-focus={detail.focus} data-wide={detail.wide || undefined}>
             <Image src={detail.image} alt={detail.alt} fill sizes="14rem" />
           </div>
           {detail.portrait ? null : <figcaption>{detail.label}</figcaption>}
