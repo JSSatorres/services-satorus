@@ -626,10 +626,21 @@ html[data-intro="seen"] .ns {
 /* Móvil animado: la misma coreografía que en escritorio, en columna. El
    paréntesis se abre igual, sólo que más estrecho, entre las dos frases. */
 @media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  /* Más corta que en escritorio: el zoom corre solo y no consume scroll. */
   .ns {
     --cw: 60vw;
-    height: 420vh;
-    height: 420svh;
+    height: 260vh;
+    height: 260svh;
+  }
+
+  /* Portada más ligera: las manchas quietas y sin grano (en móvil cada capa
+     animada encima del vídeo y de las mezclas de color resta fotogramas). */
+  .ns-blob {
+    animation: none;
+  }
+
+  .ns-grain {
+    display: none;
   }
 
   .ns-wordmark {

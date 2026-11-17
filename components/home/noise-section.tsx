@@ -119,16 +119,27 @@ export function NoiseSection() {
         }
         if (desktop) window.addEventListener("pointermove", onPointer, { passive: true })
 
+        // Escritorio: el zoom va atado a la rueda. Móvil: un solo deslizamiento
+        // lo dispara entero y corre solo (atado al dedo había que empujar la
+        // bola muchas veces y se quedaba clavada); al volver arriba, se deshace.
         const intro = gsap.timeline({
           defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: "+=110%",
-            scrub: 0.6,
-            invalidateOnRefresh: true,
-          },
+          scrollTrigger: desktop
+            ? {
+                trigger: root.current,
+                start: "top top",
+                end: "+=110%",
+                scrub: 0.6,
+                invalidateOnRefresh: true,
+              }
+            : {
+                trigger: root.current,
+                start: "top+=24 top",
+                toggleActions: "play none none reverse",
+                invalidateOnRefresh: true,
+              },
         })
+        if (!desktop) intro.timeScale(1.15)
         intro
           .to(q(".ns-intro-fade"), { autoAlpha: 0, y: -40, duration: 0.25, stagger: 0.03, ease: "power1.in" })
           .fromTo(
@@ -145,7 +156,8 @@ export function NoiseSection() {
           )
           .set(brands, { autoAlpha: 0 }, 0.8)
           .set(q(".ns-veil"), { autoAlpha: 1 }, 0.8)
-          .set(q(".ns-video"), { filter: "blur(10px)" }, 0.8)
+          // El desenfoque sobre un vídeo en marcha es muy caro en móvil: allí basta el velo.
+          .set(q(".ns-video"), { filter: desktop ? "blur(10px)" : "blur(0px)" }, 0.8)
           .to(q(".ns-burst"), { autoAlpha: 0, duration: 0.2, ease: "power1.inOut" }, 0.85)
         // Sonido: el aire al empezar a acercarse y el golpe al cruzar el punto.
         cue(intro, 0.06, "whoosh", { volume: 0.6 })
@@ -179,9 +191,10 @@ export function NoiseSection() {
           defaults: { ease: "power2.out" },
           scrollTrigger: {
             trigger: root.current,
-            start: () => `top+=${window.innerHeight * 1.05} top`,
+            // En móvil el zoom ya no gasta scroll: el paréntesis empieza enseguida.
+            start: () => `top+=${window.innerHeight * (desktop ? 1.05 : 0.35)} top`,
             end: "bottom bottom",
-            scrub: 0.6,
+            scrub: desktop ? 0.6 : true,
             invalidateOnRefresh: true,
           },
         })
