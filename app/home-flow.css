@@ -164,12 +164,14 @@
   mix-blend-mode: screen;
 }
 
-/* El fondo. Letras blancas × vídeo = vídeo intacto; fondo × blanco = fondo.
+/* El fondo. Letras grafito × vídeo = vídeo oscurecido sólo dentro de las
+   letras (un «filtro negro»: la marca se lee negra y el vídeo asoma detrás);
+   fondo × blanco = fondo.
    Colores sacados del vídeo: todos claros, para contrastar con sus azules,
    grafitos y marrones; el melocotón emparenta con el punto naranja sin
    competir con él. Las manchas derivan solas y siguen un poco al ratón. */
 .ns-brand--tint {
-  color: #fff;
+  color: #464943;
   background: #eceee0;
   mix-blend-mode: multiply;
   overflow: hidden;
